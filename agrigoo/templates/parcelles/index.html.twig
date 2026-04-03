@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Parcelles{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Gestion des Parcelles</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="#" class="btn btn-primary">Ajouter une parcelle</a>
+        </div>
+    </div>
+
+    {% if parcelles is empty %}
+        <div class="alert alert-info">
+            Aucune parcelle trouvée. <a href="#">Créer une parcelle</a>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Surface (ha)</th>
+                        <th>Type de sol</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parcelle in parcelles %}
+                        <tr>
+                            <td>{{ parcelle.idParcelle }}</td>
+                            <td>{{ parcelle.nomParcelle }}</td>
+                            <td>{{ parcelle.surface }}</td>
+                            <td>{{ parcelle.typeSol ?? 'N/A' }}</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-info">Voir</a>
+                                <a href="#" class="btn btn-sm btn-warning">Éditer</a>
+                                <a href="#" class="btn btn-sm btn-danger">Supprimer</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
