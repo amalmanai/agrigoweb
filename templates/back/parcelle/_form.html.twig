@@ -1,0 +1,28 @@
+﻿{{ form_start(form) }}
+<div class="mb-3">
+    {{ form_label(form.nomParcelle) }}
+    {{ form_widget(form.nomParcelle) }}
+    {{ form_errors(form.nomParcelle) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.surface) }}
+    {{ form_widget(form.surface) }}
+    {{ form_errors(form.surface) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.coordonneesGps) }}
+    {{ form_widget(form.coordonneesGps) }}
+    {{ form_errors(form.coordonneesGps) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.typeSol) }}
+    {{ form_widget(form.typeSol) }}
+    {{ form_errors(form.typeSol) }}
+</div>
+<div class="d-flex gap-2">
+    {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}
+    <a class="btn btn-secondary" href="{{ path('admin_parcelle_index') }}">Annuler</a>
+</div>
+{{ form_end(form) }}
+
+

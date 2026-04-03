@@ -1,0 +1,28 @@
+﻿{{ form_start(form) }}
+<div class="mb-3">
+    {{ form_label(form.parcelle) }}
+    {{ form_widget(form.parcelle) }}
+    {{ form_errors(form.parcelle) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.ancienneCulture) }}
+    {{ form_widget(form.ancienneCulture) }}
+    {{ form_errors(form.ancienneCulture) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.dateRecolteEffective) }}
+    {{ form_widget(form.dateRecolteEffective) }}
+    {{ form_errors(form.dateRecolteEffective) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.rendementFinal) }}
+    {{ form_widget(form.rendementFinal) }}
+    {{ form_errors(form.rendementFinal) }}
+</div>
+<div class="d-flex gap-2">
+    {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}
+    <a class="btn btn-secondary" href="{{ path('admin_historique_culture_index') }}">Annuler</a>
+</div>
+{{ form_end(form) }}
+
+

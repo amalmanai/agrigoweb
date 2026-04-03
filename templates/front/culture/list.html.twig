@@ -1,0 +1,67 @@
+﻿{% extends 'front/base.html.twig' %}
+
+{% block title %}Cultures - Front{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Intentionally left minimal after removing stats/maps modules. */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Cultures</h1>
+    <a href="{{ path('admin_culture_index') }}" class="btn btn-outline-secondary">Vue administration</a>
+</div>
+
+{% include '_partials/list_filter.html.twig' with {
+    routeName: 'app_culture_list',
+    resetRoute: 'app_culture_list',
+    search: search,
+    sort: sort,
+    direction: direction,
+    sortOptions: sortOptions
+} %}
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Date semis</th>
+            <th>Etat</th>
+            <th>Rendement prevu</th>
+            <th>Parcelle</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for culture in cultures %}
+            <tr>
+                <td>{{ culture.id }}</td>
+                <td>{{ culture.nomCulture }}</td>
+                <td>{{ culture.dateSemis ? culture.dateSemis|date('Y-m-d') : '-' }}</td>
+                <td>{{ culture.etatCroissance ?? '-' }}</td>
+                <td>{{ culture.rendementPrevu is not null ? culture.rendementPrevu : '-' }}</td>
+                <td>{{ culture.parcelle ? culture.parcelle.nomParcelle : 'Aucune' }}</td>
+                <td>
+                    <a href="{{ path('app_culture_show', {id: culture.id}) }}" class="btn btn-sm btn-primary">Details</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" class="text-center text-muted">Aucune culture disponible.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+
