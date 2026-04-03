@@ -1,0 +1,11 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier Historique Culture{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Modifier l'historique #{{ historique.id }}</h1>
+
+{% include 'back/historique_culture/_form.html.twig' with {form: form, button_label: 'Mettre a jour'} %}
+{% endblock %}
+
+

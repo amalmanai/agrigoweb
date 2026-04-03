@@ -1,0 +1,11 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Nouveau Historique Culture{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Ajouter un historique culture</h1>
+
+{% include 'back/historique_culture/_form.html.twig' with {form: form, button_label: 'Creer'} %}
+{% endblock %}
+
+

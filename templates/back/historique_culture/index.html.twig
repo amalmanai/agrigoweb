@@ -1,0 +1,59 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Historique Cultures - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Administration historique cultures</h1>
+    <a href="{{ path('admin_historique_culture_new') }}" class="btn btn-primary">Ajouter un historique</a>
+</div>
+
+{% include '_partials/list_filter.html.twig' with {
+    routeName: 'admin_historique_culture_index',
+    resetRoute: 'admin_historique_culture_index',
+    search: search,
+    sort: sort,
+    direction: direction,
+    sortOptions: sortOptions
+} %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Parcelle</th>
+            <th>Ancienne culture</th>
+            <th>Date recolte</th>
+            <th>Rendement final</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for historique in historiques %}
+            <tr>
+                <td>{{ historique.id }}</td>
+                <td>{{ historique.parcelle ? historique.parcelle.nomParcelle : 'Aucune' }}</td>
+                <td>{{ historique.ancienneCulture ?? '-' }}</td>
+                <td>{{ historique.dateRecolteEffective ? historique.dateRecolteEffective|date('Y-m-d') : '-' }}</td>
+                <td>{{ historique.rendementFinal is not null ? historique.rendementFinal : '-' }}</td>
+                <td class="d-flex gap-2">
+                    <a href="{{ path('admin_historique_culture_show', {id: historique.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                    <a href="{{ path('admin_historique_culture_edit', {id: historique.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    <form method="post" action="{{ path('admin_historique_culture_delete', {id: historique.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_historique_' ~ historique.id) }}">
+                        <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">Aucun historique enregistre.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+

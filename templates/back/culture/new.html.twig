@@ -1,0 +1,11 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Nouvelle Culture{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Ajouter une culture</h1>
+
+{% include 'back/culture/_form.html.twig' with {form: form, button_label: 'Creer'} %}
+{% endblock %}
+
+

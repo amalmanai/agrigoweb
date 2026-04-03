@@ -1,0 +1,68 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Cultures - Back{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Administration des cultures</h1>
+    <a href="{{ path('admin_culture_new') }}" class="btn btn-primary">Ajouter une culture</a>
+</div>
+
+{% include '_partials/list_filter.html.twig' with {
+    routeName: 'admin_culture_index',
+    resetRoute: 'admin_culture_index',
+    search: search,
+    sort: sort,
+    direction: direction,
+    sortOptions: sortOptions
+} %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Date semis</th>
+            <th>Etat</th>
+            <th>Rendement</th>
+            <th>Parcelle</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for culture in cultures %}
+            <tr>
+                <td>{{ culture.id }}</td>
+                <td>{{ culture.nomCulture }}</td>
+                <td>{{ culture.dateSemis ? culture.dateSemis|date('Y-m-d') : '-' }}</td>
+                <td>{{ culture.etatCroissance ?? '-' }}</td>
+                <td>{{ culture.rendementPrevu is not null ? culture.rendementPrevu : '-' }}</td>
+                <td>{{ culture.parcelle ? culture.parcelle.nomParcelle : 'Aucune' }}</td>
+                <td class="d-flex gap-2">
+                    <a href="{{ path('admin_culture_edit', {id: culture.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    <form method="post" action="{{ path('admin_culture_delete', {id: culture.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_culture_' ~ culture.id) }}">
+                        <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7" class="text-center text-muted">Aucune culture enregistree.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+
