@@ -1,0 +1,111 @@
+<?php
+
+declare(strict_types=1);
+
+namespace DoctrineMigrations;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+final class Version20260403104256 extends AbstractMigration
+{
+    public function getDescription(): string
+    {
+        return '';
+    }
+
+    public function up(Schema $schema): void
+    {
+        // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL, available_at DATETIME NOT NULL, delivered_at DATETIME DEFAULT NULL, INDEX IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750 (queue_name, available_at, delivered_at, id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql('ALTER TABLE alertes_risques DROP FOREIGN KEY `alertes_risques_ibfk_1`');
+        $this->addSql('ALTER TABLE alertes_risques CHANGE type_alerte type_alerte VARCHAR(255) DEFAULT NULL, CHANGE description description LONGTEXT DEFAULT NULL, CHANGE date_alerte date_alerte DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE alertes_risques ADD CONSTRAINT FK_D7CFD2586834359B FOREIGN KEY (id_culture) REFERENCES cultures (id_culture)');
+        $this->addSql('DROP INDEX id_culture ON alertes_risques');
+        $this->addSql('CREATE INDEX IDX_D7CFD2586834359B ON alertes_risques (id_culture)');
+        $this->addSql('ALTER TABLE alertes_risques ADD CONSTRAINT `alertes_risques_ibfk_1` FOREIGN KEY (id_culture) REFERENCES cultures (id_culture) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE cultures DROP FOREIGN KEY `cultures_ibfk_1`');
+        $this->addSql('ALTER TABLE cultures CHANGE nom_culture nom_culture VARCHAR(255) NOT NULL, CHANGE etat_croissance etat_croissance VARCHAR(255) DEFAULT NULL, CHANGE rendement_prevu rendement_prevu NUMERIC(10, 2) DEFAULT NULL');
+        $this->addSql('ALTER TABLE cultures ADD CONSTRAINT FK_2C605D6795B5C063 FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle)');
+        $this->addSql('DROP INDEX id_parcelle ON cultures');
+        $this->addSql('CREATE INDEX IDX_2C605D6795B5C063 ON cultures (id_parcelle)');
+        $this->addSql('ALTER TABLE cultures ADD CONSTRAINT `cultures_ibfk_1` FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE historique_cultures DROP FOREIGN KEY `historique_cultures_ibfk_1`');
+        $this->addSql('ALTER TABLE historique_cultures CHANGE ancienne_culture ancienne_culture VARCHAR(255) DEFAULT NULL, CHANGE rendement_final rendement_final NUMERIC(10, 2) DEFAULT NULL');
+        $this->addSql('ALTER TABLE historique_cultures ADD CONSTRAINT FK_ECB8259595B5C063 FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle)');
+        $this->addSql('DROP INDEX id_parcelle ON historique_cultures');
+        $this->addSql('CREATE INDEX IDX_ECB8259595B5C063 ON historique_cultures (id_parcelle)');
+        $this->addSql('ALTER TABLE historique_cultures ADD CONSTRAINT `historique_cultures_ibfk_1` FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE historique_irrigation DROP FOREIGN KEY `fk_systeme`');
+        $this->addSql('DROP INDEX idx_date_irrigation ON historique_irrigation');
+        $this->addSql('ALTER TABLE historique_irrigation CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE id_systeme id_systeme INT DEFAULT NULL, CHANGE date_irrigation date_irrigation DATETIME NOT NULL, CHANGE volume_eau volume_eau NUMERIC(10, 2) DEFAULT NULL, CHANGE humidite_avant humidite_avant NUMERIC(10, 2) DEFAULT NULL, CHANGE type_declenchement type_declenchement VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE historique_irrigation ADD CONSTRAINT FK_C2B514E14BE4C493 FOREIGN KEY (id_systeme) REFERENCES systeme_irrigation (id_systeme)');
+        $this->addSql('DROP INDEX idx_systeme_historique ON historique_irrigation');
+        $this->addSql('CREATE INDEX IDX_C2B514E14BE4C493 ON historique_irrigation (id_systeme)');
+        $this->addSql('ALTER TABLE historique_irrigation ADD CONSTRAINT `fk_systeme` FOREIGN KEY (id_systeme) REFERENCES systeme_irrigation (id_systeme) ON UPDATE CASCADE ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE mouvement_stock CHANGE date_mouvement date_mouvement VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE parcelles CHANGE nom_parcelle nom_parcelle VARCHAR(255) NOT NULL, CHANGE surface surface NUMERIC(10, 2) NOT NULL, CHANGE type_sol type_sol VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE produit CHANGE id_produit id_produit INT AUTO_INCREMENT NOT NULL, CHANGE unite unite VARCHAR(255) NOT NULL, CHANGE date_expiration date_expiration VARCHAR(255) DEFAULT NULL');
+        $this->addSql('ALTER TABLE recolte CHANGE nom_produit nom_produit VARCHAR(255) DEFAULT NULL, CHANGE quantite quantite NUMERIC(10, 2) DEFAULT NULL, CHANGE unite unite VARCHAR(255) DEFAULT NULL, CHANGE cout_production cout_production NUMERIC(10, 2) DEFAULT NULL');
+        $this->addSql('DROP INDEX idx_parcelle ON systeme_irrigation');
+        $this->addSql('ALTER TABLE systeme_irrigation CHANGE id_systeme id_systeme INT AUTO_INCREMENT NOT NULL, CHANGE id_parcelle id_parcelle INT NOT NULL, CHANGE nom_systeme nom_systeme VARCHAR(255) NOT NULL, CHANGE seuil_humidite seuil_humidite NUMERIC(10, 2) DEFAULT NULL, CHANGE mode mode VARCHAR(255) DEFAULT NULL, CHANGE statut statut VARCHAR(255) DEFAULT NULL, CHANGE date_creation date_creation DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE tache CHANGE tittre_tache tittre_tache VARCHAR(255) NOT NULL, CHANGE description_tache description_tache VARCHAR(255) NOT NULL, CHANGE type_tache type_tache VARCHAR(255) NOT NULL, CHANGE status_tache status_tache VARCHAR(255) NOT NULL, CHANGE remarque_tache remarque_tache VARCHAR(255) NOT NULL');
+        $this->addSql('DROP INDEX email ON utilisateur');
+        $this->addSql('ALTER TABLE utilisateur CHANGE nom nom VARCHAR(255) NOT NULL, CHANGE email email VARCHAR(255) NOT NULL, CHANGE telephone telephone VARCHAR(255) DEFAULT NULL, CHANGE created_at created_at DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE vente DROP FOREIGN KEY `fk_vente_user`');
+        $this->addSql('DROP INDEX idx_vente_user_date ON vente');
+        $this->addSql('ALTER TABLE vente CHANGE id_user id_user INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE vente ADD CONSTRAINT FK_888A2A4C6B3CA4B FOREIGN KEY (id_user) REFERENCES utilisateur (id_user)');
+    }
+
+    public function down(Schema $schema): void
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('DROP TABLE messenger_messages');
+        $this->addSql('ALTER TABLE alertes_risques DROP FOREIGN KEY FK_D7CFD2586834359B');
+        $this->addSql('ALTER TABLE alertes_risques DROP FOREIGN KEY FK_D7CFD2586834359B');
+        $this->addSql('ALTER TABLE alertes_risques CHANGE type_alerte type_alerte VARCHAR(50) DEFAULT NULL, CHANGE description description TEXT DEFAULT NULL, CHANGE date_alerte date_alerte DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
+        $this->addSql('ALTER TABLE alertes_risques ADD CONSTRAINT `alertes_risques_ibfk_1` FOREIGN KEY (id_culture) REFERENCES cultures (id_culture) ON DELETE CASCADE');
+        $this->addSql('DROP INDEX idx_d7cfd2586834359b ON alertes_risques');
+        $this->addSql('CREATE INDEX id_culture ON alertes_risques (id_culture)');
+        $this->addSql('ALTER TABLE alertes_risques ADD CONSTRAINT FK_D7CFD2586834359B FOREIGN KEY (id_culture) REFERENCES cultures (id_culture)');
+        $this->addSql('ALTER TABLE cultures DROP FOREIGN KEY FK_2C605D6795B5C063');
+        $this->addSql('ALTER TABLE cultures DROP FOREIGN KEY FK_2C605D6795B5C063');
+        $this->addSql('ALTER TABLE cultures CHANGE nom_culture nom_culture VARCHAR(100) NOT NULL, CHANGE etat_croissance etat_croissance VARCHAR(50) DEFAULT NULL, CHANGE rendement_prevu rendement_prevu DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('ALTER TABLE cultures ADD CONSTRAINT `cultures_ibfk_1` FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle) ON DELETE CASCADE');
+        $this->addSql('DROP INDEX idx_2c605d6795b5c063 ON cultures');
+        $this->addSql('CREATE INDEX id_parcelle ON cultures (id_parcelle)');
+        $this->addSql('ALTER TABLE cultures ADD CONSTRAINT FK_2C605D6795B5C063 FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle)');
+        $this->addSql('ALTER TABLE historique_cultures DROP FOREIGN KEY FK_ECB8259595B5C063');
+        $this->addSql('ALTER TABLE historique_cultures DROP FOREIGN KEY FK_ECB8259595B5C063');
+        $this->addSql('ALTER TABLE historique_cultures CHANGE ancienne_culture ancienne_culture VARCHAR(100) DEFAULT NULL, CHANGE rendement_final rendement_final DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('ALTER TABLE historique_cultures ADD CONSTRAINT `historique_cultures_ibfk_1` FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle) ON DELETE SET NULL');
+        $this->addSql('DROP INDEX idx_ecb8259595b5c063 ON historique_cultures');
+        $this->addSql('CREATE INDEX id_parcelle ON historique_cultures (id_parcelle)');
+        $this->addSql('ALTER TABLE historique_cultures ADD CONSTRAINT FK_ECB8259595B5C063 FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle)');
+        $this->addSql('ALTER TABLE historique_irrigation DROP FOREIGN KEY FK_C2B514E14BE4C493');
+        $this->addSql('ALTER TABLE historique_irrigation DROP FOREIGN KEY FK_C2B514E14BE4C493');
+        $this->addSql('ALTER TABLE historique_irrigation CHANGE id id BIGINT AUTO_INCREMENT NOT NULL, CHANGE date_irrigation date_irrigation DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, CHANGE volume_eau volume_eau NUMERIC(8, 2) DEFAULT NULL, CHANGE humidite_avant humidite_avant NUMERIC(5, 2) DEFAULT NULL, CHANGE type_declenchement type_declenchement ENUM(\'AUTO\', \'MANUEL\') DEFAULT \'MANUEL\', CHANGE id_systeme id_systeme BIGINT NOT NULL');
+        $this->addSql('ALTER TABLE historique_irrigation ADD CONSTRAINT `fk_systeme` FOREIGN KEY (id_systeme) REFERENCES systeme_irrigation (id_systeme) ON UPDATE CASCADE ON DELETE CASCADE');
+        $this->addSql('CREATE INDEX idx_date_irrigation ON historique_irrigation (date_irrigation)');
+        $this->addSql('DROP INDEX idx_c2b514e14be4c493 ON historique_irrigation');
+        $this->addSql('CREATE INDEX idx_systeme_historique ON historique_irrigation (id_systeme)');
+        $this->addSql('ALTER TABLE historique_irrigation ADD CONSTRAINT FK_C2B514E14BE4C493 FOREIGN KEY (id_systeme) REFERENCES systeme_irrigation (id_systeme)');
+        $this->addSql('ALTER TABLE mouvement_stock CHANGE date_mouvement date_mouvement VARCHAR(20) NOT NULL');
+        $this->addSql('ALTER TABLE parcelles CHANGE nom_parcelle nom_parcelle VARCHAR(100) NOT NULL, CHANGE surface surface DOUBLE PRECISION NOT NULL, CHANGE type_sol type_sol VARCHAR(50) DEFAULT NULL');
+        $this->addSql('ALTER TABLE produit CHANGE id_produit id_produit INT NOT NULL, CHANGE unite unite VARCHAR(50) NOT NULL, CHANGE date_expiration date_expiration VARCHAR(20) DEFAULT NULL');
+        $this->addSql('ALTER TABLE recolte CHANGE nom_produit nom_produit VARCHAR(100) DEFAULT NULL, CHANGE quantite quantite DOUBLE PRECISION DEFAULT NULL, CHANGE unite unite VARCHAR(20) DEFAULT NULL, CHANGE cout_production cout_production DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('ALTER TABLE systeme_irrigation CHANGE id_systeme id_systeme BIGINT AUTO_INCREMENT NOT NULL, CHANGE id_parcelle id_parcelle BIGINT NOT NULL, CHANGE nom_systeme nom_systeme VARCHAR(100) NOT NULL, CHANGE seuil_humidite seuil_humidite NUMERIC(5, 2) DEFAULT \'30.00\', CHANGE mode mode ENUM(\'AUTO\', \'MANUEL\') DEFAULT \'MANUEL\', CHANGE statut statut ENUM(\'ACTIF\', \'INACTIF\') DEFAULT \'ACTIF\', CHANGE date_creation date_creation DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
+        $this->addSql('CREATE INDEX idx_parcelle ON systeme_irrigation (id_parcelle)');
+        $this->addSql('ALTER TABLE tache CHANGE tittre_tache tittre_tache VARCHAR(150) NOT NULL, CHANGE description_tache description_tache VARCHAR(200) NOT NULL, CHANGE type_tache type_tache VARCHAR(200) NOT NULL, CHANGE status_tache status_tache VARCHAR(200) NOT NULL, CHANGE remarque_tache remarque_tache VARCHAR(200) NOT NULL');
+        $this->addSql('ALTER TABLE utilisateur CHANGE nom nom VARCHAR(120) NOT NULL, CHANGE email email VARCHAR(190) NOT NULL, CHANGE telephone telephone VARCHAR(40) DEFAULT NULL, CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
+        $this->addSql('CREATE UNIQUE INDEX email ON utilisateur (email)');
+        $this->addSql('ALTER TABLE vente DROP FOREIGN KEY FK_888A2A4C6B3CA4B');
+        $this->addSql('ALTER TABLE vente CHANGE id_user id_user INT NOT NULL');
+        $this->addSql('ALTER TABLE vente ADD CONSTRAINT `fk_vente_user` FOREIGN KEY (id_user) REFERENCES utilisateur (id_user) ON UPDATE CASCADE');
+        $this->addSql('CREATE INDEX idx_vente_user_date ON vente (id_user, date_vente)');
+    }
+}
