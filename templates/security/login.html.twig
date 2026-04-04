@@ -63,29 +63,4 @@
     </div>
 </div>
 
-<script>
-    if (!window.passwordToggleInitialized) {
-        window.passwordToggleInitialized = true;
-        document.addEventListener('click', function(e) {
-            const toggle = e.target.closest('.password-toggle');
-            
-            if (toggle) {
-                const passwordInput = toggle.parentElement.querySelector('input');
-                const icon = toggle.querySelector('i');
-                
-                if (passwordInput && icon) {
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
-                    }
-                }
-            }
-        });
-    }
-</script>
 {% endblock %}
