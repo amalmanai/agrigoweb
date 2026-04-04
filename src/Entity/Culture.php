@@ -39,6 +39,7 @@ class Culture
     private ?\DateTimeInterface $dateSemis = null;
 
     #[ORM\Column(name: 'etat_croissance', type: 'string', length: 50, nullable: true)]
+    #[Assert\NotBlank(message: 'L\'etat de croissance est obligatoire.')]
     #[Assert\Choice(
         choices: ['Semis', 'Croissance', 'Floraison', 'Recolte', 'Recolte termine'],
         message: 'L\'etat de croissance selectionne est invalide.'
@@ -46,6 +47,7 @@ class Culture
     private ?string $etatCroissance = null;
 
     #[ORM\Column(name: 'rendement_prevu', type: 'float', nullable: true)]
+    #[Assert\NotNull(message: 'Le rendement prevu est obligatoire.')]
     #[Assert\Type(type: 'float', message: 'Le rendement prevu doit etre numerique.')]
     #[Assert\Range(
         min: 0,
@@ -56,6 +58,7 @@ class Culture
 
     #[ORM\ManyToOne(targetEntity: Parcelle::class, inversedBy: 'cultures')]
     #[ORM\JoinColumn(name: 'id_parcelle', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'CASCADE')]
+    #[Assert\NotNull(message: 'La parcelle est obligatoire.')]
     private ?Parcelle $parcelle = null;
 
     #[ORM\OneToMany(targetEntity: AlerteRisque::class, mappedBy: 'culture')]

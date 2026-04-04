@@ -39,7 +39,7 @@ class CultureFormType extends AbstractType
             ])
             ->add('etatCroissance', ChoiceType::class, [
                 'label' => 'Etat de Croissance',
-                'required' => false,
+                'required' => true,
                 'placeholder' => 'Selectionner un etat',
                 'choices' => [
                     'Semis' => 'Semis',
@@ -54,7 +54,7 @@ class CultureFormType extends AbstractType
             ])
             ->add('rendementPrevu', NumberType::class, [
                 'label' => 'Rendement Prevu',
-                'required' => false,
+                'required' => true,
                 'scale' => 2,
                 'html5' => true,
                 'attr' => [
@@ -68,8 +68,8 @@ class CultureFormType extends AbstractType
                 'label' => 'Parcelle',
                 'class' => Parcelle::class,
                 'choice_label' => 'nomParcelle',
-                'required' => false,
-                'placeholder' => 'Aucune parcelle',
+                'required' => true,
+                'placeholder' => 'Selectionner une parcelle',
                 'attr' => [
                     'class' => 'form-control',
                 ],

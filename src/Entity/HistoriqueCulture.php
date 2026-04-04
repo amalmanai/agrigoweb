@@ -19,16 +19,22 @@ class HistoriqueCulture
 
     #[ORM\ManyToOne(targetEntity: Parcelle::class, inversedBy: 'historiqueCultures')]
     #[ORM\JoinColumn(name: 'id_parcelle', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'SET NULL')]
+    #[Assert\NotNull(message: 'La parcelle est obligatoire.')]
     private ?Parcelle $parcelle = null;
 
     #[ORM\Column(name: 'ancienne_culture', type: 'string', length: 100, nullable: true)]
+    #[Assert\NotBlank(message: 'L\'ancienne culture est obligatoire.')]
     #[Assert\Length(max: 100, maxMessage: 'L\'ancienne culture ne doit pas depasser {{ limit }} caracteres.')]
     private ?string $ancienneCulture = null;
 
     #[ORM\Column(name: 'date_recolte_effective', type: 'date', nullable: true)]
+    #[Assert\NotNull(message: 'La date de recolte effective est obligatoire.')]
+    #[Assert\Type(type: \DateTimeInterface::class, message: 'La date de recolte effective est invalide.')]
+    #[Assert\LessThanOrEqual('today', message: 'La date de recolte ne peut pas etre dans le futur.')]
     private ?\DateTimeInterface $dateRecolteEffective = null;
 
     #[ORM\Column(name: 'rendement_final', type: 'float', nullable: true)]
+    #[Assert\NotNull(message: 'Le rendement final est obligatoire.')]
     #[Assert\Type(type: 'float', message: 'Le rendement final doit etre numerique.')]
     #[Assert\Range(min: 0, max: 1000000, notInRangeMessage: 'Le rendement final doit etre compris entre {{ min }} et {{ max }}.')]
     private ?float $rendementFinal = null;

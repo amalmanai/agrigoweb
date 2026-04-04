@@ -22,12 +22,12 @@ class AlerteRisqueFormType extends AbstractType
         $builder
             ->add('typeAlerte', TextType::class, [
                 'label' => 'Type Alerte',
-                'required' => false,
+                'required' => true,
                 'attr' => ['class' => 'form-control', 'maxlength' => 50],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
-                'required' => false,
+                'required' => true,
                 'attr' => ['class' => 'form-control', 'rows' => 4],
             ])
             ->add('dateAlerte', DateTimeType::class, [
@@ -40,8 +40,8 @@ class AlerteRisqueFormType extends AbstractType
                 'label' => 'Culture',
                 'class' => Culture::class,
                 'choice_label' => 'nomCulture',
-                'required' => false,
-                'placeholder' => 'Aucune culture',
+                'required' => true,
+                'placeholder' => 'Selectionner une culture',
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('submit', SubmitType::class, [
