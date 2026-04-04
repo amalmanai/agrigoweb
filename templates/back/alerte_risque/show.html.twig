@@ -1,0 +1,31 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Alerte Risque - Detail{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Detail alerte #{{ alerte.id }}</h1>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Type</dt>
+            <dd class="col-sm-8">{{ alerte.typeAlerte ?? '-' }}</dd>
+
+            <dt class="col-sm-4">Description</dt>
+            <dd class="col-sm-8">{{ alerte.description ?? '-' }}</dd>
+
+            <dt class="col-sm-4">Date alerte</dt>
+            <dd class="col-sm-8">{{ alerte.dateAlerte ? alerte.dateAlerte|date('Y-m-d H:i:s') : '-' }}</dd>
+
+            <dt class="col-sm-4">Culture</dt>
+            <dd class="col-sm-8">{{ alerte.culture ? alerte.culture.nomCulture : 'Aucune' }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a class="btn btn-secondary" href="{{ path('admin_alerte_risque_index') }}">Retour liste</a>
+</div>
+{% endblock %}
+
+

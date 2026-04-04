@@ -1,0 +1,34 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Parcelle - Detail{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Detail parcelle #{{ parcelle.id }}</h1>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Nom</dt>
+            <dd class="col-sm-8">{{ parcelle.nomParcelle }}</dd>
+
+            <dt class="col-sm-4">Surface</dt>
+            <dd class="col-sm-8">{{ parcelle.surface }}</dd>
+
+            <dt class="col-sm-4">Coordonnees GPS</dt>
+            <dd class="col-sm-8">{{ parcelle.coordonneesGps ?? '-' }}</dd>
+
+            <dt class="col-sm-4">Type de sol</dt>
+            <dd class="col-sm-8">{{ parcelle.typeSol ?? '-' }}</dd>
+
+            <dt class="col-sm-4">Nombre de cultures</dt>
+            <dd class="col-sm-8">{{ parcelle.cultures|length }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a class="btn btn-secondary" href="{{ path('admin_parcelle_index') }}">Retour liste</a>
+</div>
+{% endblock %}
+
+

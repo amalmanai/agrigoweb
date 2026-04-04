@@ -1,0 +1,70 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Parcelles - Back{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles simplified after removing stats/maps modules. */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Administration des parcelles</h1>
+    <a href="{{ path('admin_parcelle_new') }}" class="btn btn-primary">Ajouter une parcelle</a>
+</div>
+
+{% include '_partials/list_filter.html.twig' with {
+    routeName: 'admin_parcelle_index',
+    resetRoute: 'admin_parcelle_index',
+    search: search,
+    sort: sort,
+    direction: direction,
+    sortOptions: sortOptions
+} %}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Surface</th>
+            <th>Coordonnees GPS</th>
+            <th>Type de sol</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for parcelle in parcelles %}
+            <tr>
+                <td>{{ parcelle.id }}</td>
+                <td>{{ parcelle.nomParcelle }}</td>
+                <td>{{ parcelle.surface }}</td>
+                <td>{{ parcelle.coordonneesGps ?? '-' }}</td>
+                <td>{{ parcelle.typeSol ?? '-' }}</td>
+                <td class="d-flex gap-2">
+                    <a href="{{ path('admin_parcelle_show', {id: parcelle.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                    <a href="{{ path('admin_parcelle_edit', {id: parcelle.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    <form method="post" action="{{ path('admin_parcelle_delete', {id: parcelle.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_parcelle_' ~ parcelle.id) }}">
+                        <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">Aucune parcelle enregistree.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+
