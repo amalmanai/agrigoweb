@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'utilisateur{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Modifier l'utilisateur</h1>
+            <p class="text-muted">{{ user.emailUser }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('app_admin_users') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            {{ form_start(form) }}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.nomUser, {
+                                    'attr': {'class': 'form-control', 'placeholder': 'Nom'}
+                                }) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.prenomUser, {
+                                    'attr': {'class': 'form-control', 'placeholder': 'Prénom'}
+                                }) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.emailUser, {
+                                'attr': {'class': 'form-control', 'placeholder': 'Email', 'type': 'email'}
+                            }) }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.numUser, {
+                                    'attr': {'class': 'form-control', 'placeholder': 'Numéro de téléphone'}
+                                }) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_row(form.roleUser, {
+                                    'attr': {'class': 'form-control'}
+                                }) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.adresseUser, {
+                                'attr': {'class': 'form-control', 'placeholder': 'Adresse'}
+                            }) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_row(form.password, {
+                                'attr': {'class': 'form-control', 'placeholder': 'Nouveau mot de passe (laisser vide pour conserver l\'ancien)'}
+                            }) }}
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="isActive" {{ user.isActive() ? 'checked' : '' }} disabled>
+                            <label class="form-check-label" for="isActive">
+                                Compte actif
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                    <a href="{{ path('app_admin_users') }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
