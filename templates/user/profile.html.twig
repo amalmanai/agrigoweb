@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0"><i class="fas fa-user"></i> Mon Profil</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            {% if user.photoPath %}
+                                <img src="{{ user.photoPath }}" alt="Photo de profil" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px;">
+                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h3>{{ user.prenomUser }} {{ user.nomUser }}</h3>
+                            <p class="text-muted">{{ user.emailUser }}</p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Téléphone:</strong><br>
+                                    {{ user.numUser }}
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Adresse:</strong><br>
+                                    {{ user.adresseUser }}
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-sm-6">
+                                    <strong>Rôle:</strong><br>
+                                    {% if user.roleUser == 'ROLE_ADMIN' %}Administrateur{% else %}Agriculteur{% endif %}
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Statut:</strong><br>
+                                    {% if user.isActive %}<span class="badge bg-success">Actif</span>{% else %}<span class="badge bg-danger">Inactif</span>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Modifier le profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

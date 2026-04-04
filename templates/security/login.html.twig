@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Agrigo{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 mt-5">
+            <div class="card-header text-center py-4 bg-white border-bottom-0">
+                <img src="{{ asset('images/logo.png') }}" alt="Agrigo Logo" height="120" class="mb-3">
+                <p class="text-muted small">Plateforme Intelligente de Gestion Agricole Tunisienne</p>
+            </div>
+            <div class="card-body p-4">
+                {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading"><i class="fas fa-exclamation-circle"></i> Erreur de connexion</h5>
+                        <p class="mb-0">
+                            {% if error.messageKey == 'Invalid credentials.' %}
+                                <strong>Identifiants invalides.</strong><br>
+                                Veuillez vérifier votre email et mot de passe.
+                            {% else %}
+                                {{ error.messageKey|trans(error.messageData, 'security') }}
+                            {% endif %}
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="inputEmail" class="form-label">Adresse Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control border-start-0" autocomplete="email" required autofocus placeholder="agriculteur@exemple.tn">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="inputPassword" class="form-label">Mot de passe</label>
+                        <div class="password-wrapper input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" name="_password" id="inputPassword" class="form-control border-start-0 border-end-0" autocomplete="current-password" required placeholder="••••••••">
+                            <span class="input-group-text bg-light border-start-0 password-toggle" style="cursor: pointer;">
+                                <i class="fas fa-eye text-muted"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button class="btn btn-success w-100 py-2 fw-bold" type="submit">
+                        SE CONNECTER
+                    </button>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ path('app_register') }}" class="text-decoration-none text-success small">Créer un compte</a>
+                        <span class="mx-2 text-muted">|</span>
+                        <a href="{{ path('app_forgot_password') }}" class="text-decoration-none text-danger small">Mot de passe oublié ?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (!window.passwordToggleInitialized) {
+        window.passwordToggleInitialized = true;
+        document.addEventListener('click', function(e) {
+            const toggle = e.target.closest('.password-toggle');
+            
+            if (toggle) {
+                const passwordInput = toggle.parentElement.querySelector('input');
+                const icon = toggle.querySelector('i');
+                
+                if (passwordInput && icon) {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

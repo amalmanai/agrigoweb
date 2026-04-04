@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Profil - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="fas fa-edit"></i> Modifier le Profil</h2>
+                </div>
+                <div class="card-body">
+                    {% if form.vars.errors | length > 0 %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Erreurs</h4>
+                            {% for error in form.vars.errors %}
+                                <div>{{ error.message }}</div>
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form_label(form.nomUser) }}
+                                    {{ form_widget(form.nomUser, {
+                                        attr: {class: 'form-control ' ~ (form.nomUser.vars.errors | length > 0 ? 'is-invalid' : '')}
+                                    }) }}
+                                    {% if form.nomUser.vars.errors | length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.nomUser.vars.errors %}
+                                                <i class="fas fa-times-circle"></i> {{ error.message }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form_label(form.prenomUser) }}
+                                    {{ form_widget(form.prenomUser, {
+                                        attr: {class: 'form-control ' ~ (form.prenomUser.vars.errors | length > 0 ? 'is-invalid' : '')}
+                                    }) }}
+                                    {% if form.prenomUser.vars.errors | length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.prenomUser.vars.errors %}
+                                                <i class="fas fa-times-circle"></i> {{ error.message }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            {{ form_label(form.emailUser) }}
+                            {{ form_widget(form.emailUser, {
+                                attr: {class: 'form-control ' ~ (form.emailUser.vars.errors | length > 0 ? 'is-invalid' : '')}
+                            }) }}
+                            {% if form.emailUser.vars.errors | length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.emailUser.vars.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form_label(form.numUser) }}
+                                    {{ form_widget(form.numUser, {
+                                        attr: {class: 'form-control ' ~ (form.numUser.vars.errors | length > 0 ? 'is-invalid' : '')}
+                                    }) }}
+                                    {% if form.numUser.vars.errors | length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.numUser.vars.errors %}
+                                                <i class="fas fa-times-circle"></i> {{ error.message }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    {{ form_label(form.adresseUser) }}
+                                    {{ form_widget(form.adresseUser, {
+                                        attr: {class: 'form-control ' ~ (form.adresseUser.vars.errors | length > 0 ? 'is-invalid' : '')}
+                                    }) }}
+                                    {% if form.adresseUser.vars.errors | length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.adresseUser.vars.errors %}
+                                                <i class="fas fa-times-circle"></i> {{ error.message }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{{ path('app_profile') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+        display: block !important;
+    }
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}
