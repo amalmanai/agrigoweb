@@ -1,0 +1,79 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Parcelles - Front{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .parcelle-card {
+            border: 1px solid #dbe8d4;
+            border-radius: 14px;
+            padding: 0.9rem;
+            background: #fff;
+            box-shadow: 0 8px 18px rgba(56, 77, 49, 0.08);
+            height: 100%;
+        }
+
+        .parcelle-card h3 {
+            margin: 0 0 0.45rem;
+            color: #274736;
+            font-size: 1.08rem;
+            font-weight: 700;
+        }
+
+        .parcelle-card p {
+            margin: 0.15rem 0;
+            color: #4f6255;
+        }
+
+        .parcelle-cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 992px) {
+            .parcelle-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Parcelles</h1>
+    <a href="{{ path('app_culture_list') }}" class="btn btn-outline-secondary">Voir les cultures</a>
+</div>
+
+{% include '_partials/list_filter.html.twig' with {
+    routeName: 'app_parcelle_list',
+    resetRoute: 'app_parcelle_list',
+    search: search,
+    sort: sort,
+    direction: direction,
+    sortOptions: sortOptions
+} %}
+
+<section class="parcelle-cards">
+    {% for parcelle in parcelles %}
+        <article class="parcelle-card">
+            <h3>{{ parcelle.nomParcelle }}</h3>
+            <p><strong>Surface:</strong> {{ parcelle.surface|number_format(2, '.', ' ') }} ha</p>
+            <p><strong>Type de sol:</strong> {{ parcelle.typeSol ?? 'Non defini' }}</p>
+            <p><strong>Coordonnees:</strong> {{ parcelle.coordonneesGps ?? 'Non renseignees' }}</p>
+            <p><strong>Cultures liees:</strong> {{ parcelle.cultures|length }}</p>
+            <div class="mt-3">
+                <a class="btn btn-sm btn-primary" href="{{ path('app_parcelle_show', {id: parcelle.id}) }}">Details</a>
+            </div>
+        </article>
+    {% else %}
+        <p class="text-muted">Aucune parcelle disponible.</p>
+    {% endfor %}
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

@@ -1,0 +1,11 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Nouvelle Parcelle{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Ajouter une parcelle</h1>
+
+{% include 'back/parcelle/_form.html.twig' with {form: form, button_label: 'Creer'} %}
+{% endblock %}
+
+

@@ -1,0 +1,28 @@
+﻿{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+<div class="mb-3">
+    {{ form_label(form.typeAlerte) }}
+    {{ form_widget(form.typeAlerte) }}
+    {{ form_errors(form.typeAlerte) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.description) }}
+    {{ form_widget(form.description) }}
+    {{ form_errors(form.description) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.dateAlerte) }}
+    {{ form_widget(form.dateAlerte) }}
+    {{ form_errors(form.dateAlerte) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.culture) }}
+    {{ form_widget(form.culture) }}
+    {{ form_errors(form.culture) }}
+</div>
+<div class="d-flex gap-2">
+    {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}
+    <a class="btn btn-secondary" href="{{ path('admin_alerte_risque_index') }}">Annuler</a>
+</div>
+{{ form_end(form) }}
+
+

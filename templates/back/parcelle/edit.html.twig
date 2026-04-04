@@ -1,0 +1,11 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier Parcelle{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Modifier la parcelle #{{ parcelle.id }}</h1>
+
+{% include 'back/parcelle/_form.html.twig' with {form: form, button_label: 'Mettre a jour'} %}
+{% endblock %}
+
+
