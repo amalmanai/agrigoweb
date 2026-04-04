@@ -1,0 +1,11 @@
+﻿{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier Alerte Risque{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Modifier l'alerte #{{ alerte.id }}</h1>
+
+{% include 'back/alerte_risque/_form.html.twig' with {form: form, button_label: 'Mettre a jour'} %}
+{% endblock %}
+
+

@@ -1,0 +1,37 @@
+﻿{% extends 'front/base.html.twig' %}
+
+{% block title %}Culture - Detail{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Detail de la culture</h1>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">ID</dt>
+            <dd class="col-sm-8">{{ culture.id }}</dd>
+
+            <dt class="col-sm-4">Nom</dt>
+            <dd class="col-sm-8">{{ culture.nomCulture }}</dd>
+
+            <dt class="col-sm-4">Date semis</dt>
+            <dd class="col-sm-8">{{ culture.dateSemis ? culture.dateSemis|date('Y-m-d') : '-' }}</dd>
+
+            <dt class="col-sm-4">Etat croissance</dt>
+            <dd class="col-sm-8">{{ culture.etatCroissance ?? '-' }}</dd>
+
+            <dt class="col-sm-4">Rendement prevu</dt>
+            <dd class="col-sm-8">{{ culture.rendementPrevu is not null ? culture.rendementPrevu : '-' }}</dd>
+
+            <dt class="col-sm-4">Parcelle</dt>
+            <dd class="col-sm-8">{{ culture.parcelle ? culture.parcelle.nomParcelle : 'Aucune' }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ path('app_culture_list') }}" class="btn btn-secondary">Retour liste</a>
+</div>
+{% endblock %}
+
+

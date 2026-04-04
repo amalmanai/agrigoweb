@@ -8,5 +8,4 @@
 #   bin/console debug:router
 
 controllers:
-    resource: ../src/Controller/
-    type: attribute
+    resource: routing.controllers

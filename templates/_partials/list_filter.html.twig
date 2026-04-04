@@ -1,0 +1,25 @@
+<form method="get" action="{{ path(routeName) }}" class="row g-2 align-items-end mb-3">
+    <div class="col-12 col-md-5">
+        <label class="form-label fw-semibold" for="search-field">Recherche</label>
+        <input id="search-field" type="text" name="search" value="{{ search|default('') }}" class="form-control" placeholder="Rechercher...">
+    </div>
+    <div class="col-12 col-md-3">
+        <label class="form-label fw-semibold" for="sort-field">Tri</label>
+        <select id="sort-field" name="sort" class="form-select">
+            {% for key, label in sortOptions %}
+                <option value="{{ key }}" {{ sort|default('') == key ? 'selected' : '' }}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-2">
+        <label class="form-label fw-semibold" for="direction-field">Ordre</label>
+        <select id="direction-field" name="direction" class="form-select">
+            <option value="ASC" {{ direction|default('ASC') == 'ASC' ? 'selected' : '' }}>Croissant</option>
+            <option value="DESC" {{ direction|default('ASC') == 'DESC' ? 'selected' : '' }}>Decroissant</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">Appliquer</button>
+        <a href="{{ path(resetRoute) }}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
