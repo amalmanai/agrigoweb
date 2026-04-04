@@ -24,25 +24,25 @@ class HistoriqueCultureFormType extends AbstractType
                 'label' => 'Parcelle',
                 'class' => Parcelle::class,
                 'choice_label' => 'nomParcelle',
-                'required' => false,
-                'placeholder' => 'Aucune parcelle',
+                'required' => true,
+                'placeholder' => 'Selectionner une parcelle',
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('ancienneCulture', TextType::class, [
                 'label' => 'Ancienne Culture',
-                'required' => false,
+                'required' => true,
                 'attr' => ['class' => 'form-control', 'maxlength' => 100],
             ])
             ->add('dateRecolteEffective', DateType::class, [
                 'label' => 'Date Recolte Effective',
-                'required' => false,
+                'required' => true,
                 'widget' => 'single_text',
                 'html5' => true,
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('rendementFinal', NumberType::class, [
                 'label' => 'Rendement Final',
-                'required' => false,
+                'required' => true,
                 'scale' => 2,
                 'html5' => true,
                 'attr' => ['class' => 'form-control', 'min' => '0', 'max' => '1000000', 'step' => '0.01'],

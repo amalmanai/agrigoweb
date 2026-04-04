@@ -36,11 +36,13 @@ final class Version20260403193000 extends AbstractMigration
             PRIMARY KEY(id_historique)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_general_ci` ENGINE = InnoDB");
 
+        $this->addSql('ALTER TABLE alertes_risques ADD CONSTRAINT alertes_risques_ibfk_1 FOREIGN KEY (id_culture) REFERENCES cultures (id_culture) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE historique_cultures ADD CONSTRAINT historique_cultures_ibfk_1 FOREIGN KEY (id_parcelle) REFERENCES parcelles (id_parcelle) ON DELETE SET NULL');
     }
 
     public function down(Schema $schema): void
     {
+        $this->addSql('ALTER TABLE alertes_risques DROP FOREIGN KEY alertes_risques_ibfk_1');
         $this->addSql('ALTER TABLE historique_cultures DROP FOREIGN KEY historique_cultures_ibfk_1');
         $this->addSql('DROP TABLE historique_cultures');
         $this->addSql('DROP TABLE alertes_risques');

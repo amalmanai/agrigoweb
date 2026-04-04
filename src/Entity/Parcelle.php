@@ -35,13 +35,19 @@ class Parcelle
     private ?float $surface = null;
 
     #[ORM\Column(name: 'coordonnees_gps', type: 'string', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'Les coordonnees GPS sont obligatoires.')]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Les coordonnees GPS ne doivent pas depasser {{ limit }} caracteres.'
     )]
+    #[Assert\Regex(
+        pattern: '/^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/',
+        message: 'Le format GPS est invalide. Utilisez: latitude, longitude.'
+    )]
     private ?string $coordonneesGps = null;
 
     #[ORM\Column(name: 'type_sol', type: 'string', length: 50, nullable: true)]
+    #[Assert\NotBlank(message: 'Le type de sol est obligatoire.')]
     #[Assert\Length(
         max: 50,
         maxMessage: 'Le type de sol ne doit pas depasser {{ limit }} caracteres.'

@@ -36,7 +36,7 @@ class ParcelleFormType extends AbstractType
             ])
             ->add('coordonneesGps', TextType::class, [
                 'label' => 'Coordonnees GPS',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Ex: 36.80, 10.18',
@@ -44,7 +44,7 @@ class ParcelleFormType extends AbstractType
             ])
             ->add('typeSol', TextType::class, [
                 'label' => 'Type de Sol',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Ex: Argileux',
