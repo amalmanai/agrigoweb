@@ -49,6 +49,29 @@
             color: #ffffff;
         }
 
+        .front-avatar-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-left: 0.35rem;
+        }
+
+        .front-avatar-img,
+        .front-avatar-fallback {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            object-fit: cover;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.86rem;
+        }
+
         .front-hero {
             margin-top: 1.25rem;
             margin-bottom: 1.25rem;
@@ -152,7 +175,26 @@
             <a class="nav-link" href="{{ path('app_front_home') }}">Accueil</a>
             <a class="nav-link" href="{{ path('app_culture_list') }}">Cultures</a>
             <a class="nav-link" href="{{ path('app_parcelle_list') }}">Parcelles</a>
-            <a class="nav-link" href="{{ path('admin_culture_index') }}">Administration</a>
+            {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+                <a class="nav-link" href="{{ path('admin_culture_index') }}">Administration</a>
+            {% endif %}
+            {% if app.user %}
+                {% set userPhoto = app.user.photoPath %}
+                {% if userPhoto %}
+                    {% set userPhotoSrc = userPhoto starts with 'http' ? userPhoto : asset('uploads/users/' ~ userPhoto) %}
+                {% endif %}
+                <a class="nav-link front-avatar-link" href="{{ path('app_profile_edit') }}" title="Modifier le profil">
+                    {% if userPhoto %}
+                        <img src="{{ userPhotoSrc }}" alt="Profil" class="front-avatar-img">
+                    {% else %}
+                        <span class="front-avatar-fallback">{{ app.user.prenomUser|default('U')|slice(0, 1)|upper }}</span>
+                    {% endif %}
+                    <span class="d-none d-md-inline">Profil</span>
+                </a>
+                <a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
+            {% else %}
+                <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+            {% endif %}
         </div>
     </div>
 </nav>

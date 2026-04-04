@@ -56,53 +56,33 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            {{ form_label(form.emailUser) }}
-                            {{ form_widget(form.emailUser, {
-                                attr: {class: 'form-control ' ~ (form.emailUser.vars.errors | length > 0 ? 'is-invalid' : '')}
+                            {{ form_label(form.photoPath) }}
+                            {{ form_widget(form.photoPath, {
+                                attr: {class: 'form-control ' ~ (form.photoPath.vars.errors | length > 0 ? 'is-invalid' : '')}
                             }) }}
-                            {% if form.emailUser.vars.errors | length > 0 %}
+                            {% if form.photoPath.vars.errors | length > 0 %}
                                 <div class="invalid-feedback d-block">
-                                    {% for error in form.emailUser.vars.errors %}
+                                    {% for error in form.photoPath.vars.errors %}
                                         <i class="fas fa-times-circle"></i> {{ error.message }}
                                     {% endfor %}
                                 </div>
                             {% endif %}
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    {{ form_label(form.numUser) }}
-                                    {{ form_widget(form.numUser, {
-                                        attr: {class: 'form-control ' ~ (form.numUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                                    }) }}
-                                    {% if form.numUser.vars.errors | length > 0 %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in form.numUser.vars.errors %}
-                                                <i class="fas fa-times-circle"></i> {{ error.message }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+                        <div class="form-group mb-3">
+                            {{ form_label(form.plainPassword) }}
+                            {{ form_widget(form.plainPassword, {
+                                attr: {class: 'form-control ' ~ (form.plainPassword.vars.errors | length > 0 ? 'is-invalid' : '')}
+                            }) }}
+                            {% if form.plainPassword.vars.errors | length > 0 %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.plainPassword.vars.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error.message }}
+                                    {% endfor %}
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    {{ form_label(form.adresseUser) }}
-                                    {{ form_widget(form.adresseUser, {
-                                        attr: {class: 'form-control ' ~ (form.adresseUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                                    }) }}
-                                    {% if form.adresseUser.vars.errors | length > 0 %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in form.adresseUser.vars.errors %}
-                                                <i class="fas fa-times-circle"></i> {{ error.message }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            {% endif %}
+                            <div class="form-text">Laissez vide si vous ne voulez pas changer le mot de passe.</div>
                         </div>
-
-
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">
