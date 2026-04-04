@@ -164,11 +164,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // Symfony Security Interface Methods
     public function getRoles(): array
     {
-        $roles = [$this->roleUser];
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-        
-        return array_unique($roles);
+        $storedRole = strtoupper(trim((string) $this->roleUser));
+
+        // Support legacy values from database like "admin" or business labels.
+        if (str_contains($storedRole, 'ADMIN')) {
+            return ['ROLE_ADMIN', 'ROLE_USER'];
+        }
+
+        if (str_starts_with($storedRole, 'ROLE_')) {
+            return array_unique([$storedRole, 'ROLE_USER']);
+        }
+
+        return ['ROLE_USER'];
     }
 
     public function eraseCredentials(): void

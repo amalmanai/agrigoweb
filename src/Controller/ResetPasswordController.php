@@ -38,8 +38,8 @@ class ResetPasswordController extends AbstractController
                 $request->getSession()->set('reset_password_email', $email);
 
                 // Send the email
-                $mailerDsn = $_ENV['MAILER_DSN'] ?? 'null://null';
-                $isMailerConfigured = ($mailerDsn !== 'null://null');
+                $mailerDsn = (string) (getenv('MAILER_DSN') ?: ($_ENV['MAILER_DSN'] ?? ($_SERVER['MAILER_DSN'] ?? 'null://null')));
+                $isMailerConfigured = $mailerDsn !== '' && !str_starts_with($mailerDsn, 'null://');
 
                 try {
                     if ($isMailerConfigured) {
@@ -68,7 +68,7 @@ class ResetPasswordController extends AbstractController
                         throw new \Exception("Mailer not configured");
                     }
                 } catch (\Exception $e) {
-                    $this->addFlash('warning', "⚠️ Mode Test : Le service d'e-mail n'est pas encore configuré. Votre code de vérification est : $otp");
+                    $this->addFlash('warning', "Mode test: e-mail non configure. Votre code OTP est: $otp");
                 }
 
                 return $this->redirectToRoute('app_verify_code');

@@ -12,7 +12,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 m-0">Cultures</h1>
-    <a href="{{ path('admin_culture_index') }}" class="btn btn-outline-secondary">Vue administration</a>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('admin_culture_index') }}" class="btn btn-outline-secondary">Vue administration</a>
+    {% else %}
+        <a href="{{ path('app_parcelle_list') }}" class="btn btn-outline-secondary">Vue parcelles</a>
+    {% endif %}
 </div>
 
 {% include '_partials/list_filter.html.twig' with {
