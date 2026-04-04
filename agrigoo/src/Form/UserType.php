@@ -50,18 +50,21 @@ class UserType extends AbstractType
                 ],
                 'expanded' => false,
                 'multiple' => false,
-            ])
-            ->add('password', PasswordType::class, [
+            ]);
+
+        if (!$isEdit) {
+            $builder->add('password', PasswordType::class, [
                 'label' => 'Mot de passe',
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password', 'class' => 'password-field'],
-                'required' => !$isEdit,
-                'constraints' => $isEdit ? [] : [
+                'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer un mot de passe']),
                     new Length(min: 8, minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères', max: 4096),
                 ],
-            ])
-            ->add('photoPath', TextType::class, [
+            ]);
+        }
+
+        $builder->add('photoPath', TextType::class, [
                 'label' => 'URL Image (Photo)',
                 'required' => false,
                 'attr' => ['placeholder' => 'https://...']

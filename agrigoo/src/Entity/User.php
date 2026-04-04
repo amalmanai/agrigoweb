@@ -31,8 +31,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $emailUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
-    #[Assert\Length(min: 8, minMessage: "Le mot de passe doit faire au moins {{ limit }} caractères.")]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -52,6 +50,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
+
+    #[ORM\Column(name: 'reset_token', length: 20, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(name: 'reset_expires', type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $resetExpiresAt = null;
 
     public function getIdUser(): ?int
     {
@@ -180,5 +184,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getFullName(): string
     {
         return trim($this->prenomUser . ' ' . $this->nomUser);
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function getResetExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->resetExpiresAt;
+    }
+
+    public function setResetExpiresAt(?\DateTimeImmutable $resetExpiresAt): self
+    {
+        $this->resetExpiresAt = $resetExpiresAt;
+        return $this;
+    }
+
+    public function isResetTokenValid(): bool
+    {
+        return $this->resetToken !== null &&
+            $this->resetExpiresAt !== null &&
+            $this->resetExpiresAt > new \DateTimeImmutable();
     }
 }

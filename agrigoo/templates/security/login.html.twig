@@ -7,7 +7,7 @@
     <div class="col-md-5">
         <div class="card shadow-lg border-0 mt-5">
             <div class="card-header text-center py-4 bg-white border-bottom-0">
-                <h2 class="fw-bold text-success">Agrigo</h2>
+                <img src="{{ asset('images/logo.png') }}" alt="Agrigo Logo" height="120" class="mb-3">
                 <p class="text-muted small">Plateforme Intelligente de Gestion Agricole Tunisienne</p>
             </div>
             <div class="card-body p-4">
@@ -63,23 +63,4 @@
     </div>
 </div>
 
-<script>
-    // Script pour afficher/masquer le mot de passe
-    document.querySelectorAll('.password-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const passwordInput = this.parentElement.querySelector('input');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-    });
-</script>
 {% endblock %}

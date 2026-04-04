@@ -6,11 +6,13 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white">
-                    <h2 class="mb-0"><i class="fas fa-user-plus"></i> Créer un compte</h2>
+            <div class="card shadow-lg border-0 mt-3" style="border-radius: 20px;">
+                <div class="card-header bg-white text-center py-4 border-bottom-0" style="border-radius: 20px 20px 0 0;">
+                    <img src="{{ asset('images/logo.png') }}" alt="Agrigo Logo" height="120" class="mb-3">
+                    <h3 class="fw-bold mb-0">Créer un compte</h3>
+                    <p class="text-muted small">Rejoignez la communauté Agrigo dès maintenant</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body px-4 pb-4">
                     {% if registrationForm.vars.errors | length > 0 %}
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Erreurs de validation</h4>

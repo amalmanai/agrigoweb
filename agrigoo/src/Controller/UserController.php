@@ -40,11 +40,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // If password is provided, store in plain text
-            if ($form->get('password')->getData()) {
-                $user->setPassword($form->get('password')->getData());
-            }
-
             $entityManager->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès.');
@@ -58,12 +53,62 @@ class UserController extends AbstractController
 
     #[Route('/admin/users', name: 'app_admin_users')]
     #[IsGranted('ROLE_ADMIN')]
-    public function listUsers(UserRepository $userRepository): Response
+    public function listUsers(Request $request, UserRepository $userRepository): Response
     {
-        $users = $userRepository->findAll();
+        $query = $request->query->get('q', '');
+        $role = $request->query->get('role', '');
+        $status = $request->query->get('status', '');
+        $sortBy = $request->query->get('sort', 'idUser');
+        $sortOrder = $request->query->get('order', 'DESC');
+
+        $users = $userRepository->findByAdvancedFilters($query, $role, $status, $sortBy, $sortOrder);
+
+        $totalUsers = $userRepository->count([]);
+        $activeUsers = $userRepository->count(['isActive' => true]);
+        $inactiveUsers = $totalUsers - $activeUsers;
 
         return $this->render('admin/users.html.twig', [
             'users' => $users,
+            'query' => $query,
+            'role' => $role,
+            'status' => $status,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+            'totalUsers' => $totalUsers,
+            'activeUsers' => $activeUsers,
+            'inactiveUsers' => $inactiveUsers,
+        ]);
+    }
+
+    #[Route('/admin/users/export/pdf', name: 'app_admin_users_export_pdf')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function exportUsersPdf(Request $request, UserRepository $userRepository): Response
+    {
+        $query = $request->query->get('q', '');
+        $role = $request->query->get('role', '');
+        $status = $request->query->get('status', '');
+        $sortBy = $request->query->get('sort', 'idUser');
+        $sortOrder = $request->query->get('order', 'DESC');
+
+        $users = $userRepository->findByAdvancedFilters($query, $role, $status, $sortBy, $sortOrder);
+
+        $html = $this->renderView('admin/users_pdf.html.twig', [
+            'users' => $users,
+            'date' => new \DateTime(),
+        ]);
+
+        $dompdf = new \Dompdf\Dompdf();
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf->setOptions($options);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="utilisateurs_' . date('Y-m-d_H-i') . '.pdf"',
         ]);
     }
 
@@ -83,16 +128,17 @@ class UserController extends AbstractController
         $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // If password is provided, store in plain text
-            if ($form->get('password')->getData()) {
-                $user->setPassword($form->get('password')->getData());
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Utilisateur modifié avec succès.');
+                return $this->redirectToRoute('app_admin_users');
+            } else {
+                foreach ($form->getErrors(true) as $error) {
+                    $this->addFlash('danger', $error->getMessage());
+                }
             }
-
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Utilisateur modifié avec succès.');
-            return $this->redirectToRoute('app_admin_users');
         }
 
         return $this->render('admin/edit_user.html.twig', [
