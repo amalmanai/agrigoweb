@@ -236,11 +236,13 @@
             <span>AgriGo Admin</span>
         </a>
         <nav class="admin-nav">
+            <a href="{{ path('app_home') }}"><i class="bi bi-house-door"></i> Dashboard</a>
             <a href="{{ path('admin_culture_index') }}"><i class="bi bi-flower1"></i> Cultures</a>
             <a href="{{ path('admin_parcelle_index') }}"><i class="bi bi-map"></i> Parcelles</a>
-            <a href="{{ path('admin_historique_culture_index') }}"><i class="bi bi-clock-history"></i> Historiques</a>
-            <a href="{{ path('admin_alerte_risque_index') }}"><i class="bi bi-exclamation-triangle"></i> Alertes</a>
-            <a href="{{ path('app_culture_list') }}"><i class="bi bi-box-arrow-up-right"></i> Vue front</a>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                <a href="{{ path('app_admin_users') }}"><i class="bi bi-people"></i> Manage Users</a>
+            {% endif %}
+            <a href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>
     </aside>
 

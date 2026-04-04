@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\ProfileType;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,10 +37,15 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
+        $form = $this->createForm(ProfileType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $newPassword = (string) $form->get('plainPassword')->getData();
+            if ($newPassword !== '') {
+                $user->setPassword($userPasswordHasher->hashPassword($user, $newPassword));
+            }
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès.');

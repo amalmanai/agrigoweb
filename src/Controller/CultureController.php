@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class CultureController extends AbstractController
 {
@@ -45,6 +46,7 @@ class CultureController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/admin/culture', name: 'admin_culture_index', methods: ['GET'])]
     public function backIndex(Request $request, CultureRepository $cultureRepository): Response
     {
@@ -67,6 +69,7 @@ class CultureController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/admin/culture/new', name: 'admin_culture_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -93,6 +96,7 @@ class CultureController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/admin/culture/{id}/edit', name: 'admin_culture_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, Culture $culture, EntityManagerInterface $entityManager): Response
     {
@@ -117,6 +121,7 @@ class CultureController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/admin/culture/{id}', name: 'admin_culture_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
     public function delete(Request $request, Culture $culture, EntityManagerInterface $entityManager): Response
     {
