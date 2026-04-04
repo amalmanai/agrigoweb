@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - {{ parent() }}{% endblock %}
+
+{% block body %}
+
+<!-- HERO -->
+<div class="row align-items-center py-5 mb-5 position-relative" style="min-height: 80vh;">
+    
+    <!-- Gradient Background -->
+    <div class="position-absolute w-100 h-100 top-0 start-0" 
+         style="background: linear-gradient(135deg, rgba(25,135,84,0.05), rgba(0,0,0,0)); z-index:-2;">
+    </div>
+
+    <!-- Decorative Blur -->
+    <div class="position-absolute top-50 start-50 translate-middle rounded-circle"
+         style="width:500px;height:500px;background:#19875433;filter:blur(120px);z-index:-1;">
+    </div>
+
+    <div class="col-lg-6">
+        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill mb-3 fw-bold">
+            🌱 Agriculture intelligente en Tunisie
+        </span>
+
+        <h1 class="display-3 fw-bold mb-4">
+            Cultivez <span class="text-success">plus intelligemment</span>
+        </h1>
+
+        <p class="lead text-muted mb-4">
+            Gérez vos cultures, optimisez vos ressources et augmentez vos rendements grâce à une plateforme moderne et intuitive.
+        </p>
+
+        <div class="d-flex gap-3 flex-wrap">
+            {% if app.user %}
+                <a href="{{ path('app_profile') }}" class="btn btn-success btn-lg px-4 shadow">
+                    Dashboard 🚀
+                </a>
+            {% else %}
+                <a href="{{ path('app_register') }}" class="btn btn-success btn-lg px-4 shadow">
+                    Commencer gratuitement
+                </a>
+                <a href="{{ path('app_login') }}" class="btn btn-outline-success btn-lg px-4">
+                    Connexion
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Trust indicators -->
+        <div class="mt-4 d-flex gap-4 text-muted small">
+            <span>✔ Sécurisé</span>
+            <span>✔ Simple</span>
+            <span>✔ 100% Tunisien 🇹🇳</span>
+        </div>
+    </div>
+
+    <!-- IMAGE -->
+    <div class="col-lg-6 text-center mt-5 mt-lg-0">
+        <div class="position-relative">
+
+            <img src="{{ asset('images/hero_3d.png') }}" 
+                 class="img-fluid rounded-4 shadow-lg hero-img"
+                 style="max-height:500px;">
+
+            <!-- Floating Card -->
+            <div class="floating-card glass p-3">
+                📈 +25% rendement
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Pourquoi choisir <span class="text-success">Agrigo</span> ?</h2>
+        <p class="text-muted">Une plateforme complète pour l’agriculture moderne</p>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-md-4">
+            <div class="feature-card p-4 text-center h-100">
+                🌱
+                <h4 class="mt-3">Gestion des cultures</h4>
+                <p class="text-muted">Suivi intelligent des cycles agricoles.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="feature-card p-4 text-center h-100">
+                🗺️
+                <h4 class="mt-3">Cartographie</h4>
+                <p class="text-muted">Visualisation claire de vos terrains.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="feature-card p-4 text-center h-100">
+                📊
+                <h4 class="mt-3">Analyse & performance</h4>
+                <p class="text-muted">Prenez de meilleures décisions grâce aux données.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="container text-center py-5">
+    <div class="p-5 rounded-4 text-white"
+         style="background: linear-gradient(135deg, #198754, #145c32);">
+        
+        <h2 class="fw-bold mb-3">Prêt à révolutionner votre agriculture ?</h2>
+        <p class="mb-4">Rejoignez Agrigo aujourd’hui</p>
+
+        <a href="{{ path('app_register') }}" class="btn btn-light btn-lg px-4">
+            Créer un compte
+        </a>
+    </div>
+</div>
+
+<!-- STYLES -->
+<style>
+
+.hero-img {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0); }
+}
+
+/* Glass effect */
+.glass {
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+    position: absolute;
+    top: 10%;
+    left: -10%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Feature cards */
+.feature-card {
+    border-radius: 20px;
+    background: white;
+    transition: 0.3s;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+</style>
+
+{% endblock %}
