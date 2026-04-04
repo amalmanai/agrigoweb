@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Utilisateurs - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0"><i class="fas fa-users"></i> Gestion des Utilisateurs</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.idUser }}</td>
+                            <td>{{ user.prenomUser }} {{ user.nomUser }}</td>
+                            <td>{{ user.emailUser }}</td>
+                            <td>
+                                {% if user.roleUser == 'ROLE_ADMIN' %}
+                                    <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-info">User</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.isActive %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('app_admin_user_detail', {'id': user.idUser}) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{{ path('app_admin_user_edit', {'id': user.idUser}) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Éditer
+                                </a>
+                                <a href="{{ path('app_admin_user_toggle', {'id': user.idUser}) }}" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-toggle-on"></i> {{ user.isActive ? 'Désactiver' : 'Activer' }}
+                                </a>
+                                <a href="{{ path('app_admin_user_delete', {'id': user.idUser}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
