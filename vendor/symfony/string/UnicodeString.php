@@ -106,11 +106,15 @@ class UnicodeString extends AbstractUnicodeString
             return false;
         }
 
-        if ($this->ignoreCase) {
-            return 0 === mb_stripos(grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix)), $suffix, 0, 'UTF-8');
+        if (false === $grapheme = grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix))) {
+            $grapheme = '';
         }
 
-        return $suffix === grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix));
+        if ($this->ignoreCase) {
+            return 0 === mb_stripos($grapheme, $suffix, 0, 'UTF-8');
+        }
+
+        return $suffix === $grapheme;
     }
 
     public function equalsTo(string|iterable|AbstractString $string): bool
@@ -286,7 +290,7 @@ class UnicodeString extends AbstractUnicodeString
         $str = clone $this;
 
         $start = $start ? \strlen(grapheme_substr($this->string, 0, $start)) : 0;
-        $length = $length ? \strlen(grapheme_substr($this->string, $start, $length ?? 2147483647)) : $length;
+        $length = $length ? \strlen(grapheme_substr($this->string, $start, $length)) : $length;
         $str->string = substr_replace($this->string, $replacement, $start, $length ?? 2147483647);
 
         if (normalizer_is_normalized($str->string)) {
@@ -355,11 +359,15 @@ class UnicodeString extends AbstractUnicodeString
             return false;
         }
 
-        if ($this->ignoreCase) {
-            return 0 === mb_stripos(grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES), $prefix, 0, 'UTF-8');
+        if (false === $grapheme = grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES)) {
+            $grapheme = '';
         }
 
-        return $prefix === grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES);
+        if ($this->ignoreCase) {
+            return 0 === mb_stripos($grapheme, $prefix, 0, 'UTF-8');
+        }
+
+        return $prefix === $grapheme;
     }
 
     public function trimPrefix($prefix): static
@@ -400,11 +408,10 @@ class UnicodeString extends AbstractUnicodeString
         return parent::trimSuffix($suffix);
     }
 
-    /**
-     * @return void
-     */
-    public function __wakeup()
+    public function __unserialize(array $data): void
     {
+        $this->string = $data['string'] ?? $data["\0*\0string"];
+
         if (!\is_string($this->string)) {
             throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
         }

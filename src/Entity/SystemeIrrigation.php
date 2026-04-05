@@ -57,14 +57,14 @@ class SystemeIrrigation
     }
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?float $seuil_humidite = null;
+    private ?string $seuil_humidite = null;
 
-    public function getSeuil_humidite(): ?float
+    public function getSeuil_humidite(): ?string
     {
         return $this->seuil_humidite;
     }
 
-    public function setSeuil_humidite(?float $seuil_humidite): static
+    public function setSeuil_humidite(?string $seuil_humidite): static
     {
         $this->seuil_humidite = $seuil_humidite;
         return $this;

@@ -72,28 +72,28 @@ class HistoriqueIrrigation
     }
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?float $volume_eau = null;
+    private ?string $volume_eau = null;
 
-    public function getVolume_eau(): ?float
+    public function getVolume_eau(): ?string
     {
         return $this->volume_eau;
     }
 
-    public function setVolume_eau(?float $volume_eau): static
+    public function setVolume_eau(?string $volume_eau): static
     {
         $this->volume_eau = $volume_eau;
         return $this;
     }
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?float $humidite_avant = null;
+    private ?string $humidite_avant = null;
 
-    public function getHumidite_avant(): ?float
+    public function getHumidite_avant(): ?string
     {
         return $this->humidite_avant;
     }
 
-    public function setHumidite_avant(?float $humidite_avant): static
+    public function setHumidite_avant(?string $humidite_avant): static
     {
         $this->humidite_avant = $humidite_avant;
         return $this;
