@@ -1,0 +1,196 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord Admin â€” AgriGo{% endblock %}
+
+{% block body %}
+<div class="space-y-8">
+
+    {# ===== HEADER ===== #}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <p class="text-xs font-semibold tracking-widest uppercase text-agri-green mb-1">Administration</p>
+            <h1 class="text-3xl font-serif font-bold text-gray-900">Tableau de bord</h1>
+            <p class="text-gray-500 mt-1 text-sm">SynthÃ¨se des rÃ©coltes et des ventes de votre exploitation.</p>
+        </div>
+        <div class="flex gap-3 flex-wrap">
+            <a href="{{ path('app_recolte_new') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-agri-button text-white text-sm font-medium rounded-xl hover:bg-agri-button-hover transition shadow-sm">
+                <i class="ph ph-plant"></i> Nouvelle RÃ©colte
+            </a>
+            <a href="{{ path('app_vente_new') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                <i class="ph ph-receipt"></i> Nouvelle Vente
+            </a>
+        </div>
+    </div>
+
+    {# ===== STAT CARDS ===== #}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        {# RÃ©coltes #}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">RÃ©coltes</span>
+                <div class="w-10 h-10 rounded-full bg-lime-50 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="ph-fill ph-plant text-xl text-lime-600"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ stats.total_recoltes }}</p>
+            <p class="text-sm text-gray-500 mt-1">lots enregistrÃ©s</p>
+            <a href="{{ path('app_recolte_index') }}" class="mt-4 inline-flex items-center text-xs font-semibold text-agri-green hover:underline">
+                GÃ©rer les rÃ©coltes <i class="ph ph-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        {# QuantitÃ© rÃ©coltÃ©e #}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Volume total</span>
+                <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="ph-fill ph-scales text-xl text-amber-500"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ stats.total_quantite_recoltee|number_format(1, ',', ' ') }}</p>
+            <p class="text-sm text-gray-500 mt-1">unitÃ©s rÃ©coltÃ©es (total)</p>
+        </div>
+
+        {# CoÃ»t de production #}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">CoÃ»ts de prod.</span>
+                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="ph-fill ph-trend-down text-xl text-rose-500"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ stats.total_cout_production|number_format(0, ',', ' ') }}</p>
+            <p class="text-sm text-gray-500 mt-1">TND investis</p>
+        </div>
+
+        {# Ventes #}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Ventes</span>
+                <div class="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="ph-fill ph-shopping-cart-simple text-xl text-sky-600"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ stats.total_ventes }}</p>
+            <p class="text-sm text-gray-500 mt-1">transactions enregistrÃ©es</p>
+            <a href="{{ path('app_vente_index') }}" class="mt-4 inline-flex items-center text-xs font-semibold text-sky-600 hover:underline">
+                GÃ©rer les ventes <i class="ph ph-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        {# Revenu total #}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Revenu brut</span>
+                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="ph-fill ph-coins text-xl text-emerald-600"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ stats.total_revenu|number_format(0, ',', ' ') }}</p>
+            <p class="text-sm text-gray-500 mt-1">TND gÃ©nÃ©rÃ©s</p>
+        </div>
+
+        {# Marge brute #}
+        <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition group
+            {% if stats.marge_brute >= 0 %}border-l-4 border-l-emerald-400{% else %}border-l-4 border-l-rose-400{% endif %}">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-widest text-gray-400">Marge nette</span>
+                <div class="w-10 h-10 rounded-full {% if stats.marge_brute >= 0 %}bg-emerald-50{% else %}bg-rose-50{% endif %} flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="ph-fill ph-chart-line-up text-xl {% if stats.marge_brute >= 0 %}text-emerald-600{% else %}text-rose-500{% endif %}"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-bold {% if stats.marge_brute >= 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
+                {{ stats.marge_brute >= 0 ? '+' : '' }}{{ stats.marge_brute|number_format(0, ',', ' ') }}
+            </p>
+            <p class="text-sm text-gray-500 mt-1">TND (Revenu âˆ’ CoÃ»ts)</p>
+        </div>
+
+    </div>
+
+    {# ===== TABLES RECENTES ===== #}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {# DerniÃ¨res rÃ©coltes #}
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                    <i class="ph ph-plant text-lime-600"></i> DerniÃ¨res RÃ©coltes
+                </h2>
+                <a href="{{ path('app_recolte_index') }}" class="text-xs text-agri-green font-semibold hover:underline">Tout voir</a>
+            </div>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Produit</th>
+                        <th class="px-6 py-3 text-center">QuantitÃ©</th>
+                        <th class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for r in recoltes_recentes %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-3 font-medium text-gray-800">{{ r.name }}</td>
+                        <td class="px-6 py-3 text-center text-gray-600">{{ r.quantity }} {{ r.unit }}</td>
+                        <td class="px-6 py-3 text-right">
+                            <a href="{{ path('app_recolte_edit', {'id': r.id}) }}" class="text-indigo-500 hover:text-indigo-700 mr-3"><i class="ph ph-pencil-simple"></i></a>
+                            <a href="{{ path('app_recolte_show', {'id': r.id}) }}" class="text-gray-400 hover:text-gray-700"><i class="ph ph-eye"></i></a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="px-6 py-6 text-center text-gray-400">Aucune rÃ©colte</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
+                <a href="{{ path('app_recolte_new') }}" class="text-xs text-agri-green font-semibold hover:underline flex items-center gap-1">
+                    <i class="ph ph-plus-circle"></i> Ajouter une rÃ©colte
+                </a>
+            </div>
+        </div>
+
+        {# DerniÃ¨res ventes #}
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                    <i class="ph ph-receipt text-emerald-600"></i> DerniÃ¨res Ventes
+                </h2>
+                <a href="{{ path('app_vente_index') }}" class="text-xs text-emerald-600 font-semibold hover:underline">Tout voir</a>
+            </div>
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Produit</th>
+                        <th class="px-6 py-3 text-center">QtÃ©</th>
+                        <th class="px-6 py-3 text-right">Prix</th>
+                        <th class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for v in ventes_recentes %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-3 font-medium text-gray-800">{{ v.description }}</td>
+                        <td class="px-6 py-3 text-center text-gray-600">{{ v.recolte ? v.recolte.quantity ~ ' ' ~ v.recolte.unit : 'â€”' }}</td>
+                        <td class="px-6 py-3 text-right font-semibold text-emerald-600">{{ v.price|number_format(0, ',', ' ') }} TND</td>
+                        <td class="px-6 py-3 text-right">
+                            <a href="{{ path('app_vente_edit', {'id': v.id}) }}" class="text-indigo-500 hover:text-indigo-700 mr-3"><i class="ph ph-pencil-simple"></i></a>
+                            <a href="{{ path('app_vente_show', {'id': v.id}) }}" class="text-gray-400 hover:text-gray-700"><i class="ph ph-eye"></i></a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="px-6 py-6 text-center text-gray-400">Aucune vente</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
+                <a href="{{ path('app_vente_new') }}" class="text-xs text-emerald-600 font-semibold hover:underline flex items-center gap-1">
+                    <i class="ph ph-plus-circle"></i> Ajouter une vente
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+

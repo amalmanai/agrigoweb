@@ -1,0 +1,724 @@
+{
+    "alertes_risques": [
+        {
+            "Field": "id_alerte",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "type_alerte",
+            "Type": "varchar(50)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "description",
+            "Type": "text",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_alerte",
+            "Type": "timestamp",
+            "Null": "NO",
+            "Key": "",
+            "Default": "CURRENT_TIMESTAMP",
+            "Extra": "DEFAULT_GENERATED"
+        },
+        {
+            "Field": "id_culture",
+            "Type": "int",
+            "Null": "YES",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "cultures": [
+        {
+            "Field": "id_culture",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "nom_culture",
+            "Type": "varchar(100)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_semis",
+            "Type": "date",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "etat_croissance",
+            "Type": "varchar(50)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "rendement_prevu",
+            "Type": "double",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "id_parcelle",
+            "Type": "int",
+            "Null": "YES",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "historique_cultures": [
+        {
+            "Field": "id_historique",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "id_parcelle",
+            "Type": "int",
+            "Null": "YES",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "ancienne_culture",
+            "Type": "varchar(100)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_recolte_effective",
+            "Type": "date",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "rendement_final",
+            "Type": "double",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "historique_irrigation": [
+        {
+            "Field": "id",
+            "Type": "bigint",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "id_systeme",
+            "Type": "bigint",
+            "Null": "NO",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_irrigation",
+            "Type": "timestamp",
+            "Null": "NO",
+            "Key": "MUL",
+            "Default": "CURRENT_TIMESTAMP",
+            "Extra": "DEFAULT_GENERATED"
+        },
+        {
+            "Field": "duree_minutes",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "volume_eau",
+            "Type": "decimal(8,2)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "humidite_avant",
+            "Type": "decimal(5,2)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "type_declenchement",
+            "Type": "enum('AUTO','MANUEL')",
+            "Null": "YES",
+            "Key": "",
+            "Default": "MANUEL",
+            "Extra": ""
+        }
+    ],
+    "mouvement_stock": [
+        {
+            "Field": "id_mouvement",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "type_mouvement",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_mouvement",
+            "Type": "varchar(20)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "quantite",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "motif",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "id_produit",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "id_user",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "parcelles": [
+        {
+            "Field": "id_parcelle",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "nom_parcelle",
+            "Type": "varchar(100)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "surface",
+            "Type": "double",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "coordonnees_gps",
+            "Type": "varchar(255)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "type_sol",
+            "Type": "varchar(50)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "produit": [
+        {
+            "Field": "id_produit",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "nom_produit",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "categorie",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "quantite_disponible",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "unite",
+            "Type": "varchar(50)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "seuil_alerte",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_expiration",
+            "Type": "varchar(20)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "prix_unitaire",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "recolte": [
+        {
+            "Field": "id_recolte",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "nom_produit",
+            "Type": "varchar(100)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "quantite",
+            "Type": "double",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "unite",
+            "Type": "varchar(20)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_recolte",
+            "Type": "date",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "cout_production",
+            "Type": "double",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "id_user",
+            "Type": "int",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "systeme_irrigation": [
+        {
+            "Field": "id_systeme",
+            "Type": "bigint",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "id_parcelle",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "nom_systeme",
+            "Type": "varchar(100)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "seuil_humidite",
+            "Type": "decimal(5,2)",
+            "Null": "YES",
+            "Key": "",
+            "Default": "30.00",
+            "Extra": ""
+        },
+        {
+            "Field": "mode",
+            "Type": "enum('AUTO','MANUEL')",
+            "Null": "YES",
+            "Key": "",
+            "Default": "MANUEL",
+            "Extra": ""
+        },
+        {
+            "Field": "statut",
+            "Type": "enum('ACTIF','INACTIF')",
+            "Null": "YES",
+            "Key": "",
+            "Default": "ACTIF",
+            "Extra": ""
+        },
+        {
+            "Field": "date_creation",
+            "Type": "timestamp",
+            "Null": "NO",
+            "Key": "",
+            "Default": "CURRENT_TIMESTAMP",
+            "Extra": "DEFAULT_GENERATED"
+        }
+    ],
+    "tache": [
+        {
+            "Field": "id",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "tittre_tache",
+            "Type": "varchar(150)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "description_tache",
+            "Type": "varchar(200)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "type_tache",
+            "Type": "enum('Travail','R\u00e9colte','Semis','Maintenance')",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "id_user",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_tache",
+            "Type": "date",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "heure_debut_tache",
+            "Type": "time",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "heure_fin_tache",
+            "Type": "time",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "status_tache",
+            "Type": "enum('Assign\u00e9e','En cours','Termin\u00e9e')",
+            "Null": "NO",
+            "Key": "",
+            "Default": "Assign\u00e9e",
+            "Extra": ""
+        },
+        {
+            "Field": "remarque_tache",
+            "Type": "varchar(200)",
+            "Null": "NO",
+            "Key": "",
+            "Default": "",
+            "Extra": ""
+        }
+    ],
+    "user": [
+        {
+            "Field": "id_user",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "nom_user",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "prenom_user",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "email_user",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "UNI",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "role_user",
+            "Type": "enum('admin','agriculteur client','ouvrier agricole')",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "num_user",
+            "Type": "varchar(20)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "password",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "adresse_user",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "photo_path",
+            "Type": "varchar(255)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        }
+    ],
+    "utilisateur": [
+        {
+            "Field": "id_user",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "nom",
+            "Type": "varchar(120)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "email",
+            "Type": "varchar(190)",
+            "Null": "NO",
+            "Key": "UNI",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "adresse",
+            "Type": "varchar(255)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "telephone",
+            "Type": "varchar(40)",
+            "Null": "YES",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "created_at",
+            "Type": "timestamp",
+            "Null": "NO",
+            "Key": "",
+            "Default": "CURRENT_TIMESTAMP",
+            "Extra": "DEFAULT_GENERATED"
+        }
+    ],
+    "vente": [
+        {
+            "Field": "id_vente",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "PRI",
+            "Default": null,
+            "Extra": "auto_increment"
+        },
+        {
+            "Field": "description",
+            "Type": "varchar(255)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "prix",
+            "Type": "decimal(10,2)",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "date_vente",
+            "Type": "date",
+            "Null": "NO",
+            "Key": "",
+            "Default": null,
+            "Extra": ""
+        },
+        {
+            "Field": "id_user",
+            "Type": "int",
+            "Null": "NO",
+            "Key": "MUL",
+            "Default": null,
+            "Extra": ""
+        }
+    ]
+}
