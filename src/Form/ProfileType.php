@@ -23,26 +23,22 @@ class ProfileType extends AbstractType
                 'label' => 'Prenom',
                 'attr' => ['placeholder' => 'Entrez votre prenom'],
             ])
+            ->add('emailUser', \Symfony\Component\Form\Extension\Core\Type\EmailType::class, [
+                'label' => 'Email',
+                'attr' => ['placeholder' => 'exemple@agri.tn']
+            ])
+            ->add('numUser', \Symfony\Component\Form\Extension\Core\Type\TelType::class, [
+                'label' => 'Numéro de Téléphone',
+                'attr' => ['placeholder' => '8 chiffres']
+            ])
+            ->add('adresseUser', TextType::class, [
+                'label' => 'Adresse',
+                'attr' => ['placeholder' => 'Votre adresse complète']
+            ])
             ->add('photoPath', TextType::class, [
                 'label' => 'Photo (URL ou nom de fichier)',
                 'required' => false,
                 'attr' => ['placeholder' => 'https://... ou photo.jpg'],
-            ])
-            ->add('plainPassword', PasswordType::class, [
-                'label' => 'Nouveau mot de passe',
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'autocomplete' => 'new-password',
-                    'placeholder' => 'Laissez vide pour garder le mot de passe actuel',
-                ],
-                'constraints' => [
-                    new Length(
-                        min: 8,
-                        minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caracteres',
-                        max: 4096
-                    ),
-                ],
             ]);
     }
 

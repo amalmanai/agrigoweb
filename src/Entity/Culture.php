@@ -64,6 +64,10 @@ class Culture
     #[ORM\OneToMany(targetEntity: AlerteRisque::class, mappedBy: 'culture')]
     private Collection $alertesRisques;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'cultures')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id_user', nullable: true, onDelete: 'SET NULL')]
+    private ?User $owner = null;
+
     public function __construct()
     {
         $this->alertesRisques = new ArrayCollection();
@@ -79,7 +83,7 @@ class Culture
         return $this->nomCulture;
     }
 
-    public function setNomCulture(string $nomCulture): self
+    public function setNomCulture(?string $nomCulture): self
     {
         $this->nomCulture = $nomCulture;
 
@@ -91,7 +95,7 @@ class Culture
         return $this->dateSemis;
     }
 
-    public function setDateSemis(\DateTimeInterface $dateSemis): self
+    public function setDateSemis(?\DateTimeInterface $dateSemis): self
     {
         $this->dateSemis = $dateSemis;
 
@@ -166,5 +170,17 @@ class Culture
     public function __toString(): string
     {
         return $this->nomCulture ?? (string) $this->id;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
     }
 }

@@ -13,25 +13,25 @@
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6",
         "dompdf/dompdf": "^3.1",
-        "symfony/asset": "7.4.*",
-        "symfony/asset-mapper": "7.4.*",
-        "symfony/console": "7.4.*",
-        "symfony/dotenv": "7.4.*",
+        "symfony/asset": "6.4.*",
+        "symfony/asset-mapper": "6.4.*",
+        "symfony/console": "6.4.*",
+        "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2",
-        "symfony/form": "7.4.*",
-        "symfony/framework-bundle": "7.4.*",
-        "symfony/mailer": "7.4.*",
-        "symfony/messenger": "7.4.*",
+        "symfony/form": "6.4.*",
+        "symfony/framework-bundle": "6.4.*",
+        "symfony/mailer": "6.4.*",
+        "symfony/messenger": "6.4.*",
         "symfony/monolog-bundle": "*",
-        "symfony/notifier": "7.4.*",
-        "symfony/runtime": "7.4.*",
-        "symfony/security-bundle": "7.4.*",
-        "symfony/security-csrf": "7.4.*",
-        "symfony/translation": "7.4.*",
-        "symfony/twig-bundle": "7.4.*",
+        "symfony/notifier": "6.4.*",
+        "symfony/runtime": "6.4.*",
+        "symfony/security-bundle": "6.4.*",
+        "symfony/security-csrf": "6.4.*",
+        "symfony/translation": "6.4.*",
+        "symfony/twig-bundle": "6.4.*",
         "symfony/ux-turbo": "^2.34",
-        "symfony/validator": "7.4.*",
-        "symfony/yaml": "7.4.*",
+        "symfony/validator": "6.4.*",
+        "symfony/yaml": "6.4.*",
         "symfonycasts/reset-password-bundle": "*"
     },
     "config": {
@@ -82,11 +82,11 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*"
+            "require": "6.4.*"
         }
     },
     "require-dev": {
-        "symfony/debug-bundle": "7.4.*",
-        "symfony/web-profiler-bundle": "7.4.*"
+        "symfony/debug-bundle": "6.4.*",
+        "symfony/web-profiler-bundle": "6.4.*"
     }
 }

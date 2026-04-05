@@ -31,6 +31,11 @@
 
 <div class="mt-3 d-flex gap-2">
     <a href="{{ path('app_parcelle_list') }}" class="btn btn-secondary">Retour parcelles</a>
+    <a href="{{ path('app_parcelle_edit', {id: parcelle.id}) }}" class="btn btn-outline-warning">Modifier</a>
+    <form method="post" action="{{ path('app_parcelle_delete', {id: parcelle.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette parcelle ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete_front_parcelle_' ~ parcelle.id) }}">
+        <button type="submit" class="btn btn-outline-danger">Supprimer</button>
+    </form>
     <a href="{{ path('app_culture_list') }}" class="btn btn-outline-secondary">Retour cultures</a>
 </div>
 {% endblock %}

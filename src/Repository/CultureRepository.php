@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Culture;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -49,9 +50,22 @@ class CultureRepository extends ServiceEntityRepository
      */
     public function findFiltered(?string $search = null, string $sortField = 'dateSemis', string $sortDirection = 'DESC'): array
     {
+        return $this->findFilteredByOwner(null, $search, $sortField, $sortDirection);
+    }
+
+    /**
+     * @return Culture[]
+     */
+    public function findFilteredByOwner(?User $owner, ?string $search = null, string $sortField = 'dateSemis', string $sortDirection = 'DESC'): array
+    {
         $qb = $this->createQueryBuilder('c')
             ->leftJoin('c.parcelle', 'p')
             ->addSelect('p');
+
+        if ($owner !== null) {
+            $qb->andWhere('c.owner = :owner')
+                ->setParameter('owner', $owner);
+        }
 
         if ($search !== null && $search !== '') {
             $qb->andWhere('LOWER(c.nomCulture) LIKE :search OR LOWER(COALESCE(c.etatCroissance, :emptyState)) LIKE :search OR LOWER(COALESCE(p.nomParcelle, :emptyParcel)) LIKE :search')

@@ -1,61 +1,321 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
 {% block title %}Connexion - Agrigo{% endblock %}
 
-{% block body %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-lg border-0 mt-5">
-            <div class="card-header text-center py-4 bg-white border-bottom-0">
-                <img src="{{ asset('images/logo.png') }}" alt="Agrigo Logo" height="120" class="mb-3">
-                <p class="text-muted small">Plateforme Intelligente de Gestion Agricole Tunisienne</p>
+{% block stylesheets %}
+<style>
+    /* Premium Login Styles */
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem 1rem;
+        perspective: 1000px;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 440px;
+        animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 24px;
+        box-shadow: 
+            0 20px 40px rgba(42, 90, 62, 0.08),
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 
+            0 25px 50px rgba(42, 90, 62, 0.12),
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+
+    .login-header {
+        text-align: center;
+        padding: 2.5rem 2rem 1rem;
+        position: relative;
+    }
+
+    .login-logo-container {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: rotate(-3deg);
+        transition: transform 0.4s ease;
+    }
+
+    .login-card:hover .login-logo-container {
+        transform: rotate(0deg) scale(1.05);
+    }
+
+    .login-logo-container i {
+        font-size: 2.5rem;
+        color: var(--front-forest);
+    }
+
+    .login-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 2rem;
+        color: var(--front-ink);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+        color: var(--front-muted);
+        font-size: 0.95rem;
+    }
+
+    .login-body {
+        padding: 1rem 2.5rem 2.5rem;
+    }
+
+    .form-group-modern {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group-modern label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--front-ink);
+        margin-bottom: 0.5rem;
+        display: block;
+        transition: color 0.3s ease;
+    }
+
+    .input-modern {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        padding: 0.8rem 1rem 0.8rem 2.8rem;
+        font-size: 1rem;
+        color: var(--front-ink);
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .input-modern:focus {
+        outline: none;
+        background: #ffffff;
+        border-color: var(--front-leaf);
+        box-shadow: 0 0 0 4px rgba(135, 169, 95, 0.15);
+    }
+
+    .input-icon {
+        position: absolute;
+        bottom: 0.85rem;
+        left: 1rem;
+        color: var(--front-muted);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+
+    .form-group-modern:focus-within label,
+    .form-group-modern:focus-within .input-icon {
+        color: var(--front-olive);
+    }
+
+    .password-toggle-modern {
+        position: absolute;
+        bottom: 0.85rem;
+        right: 1rem;
+        color: var(--front-muted);
+        cursor: pointer;
+        padding: 0.2rem;
+        z-index: 10;
+        transition: color 0.2s ease;
+    }
+
+    .password-toggle-modern:hover {
+        color: var(--front-ink);
+    }
+
+    .btn-login {
+        width: 100%;
+        background: linear-gradient(135deg, var(--front-forest) 0%, var(--front-olive) 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.9rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(42, 90, 62, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-login::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+        transform: skewX(-20deg);
+        transition: all 0.7s ease;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px rgba(42, 90, 62, 0.3);
+    }
+
+    .btn-login:hover::after {
+        left: 200%;
+    }
+
+    .login-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.8rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .login-link {
+        color: var(--front-olive);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .login-link::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--front-forest);
+        transition: width 0.3s ease;
+    }
+
+    .login-link:hover {
+        color: var(--front-forest);
+    }
+
+    .login-link:hover::after {
+        width: 100%;
+    }
+
+    .alert-modern {
+        border-radius: 12px;
+        border: none;
+        background: #fff0f0;
+        color: #d32f2f;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        box-shadow: 0 4px 6px rgba(211, 47, 47, 0.05);
+        animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .alert-modern i {
+        font-size: 1.25rem;
+        margin-top: 0.1rem;
+    }
+
+    @keyframes floatIn {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes shake {
+        10%, 90% { transform: translateX(-1px); }
+        20%, 80% { transform: translateX(2px); }
+        30%, 50%, 70% { transform: translateX(-4px); }
+        40%, 60% { transform: translateX(4px); }
+    }
+</style>
+<!-- Add FontAwesome for icons if not present in base -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo-container">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h1 class="login-title">Bienvenue</h1>
+                <p class="login-subtitle">Connectez-vous pour accéder à votre espace AgriGo</p>
             </div>
-            <div class="card-body p-4">
+            
+            <div class="login-body">
                 {% if error %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <h5 class="alert-heading"><i class="fas fa-exclamation-circle"></i> Erreur de connexion</h5>
-                        <p class="mb-0">
+                    <div class="alert-modern">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
                             {% if error.messageKey == 'Invalid credentials.' %}
                                 <strong>Identifiants invalides.</strong><br>
-                                Veuillez vérifier votre email et mot de passe.
+                                <span class="small">Veuillez vérifier votre email et mot de passe.</span>
                             {% else %}
                                 {{ error.messageKey|trans(error.messageData, 'security') }}
                             {% endif %}
-                        </p>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     </div>
                 {% endif %}
 
                 <form method="post">
-                    <div class="mb-3">
-                        <label for="inputEmail" class="form-label">Adresse Email</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-envelope text-muted"></i></span>
-                            <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control border-start-0" autocomplete="email" required autofocus placeholder="agriculteur@exemple.tn">
-                        </div>
+                    <div class="form-group-modern">
+                        <label for="inputEmail">Adresse Email</label>
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="input-modern" autocomplete="email" required autofocus placeholder="agriculteur@exemple.tn">
                     </div>
 
-                    <div class="mb-4">
-                        <label for="inputPassword" class="form-label">Mot de passe</label>
-                        <div class="password-wrapper input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
-                            <input type="password" name="_password" id="inputPassword" class="form-control border-start-0 border-end-0" autocomplete="current-password" required placeholder="••••••••">
-                            <span class="input-group-text bg-light border-start-0 password-toggle" style="cursor: pointer;">
-                                <i class="fas fa-eye text-muted"></i>
-                            </span>
+                    <div class="form-group-modern password-wrapper">
+                        <label for="inputPassword">Mot de passe</label>
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="_password" id="inputPassword" class="input-modern" autocomplete="current-password" required placeholder="••••••••">
+                        <div class="password-toggle-modern password-toggle" title="Afficher/Masquer">
+                            <i class="fas fa-eye"></i>
                         </div>
                     </div>
 
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                    <button class="btn btn-success w-100 py-2 fw-bold" type="submit">
-                        SE CONNECTER
+                    <button class="btn-login" type="submit">
+                        SE CONNECTER <i class="fas fa-arrow-right ms-2" style="font-size: 0.9em;"></i>
                     </button>
 
-                    <div class="text-center mt-4">
-                        <a href="{{ path('app_register') }}" class="text-decoration-none text-success small">Créer un compte</a>
-                        <span class="mx-2 text-muted">|</span>
-                        <a href="{{ path('app_forgot_password') }}" class="text-decoration-none text-danger small">Mot de passe oublié ?</a>
+                    <div class="login-footer">
+                        <a href="{{ path('app_register') }}" class="login-link">
+                            <i class="fas fa-user-plus me-1"></i> Créer un compte
+                        </a>
+                        <a href="{{ path('app_forgot_password') }}" class="login-link" style="color: #d32f2f;">
+                            <i class="fas fa-key me-1"></i> Oublié ?
+                        </a>
                     </div>
                 </form>
             </div>
@@ -63,4 +323,28 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.querySelector('.password-toggle');
+        const passwordInput = document.querySelector('#inputPassword');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                // Toggle the type attribute
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle the icon
+                const icon = this.querySelector('i');
+                if (type === 'text') {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
