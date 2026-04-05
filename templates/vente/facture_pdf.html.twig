@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture {{ numero_facture }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 12px;
+            color: #2d3748;
+            background: #ffffff;
+            line-height: 1.5;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: #1a3a2a;
+            color: white;
+            padding: 32px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: -40px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+        .brand-name {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #7ecba1;
+        }
+        .brand-tagline {
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .invoice-label {
+            text-align: right;
+        }
+        .invoice-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .invoice-number {
+            font-size: 13px;
+            color: #7ecba1;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+        .invoice-date {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        .status-completed { background: #7ecba1; color: #1a3a2a; }
+        .status-pending { background: #f6c90e; color: #1a3a2a; }
+        .status-default { background: rgba(255,255,255,0.2); color: white; }
+
+        /* ===== BODY CONTENT ===== */
+        .content {
+            padding: 36px 40px;
+        }
+
+        /* Info parties (Vendeur / Acheteur) */
+        .parties-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 36px;
+            gap: 20px;
+        }
+        .party-box {
+            flex: 1;
+            background: #f7faf8;
+            border: 1px solid #e2ede8;
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+        .party-box.highlight {
+            background: #edf6f1;
+            border-color: #7ecba1;
+        }
+        .party-label {
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #2f855a;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #c6e6d5;
+            padding-bottom: 6px;
+        }
+        .party-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1a3a2a;
+            margin-bottom: 4px;
+        }
+        .party-info {
+            font-size: 11px;
+            color: #718096;
+            line-height: 1.7;
+        }
+
+        /* ===== TABLE ARTICLES ===== */
+        .section-title {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #2f855a;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #c6e6d5;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 28px;
+        }
+        .items-table thead tr {
+            background: #1a3a2a;
+            color: white;
+        }
+        .items-table thead th {
+            padding: 11px 14px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+        .items-table thead th:last-child { text-align: right; }
+        .items-table thead th.center { text-align: center; }
+
+        .items-table tbody tr {
+            border-bottom: 1px solid #e2ede8;
+        }
+        .items-table tbody tr:nth-child(even) {
+            background: #f7faf8;
+        }
+        .items-table tbody td {
+            padding: 12px 14px;
+            font-size: 11px;
+            color: #2d3748;
+            vertical-align: middle;
+        }
+        .items-table tbody td:last-child {
+            text-align: right;
+            font-weight: bold;
+            color: #2f855a;
+        }
+        .items-table tbody td.center { text-align: center; }
+        .product-name { font-weight: bold; color: #1a3a2a; font-size: 12px; }
+        .product-sub { font-size: 10px; color: #718096; margin-top: 2px; }
+
+        /* ===== TOTAUX ===== */
+        .totals-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 32px;
+        }
+        .totals-box {
+            width: 300px;
+            border: 1px solid #e2ede8;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+            font-size: 11px;
+            border-bottom: 1px solid #e2ede8;
+        }
+        .total-row:last-child { border-bottom: none; }
+        .total-row .label { color: #718096; }
+        .total-row .value { font-weight: bold; color: #2d3748; }
+        .total-row.total-final {
+            background: #1a3a2a;
+            color: white;
+        }
+        .total-row.total-final .label {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .total-row.total-final .value {
+            color: #7ecba1;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* ===== NOTES / MENTIONS ===== */
+        .notes-section {
+            background: #f0f9f4;
+            border-left: 4px solid #7ecba1;
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 9.5px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        .notes-section strong { color: #2f855a; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #1a3a2a;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 10px 40px;
+            font-size: 9px;
+            letter-spacing: 1px;
+            /* PAS de position:fixed â€” Ã©vite la page 2 dans Dompdf */
+        }
+        .footer strong { color: #7ecba1; }
+
+        /* ===== HELPERS ===== */
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== EN-TÃŠTE ===== -->
+    <div class="header">
+        <div class="header-top">
+            <div>
+                <div class="brand-name">ðŸŒ¿ AGRIGO</div>
+                <div class="brand-tagline">Agriculture & Commerce Durable</div>
+            </div>
+            <div class="invoice-label">
+                <div class="invoice-title">FACTURE</div>
+                <div class="invoice-number">{{ numero_facture }}</div>
+                <div class="invoice-date">Ã‰mise le {{ date_edition|date('d/m/Y') }}</div>
+                {% if vente.status %}
+                    <span class="status-badge {% if vente.status == 'Completed' %}status-completed{% elseif vente.status == 'Pending' %}status-pending{% else %}status-default{% endif %}">
+                        {{ vente.status }}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENU ===== -->
+    <div class="content" style="padding: 20px 36px;">
+
+        <!-- Parties : Vendeur / Acheteur -->
+        <div class="parties-row" style="margin-bottom: 20px;">
+            <div class="party-box">
+                <div class="party-label">De (Vendeur)</div>
+                <div class="party-name">AgriGo â€” Exploitation Agricole</div>
+                <div class="party-info">
+                    Secteur Agricole, Zone Rurale<br>
+                    TÃ©l : +XXX XX XX XX XX<br>
+                    Email : contact@agrigo.com<br>
+                    SIRET / Registre : AGR-2024-0001
+                </div>
+            </div>
+            <div class="party-box highlight">
+                <div class="party-label">Ã€ (Acheteur)</div>
+                <div class="party-name">{{ vente.buyerName ?? 'Client non renseignÃ©' }}</div>
+                <div class="party-info">
+                    Date de vente : {{ vente.saleDate ? vente.saleDate|date('d/m/Y') : 'N/A' }}<br>
+                    RÃ©fÃ©rence vente : #{{ vente.id|e }}<br>
+                    {% if vente.recolte %}
+                        RÃ©colte liÃ©e : Lot #{{ vente.recolte.id }} â€” {{ vente.recolte.name }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles -->
+        <div class="section-title">ðŸ›’ DÃ©tail de la Commande</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width:40%">DÃ©signation</th>
+                    <th class="center" style="width:20%">QuantitÃ©</th>
+                    <th class="center" style="width:15%">UnitÃ©</th>
+                    <th class="center" style="width:10%">P.U.</th>
+                    <th style="width:15%">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="product-name">{{ vente.description }}</div>
+                        {% if vente.recolte %}
+                            <div class="product-sub">Origine : RÃ©colte du {{ vente.recolte.harvestDate ? vente.recolte.harvestDate|date('d/m/Y') : 'N/A' }} â€” {{ vente.recolte.name }}</div>
+                        {% endif %}
+                    </td>
+                    <td class="center">
+                        {% if vente.recolte %}
+                            {{ vente.recolte.quantity }}
+                        {% else %}
+                            1
+                        {% endif %}
+                    </td>
+                    <td class="center">
+                        {% if vente.recolte %}
+                            {{ vente.recolte.unit }}
+                        {% else %}
+                            lot
+                        {% endif %}
+                    </td>
+                    <td class="center">{{ vente.price|number_format(2, ',', ' ') }} TND</td>
+                    <td>{{ vente.price|number_format(2, ',', ' ') }} TND</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Totaux -->
+        <div class="totals-wrapper" style="margin-bottom: 16px;">
+            <div class="totals-box">
+                <div class="total-row">
+                    <span class="label">Sous-total HT</span>
+                    <span class="value">{{ vente.price|number_format(2, ',', ' ') }} TND</span>
+                </div>
+                <div class="total-row">
+                    <span class="label">TVA (0%)</span>
+                    <span class="value">0,00 TND</span>
+                </div>
+                <div class="total-row total-final">
+                    <span class="label">TOTAL TTC</span>
+                    <span class="value">{{ vente.price|number_format(2, ',', ' ') }} TND</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes lÃ©gales -->
+        <div class="notes-section">
+            <strong>âš  Mentions lÃ©gales & Conditions de paiement :</strong><br>
+            Cette facture est Ã©mise par AgriGo dans le cadre d'une transaction agricole.
+            Le rÃ¨glement doit intervenir dans un dÃ©lai de <strong>30 jours</strong> Ã  compter de la date d'Ã©mission.
+            Tout retard de paiement entraÃ®nera des pÃ©nalitÃ©s conformÃ©ment Ã  la rÃ©glementation en vigueur.
+            <strong>Mode de paiement acceptÃ©s :</strong> Virement bancaire Â· Mobile Money Â· EspÃ¨ces (sur bon de rÃ©ception).
+        </div>
+
+    </div>
+
+    <!-- ===== PIED DE PAGE ===== -->
+    <div class="footer">
+        <strong>AGRIGO</strong> â€” Agriculture Durable &amp; Commerce Responsable &nbsp;|&nbsp;
+        Facture NÂ° {{ numero_facture }} &nbsp;|&nbsp;
+        GÃ©nÃ©rÃ©e le {{ date_edition|date('d/m/Y Ã  H:i') }} &nbsp;|&nbsp;
+        Document officiel â€” Conserver prÃ©cieusement
+    </div>
+
+</body>
+</html>
+

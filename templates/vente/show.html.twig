@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sale Details{% endblock %}
+{% block page_title %}Sale Details{% endblock %}
+
+{% block body %}
+<div class="max-w-3xl mx-auto">
+    <div class="overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl">
+        <div class="px-4 py-6 sm:px-6 flex justify-between items-center border-b border-gray-100">
+            <div>
+                <h3 class="text-base font-semibold leading-7 text-gray-900">Sale Record #{{ vente.id }}</h3>
+                <p class="max-w-2xl text-sm leading-6 text-gray-500">Detailed information about this transaction.</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{{ path('app_vente_pdf', {'id': vente.id}) }}"
+                   class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+                   title="Télécharger la facture PDF">
+                    <i class="ph ph-file-pdf text-lg mr-1.5"></i> Facture PDF
+                </a>
+                <a href="{{ path('app_vente_edit', {'id': vente.id}) }}" class="inline-flex items-center rounded-md bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100 transition-colors">
+                    <i class="ph ph-pencil-simple text-lg mr-1.5"></i> Edit
+                </a>
+                {{ include('vente/_delete_form.html.twig') }}
+            </div>
+        </div>
+        <div class="border-t border-gray-100">
+            <dl class="divide-y divide-gray-100">
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-hash mr-2 text-gray-400"></i>Id</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ vente.id }}</dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-basket mr-2 text-gray-400"></i>Harvest (Recolte)</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 font-medium">{{ vente.recolte ? vente.recolte.name : 'N/A' }}</dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-calendar-blank mr-2 text-gray-400"></i>Sale Date</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ vente.saleDate ? vente.saleDate|date('Y-m-d') : '' }}</dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-currency-circle-dollar mr-2 text-gray-400"></i>Price</dt>
+                    <dd class="mt-1 text-sm leading-6 text-emerald-600 font-semibold sm:col-span-2 sm:mt-0">{{ vente.price }} TND</dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-user mr-2 text-gray-400"></i>Buyer Name</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ vente.buyerName }}</dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-check-circle mr-2 text-gray-400"></i>Status</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium 
+                            {% if vente.status == 'Completed' %}bg-green-100 text-green-800
+                            {% elseif vente.status == 'Pending' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ vente.status }}
+                        </span>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+        <div class="px-4 py-4 sm:px-6 bg-gray-50">
+            <a href="{{ path('app_vente_index') }}" class="text-sm font-semibold leading-6 text-gray-600 hover:text-gray-900 flex items-center group transition-colors">
+                <i class="ph ph-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
+                Back to list
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
