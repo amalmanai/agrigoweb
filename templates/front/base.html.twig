@@ -175,6 +175,8 @@
             <a class="nav-link" href="{{ path('app_front_home') }}">Accueil</a>
             <a class="nav-link" href="{{ path('app_culture_list') }}">Cultures</a>
             <a class="nav-link" href="{{ path('app_parcelle_list') }}">Parcelles</a>
+            <a class="nav-link" href="{{ path('app_recolte_index') }}">Recoltes</a>
+            <a class="nav-link" href="{{ path('app_vente_index') }}">Vente</a>
             {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
                 <a class="nav-link" href="{{ path('admin_culture_index') }}">Administration</a>
             {% endif %}
