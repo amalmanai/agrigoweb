@@ -1,0 +1,27 @@
+{{ form_start(form, {'attr': {'class': 'space-y-6', 'novalidate': 'novalidate'}}) }}
+    
+    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+            {{ form_row(form.name) }}
+        </div>
+        <div>
+            {{ form_row(form.harvestDate) }}
+        </div>
+        <div>
+            {{ form_row(form.quantity) }}
+        </div>
+        <div>
+            {{ form_row(form.unit) }}
+        </div>
+        <div>
+            {{ form_row(form.productionCost) }}
+        </div>
+    </div>
+
+    <div class="pt-4 flex justify-end">
+        <button type="submit" class="inline-flex justify-center flex-shrink-0 items-center rounded-md bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:translate-y-[-1px] hover:shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all">
+            <i class="ph ph-floppy-disk text-lg mr-2"></i>
+            {{ button_label|default('Save Harvest') }}
+        </button>
+    </div>
+{{ form_end(form) }}

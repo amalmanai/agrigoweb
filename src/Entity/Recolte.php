@@ -2,11 +2,10 @@
 
 namespace App\Entity;
 
+use App\Repository\RecolteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use App\Repository\RecolteRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RecolteRepository::class)]
 #[ORM\Table(name: 'recolte')]
@@ -14,155 +13,108 @@ class Recolte
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_recolte = null;
+    #[ORM\Column(name: 'id_recolte')]
+    private ?int $id = null;
 
-    public function getId_recolte(): ?int
+    #[ORM\Column(name: 'nom_produit', length: 100, nullable: true)]
+    #[Assert\NotBlank(message: "Le nom du produit est obligatoire.")]
+    #[Assert\Length(min: 2, max: 100, minMessage: "Le nom doit faire au moins 2 caractères.", maxMessage: "Le nom ne peut pas dépasser 100 caractères.")]
+    private ?string $name = null;
+
+    #[ORM\Column(name: 'quantite', nullable: true)]
+    #[Assert\NotBlank(message: "La quantité est obligatoire.")]
+    #[Assert\Positive(message: "La quantité doit être supérieure à zéro.")]
+    private ?float $quantity = null;
+
+    #[ORM\Column(name: 'unite', length: 20, nullable: true)]
+    #[Assert\NotBlank(message: "L'unité est obligatoire.")]
+    private ?string $unit = null;
+
+    #[ORM\Column(name: 'date_recolte', type: Types::DATE_MUTABLE, nullable: true)]
+    #[Assert\NotBlank(message: "La date de récolte est obligatoire.")]
+    private ?\DateTimeInterface $harvestDate = null;
+
+    #[ORM\Column(name: 'cout_production', nullable: true)]
+    #[Assert\NotBlank(message: "Le coût de production est obligatoire.")]
+    #[Assert\PositiveOrZero(message: "Le coût doit être positif ou nul.")]
+    private ?float $productionCost = null;
+
+    #[ORM\Column(name: 'id_user', nullable: true)]
+    private ?int $userId = null;
+
+    public function getId(): ?int
     {
-        return $this->id_recolte;
+        return $this->id;
     }
 
-    public function setId_recolte(int $id_recolte): static
+    public function getName(): ?string
     {
-        $this->id_recolte = $id_recolte;
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $nom_produit = null;
-
-    public function getNom_produit(): ?string
+    public function getHarvestDate(): ?\DateTimeInterface
     {
-        return $this->nom_produit;
+        return $this->harvestDate;
     }
 
-    public function setNom_produit(?string $nom_produit): static
+    public function setHarvestDate(?\DateTimeInterface $harvestDate): static
     {
-        $this->nom_produit = $nom_produit;
+        $this->harvestDate = $harvestDate;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?float $quantite = null;
-
-    public function getQuantite(): ?float
+    public function getQuantity(): ?float
     {
-        return $this->quantite;
+        return $this->quantity;
     }
 
-    public function setQuantite(?float $quantite): static
+    public function setQuantity(?float $quantity): static
     {
-        $this->quantite = $quantite;
+        $this->quantity = $quantity;
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $unite = null;
-
-    public function getUnite(): ?string
+    public function getUnit(): ?string
     {
-        return $this->unite;
+        return $this->unit;
     }
 
-    public function setUnite(?string $unite): static
+    public function setUnit(?string $unit): static
     {
-        $this->unite = $unite;
+        $this->unit = $unit;
         return $this;
     }
 
-    #[ORM\Column(type: 'date', nullable: true)]
-    private ?\DateTimeInterface $date_recolte = null;
-
-    public function getDate_recolte(): ?\DateTimeInterface
+    public function getProductionCost(): ?float
     {
-        return $this->date_recolte;
+        return $this->productionCost;
     }
 
-    public function setDate_recolte(?\DateTimeInterface $date_recolte): static
+    public function setProductionCost(?float $productionCost): static
     {
-        $this->date_recolte = $date_recolte;
+        $this->productionCost = $productionCost;
         return $this;
     }
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?float $cout_production = null;
-
-    public function getCout_production(): ?float
+    public function getUserId(): ?int
     {
-        return $this->cout_production;
+        return $this->userId;
     }
 
-    public function setCout_production(?float $cout_production): static
+    public function setUserId(?int $userId): static
     {
-        $this->cout_production = $cout_production;
+        $this->userId = $userId;
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $id_user = null;
-
-    public function getId_user(): ?int
+    public function __toString(): string
     {
-        return $this->id_user;
+        return $this->name ?? 'Recolte #'.$this->id;
     }
-
-    public function setId_user(?int $id_user): static
-    {
-        $this->id_user = $id_user;
-        return $this;
-    }
-
-    public function getIdRecolte(): ?int
-    {
-        return $this->id_recolte;
-    }
-
-    public function getNomProduit(): ?string
-    {
-        return $this->nom_produit;
-    }
-
-    public function setNomProduit(?string $nom_produit): static
-    {
-        $this->nom_produit = $nom_produit;
-
-        return $this;
-    }
-
-    public function getDateRecolte(): ?\DateTime
-    {
-        return $this->date_recolte;
-    }
-
-    public function setDateRecolte(?\DateTime $date_recolte): static
-    {
-        $this->date_recolte = $date_recolte;
-
-        return $this;
-    }
-
-    public function getCoutProduction(): ?string
-    {
-        return $this->cout_production;
-    }
-
-    public function setCoutProduction(?string $cout_production): static
-    {
-        $this->cout_production = $cout_production;
-
-        return $this;
-    }
-
-    public function getIdUser(): ?int
-    {
-        return $this->id_user;
-    }
-
-    public function setIdUser(?int $id_user): static
-    {
-        $this->id_user = $id_user;
-
-        return $this;
-    }
-
 }

@@ -15,4 +15,13 @@ class VenteRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Vente::class);
     }
+    public function getTotalRevenue(): float
+    {
+        $qb = $this->createQueryBuilder('v')
+            ->select('SUM(v.price) as total');
+
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        return $result ? (float) $result : 0.0;
+    }
 }

@@ -1,83 +1,173 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en" class="h-full bg-[#f4f5f0]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AgriGo{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        .top-avatar-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
+    <title>{% block title %}AgriGo Dashboard{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Lora -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agri-dark': '#324a3e',
+                        'agri-green': '#446b53',
+                        'agri-light': '#f4f5f0',
+                        'agri-button': '#325b43',
+                        'agri-button-hover': '#254432',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
+                    }
+                }
+            }
         }
-
-        .top-avatar-img,
-        .top-avatar-fallback {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.84rem;
-            color: #fff;
-            background: #495057;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Lora', serif; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
     {% block stylesheets %}{% endblock %}
 </head>
-<body>
-{% block body %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ path('app_home') }}">AgriGo</a>
-        <div class="navbar-nav ms-auto">
-            {% if app.user %}
-                <a class="nav-link" href="{{ path('app_culture_list') }}">Cultures</a>
-                <a class="nav-link" href="{{ path('app_parcelle_list') }}">Parcelle</a>
-                <a class="nav-link" href="{{ path('app_home') }}">Dashboard</a>
-                {% if 'ROLE_ADMIN' in app.user.roles %}
-                    <a class="nav-link" href="{{ path('app_admin_users') }}">Managing</a>
-                {% endif %}
-                {% set userPhoto = app.user.photoPath %}
-                {% if userPhoto %}
-                    {% set userPhotoSrc = userPhoto starts with 'http' ? userPhoto : asset('uploads/users/' ~ userPhoto) %}
-                {% endif %}
-                <a class="nav-link top-avatar-link" href="{{ path('app_profile_edit') }}" title="Modifier le profil">
-                    {% if userPhoto %}
-                        <img src="{{ userPhotoSrc }}" alt="Profil" class="top-avatar-img">
-                    {% else %}
-                        <span class="top-avatar-fallback">{{ app.user.prenomUser|default('U')|slice(0, 1)|upper }}</span>
-                    {% endif %}
-                    <span class="d-none d-md-inline">Profil</span>
-                </a>
-                <a class="nav-link" href="{{ path('app_logout') }}">Logout</a>
-            {% else %}
-                <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
-                <a class="nav-link" href="{{ path('app_register') }}">Inscription</a>
-            {% endif %}
+<body class="h-full flex flex-col antialiased bg-agri-light text-gray-800">
+
+    <!-- Top Navigation -->
+    <header class="bg-agri-dark text-white shadow-md relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-[60px]">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-serif font-bold tracking-tight text-white hover:text-gray-200 transition-colors">Agrigo</a>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="/" class="text-sm font-medium hover:text-gray-300 transition-colors">Accueil</a>
+                    <a href="{{ path('app_recolte_index') }}" class="text-sm font-medium hover:text-gray-300 transition-colors">Récoltes</a>
+                    <a href="{{ path('app_vente_index') }}" class="text-sm font-medium hover:text-gray-300 transition-colors">Ventes</a>
+                    <div class="flex items-center ml-4 space-x-4 pl-4 border-l border-white/20">
+                        <a href="{{ path('app_admin_dashboard') }}" class="text-sm font-medium text-emerald-300 hover:text-white transition-colors flex items-center gap-1">
+                            <i class="ph ph-shield-star"></i> Admin
+                        </a>
+                        <div class="flex items-center cursor-pointer hover:text-gray-300 transition-colors">
+                            <div class="w-7 h-7 rounded-full border border-white flex items-center justify-center mr-2 text-[10px] font-bold">
+                                G
+                            </div>
+                            <span class="text-sm font-medium">Profil</span>
+                        </div>
+                        <a href="#" class="text-sm font-medium hover:text-gray-300 transition-colors">Logout</a>
+                    </div>
+                </nav>
+            </div>
         </div>
-    </div>
-</nav>
+    </header>
 
-<main class="container">
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label == 'danger' ? 'danger' : 'success' }}" role="alert">{{ message }}</div>
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col min-w-0">
+        
+        <!-- Hero Banner -->
+        <div class="relative bg-agri-green rounded-[2rem] overflow-hidden shadow-md mb-6 p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between">
+            <div class="relative z-10 max-w-2xl">
+                <p class="text-[11px] font-semibold tracking-[0.2em] text-white/80 uppercase mb-2">Agriculture Durable</p>
+                <h1 class="text-4xl md:text-5xl font-serif font-bold leading-[1.1] mb-2 tracking-tight">Growing smarter <br> fields with AgriGo</h1>
+            </div>
+            <div class="relative z-10 flex-wrap gap-3 mt-6 md:mt-0 justify-end max-w-md hidden lg:flex">
+                <span class="px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-xs font-medium">Data-Driven Crops</span>
+                <span class="px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-xs font-medium">Healthy Parcels</span>
+                <span class="px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-xs font-medium">Risk Visibility</span>
+            </div>
+            <!-- Decorative overlay to match designer feel -->
+            <div class="absolute inset-0 bg-gradient-to-r from-agri-dark/40 to-transparent pointer-events-none"></div>
+            <!-- Leaf/tractor abstract watermark (using SVG path as pattern) -->
+            <div class="absolute right-0 bottom-0 top-0 w-1/2 opacity-[0.07] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath fill=\'%23FFFFFF\' d=\'M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C90.9,-33.5,97,-18,97,-2C96.9,14,90.8,30,81.3,42.8C71.8,55.5,58.8,65,44.8,72.4C30.8,79.8,15.4,85.1,-0.6,86.1C-16.5,87.1,-33.1,83.7,-46.6,75.4C-60.2,67.1,-70.8,53.8,-79.8,39.3C-88.8,24.8,-96.2,9.1,-95.8,-6.2C-95.4,-21.5,-87.3,-36.5,-76.6,-48C-65.8,-59.6,-52.4,-67.7,-38.6,-74.6C-24.8,-81.4,-12.4,-87,2.2,-90.8C16.8,-94.6,30.5,-83.6,44.7,-76.4Z\' transform=\'translate(100 100)\'/%3E%3C/svg%3E'); background-size: cover; background-position: right center;"></div>
+        </div>
+
+        <!-- Inner Content Card -->
+        <div class="bg-white rounded-[2rem] shadow-sm p-6 md:p-8 fade-in flex-1 relative z-10 border border-gray-100">
+            {% block body %}{% endblock %}
+        </div>
+    </main>
+
+    {% block javascripts %}{% endblock %}
+
+    <!-- Flash Messages (Toast Notifications) -->
+    <div id="toast-container" class="fixed top-20 right-6 z-[100] flex flex-col gap-3 pointer-events-none">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="toast-message pointer-events-auto flex items-center w-full max-w-sm p-4 text-gray-800 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 transform transition-all duration-500 translate-x-[120%] opacity-0" role="alert">
+                    <div class="inline-flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-xl
+                        {% if label == 'success' %}text-emerald-600 bg-emerald-50 border border-emerald-100{% else %}text-indigo-600 bg-indigo-50 border border-indigo-100{% endif %}">
+                        {% if label == 'success' %}
+                            <i class="ph ph-check-circle text-2xl"></i>
+                        {% else %}
+                            <i class="ph ph-info text-2xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4 mr-2 text-sm font-semibold tracking-wide text-gray-700 leading-snug">{{ message }}</div>
+                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg p-1.5 hover:bg-gray-50 flex items-center justify-center h-8 w-8 transition-colors" aria-label="Close" onclick="closeToast(this.closest('.toast-message'))">
+                        <span class="sr-only">Close</span>
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                    
+                    <!-- Progress bar -->
+                    <div class="absolute bottom-0 left-0 h-1 rounded-b-2xl {% if label == 'success' %}bg-emerald-500{% else %}bg-indigo-500{% endif %} w-full origin-left animate-toast-progress"></div>
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
+    </div>
 
-    {% block content %}{% endblock %}
-</main>
+    <style>
+        .animate-toast-progress {
+            animation: shrinkProgress 5s linear forwards;
+        }
+        @keyframes shrinkProgress {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+    </style>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-{% block javascripts %}{% endblock %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-{% endblock %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toasts = document.querySelectorAll('.toast-message');
+            
+            // Slide in toasts slightly after page load
+            setTimeout(() => {
+                toasts.forEach((toast, index) => {
+                    setTimeout(() => {
+                        toast.classList.remove('translate-x-[120%]', 'opacity-0');
+                    }, index * 100); // Stagger if multiple
+                });
+            }, 50);
+
+            // Auto-hide after 5 seconds
+            setTimeout(function() {
+                toasts.forEach(toast => {
+                    closeToast(toast);
+                });
+            }, 5000); 
+        });
+
+        function closeToast(toast) {
+            if (!toast) return;
+            toast.classList.add('translate-x-[120%]', 'opacity-0');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 500); // Wait for CSS transition finish
+        }
+    </script>
 </body>
 </html>
