@@ -60,6 +60,10 @@ class Parcelle
     #[ORM\OneToMany(targetEntity: HistoriqueCulture::class, mappedBy: 'parcelle')]
     private Collection $historiqueCultures;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'parcelles')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id_user', nullable: true, onDelete: 'SET NULL')]
+    private ?User $owner = null;
+
     public function __construct()
     {
         $this->cultures = new ArrayCollection();
@@ -76,7 +80,7 @@ class Parcelle
         return $this->nomParcelle;
     }
 
-    public function setNomParcelle(string $nomParcelle): self
+    public function setNomParcelle(?string $nomParcelle): self
     {
         $this->nomParcelle = $nomParcelle;
 
@@ -88,7 +92,7 @@ class Parcelle
         return $this->surface;
     }
 
-    public function setSurface(float $surface): self
+    public function setSurface(?float $surface): self
     {
         $this->surface = $surface;
 
@@ -180,5 +184,17 @@ class Parcelle
     public function __toString(): string
     {
         return $this->nomParcelle ?? (string) $this->id;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
     }
 }

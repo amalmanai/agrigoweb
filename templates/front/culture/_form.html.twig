@@ -1,0 +1,31 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+<div class="mb-3">
+    {{ form_label(form.nomCulture) }}
+    {{ form_widget(form.nomCulture) }}
+    {{ form_errors(form.nomCulture) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.dateSemis) }}
+    {{ form_widget(form.dateSemis) }}
+    {{ form_errors(form.dateSemis) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.etatCroissance) }}
+    {{ form_widget(form.etatCroissance) }}
+    {{ form_errors(form.etatCroissance) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.rendementPrevu) }}
+    {{ form_widget(form.rendementPrevu) }}
+    {{ form_errors(form.rendementPrevu) }}
+</div>
+<div class="mb-3">
+    {{ form_label(form.parcelle) }}
+    {{ form_widget(form.parcelle) }}
+    {{ form_errors(form.parcelle) }}
+</div>
+<div class="d-flex gap-2">
+    {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}
+    <a class="btn btn-outline-secondary" href="{{ cancel_path|default(path('app_culture_list')) }}">Annuler</a>
+</div>
+{{ form_end(form) }}

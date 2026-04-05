@@ -1,148 +1,419 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
-{% block title %}Inscription - {{ parent() }}{% endblock %}
+{% block title %}Inscription - Agrigo{% endblock %}
 
-{% block body %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg border-0 mt-3" style="border-radius: 20px;">
-                <div class="card-header bg-white text-center py-4 border-bottom-0" style="border-radius: 20px 20px 0 0;">
-                    <img src="{{ asset('images/logo.png') }}" alt="Agrigo Logo" height="120" class="mb-3">
-                    <h3 class="fw-bold mb-0">Créer un compte</h3>
-                    <p class="text-muted small">Rejoignez la communauté Agrigo dès maintenant</p>
+{% block stylesheets %}
+<style>
+    /* Premium Register Styles */
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem 1rem;
+        perspective: 1000px;
+    }
+
+    .register-wrapper {
+        width: 100%;
+        max-width: 600px;
+        animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .register-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 24px;
+        box-shadow: 
+            0 20px 40px rgba(42, 90, 62, 0.08),
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .register-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 
+            0 25px 50px rgba(42, 90, 62, 0.12),
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+
+    .register-header {
+        text-align: center;
+        padding: 2.5rem 2rem 1rem;
+        position: relative;
+    }
+
+    .register-logo-container {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: rotate(-3deg);
+        transition: transform 0.4s ease;
+    }
+
+    .register-card:hover .register-logo-container {
+        transform: rotate(0deg) scale(1.05);
+    }
+
+    .register-logo-container i {
+        font-size: 2.5rem;
+        color: var(--front-forest);
+    }
+
+    .register-title {
+        font-family: 'DM Serif Display', serif;
+        font-size: 2rem;
+        color: var(--front-ink);
+        margin-bottom: 0.5rem;
+    }
+
+    .register-subtitle {
+        color: var(--front-muted);
+        font-size: 0.95rem;
+    }
+
+    .register-body {
+        padding: 1rem 2.5rem 2.5rem;
+    }
+
+    .form-group-modern {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group-modern label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--front-ink);
+        margin-bottom: 0.5rem;
+        display: block;
+        transition: color 0.3s ease;
+    }
+
+    .input-modern {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        padding: 0.8rem 1rem 0.8rem 2.8rem;
+        font-size: 1rem;
+        color: var(--front-ink);
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .input-modern.is-invalid {
+        border-color: #dc3545;
+        box-shadow: inset 0 2px 4px rgba(220, 53, 69, 0.1);
+    }
+
+    .input-modern:focus {
+        outline: none;
+        background: #ffffff;
+        border-color: var(--front-leaf);
+        box-shadow: 0 0 0 4px rgba(135, 169, 95, 0.15);
+    }
+
+    .input-modern.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.15);
+    }
+
+    .input-icon {
+        position: absolute;
+        bottom: 0.85rem;
+        left: 1rem;
+        color: var(--front-muted);
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+
+    .form-group-modern:focus-within label,
+    .form-group-modern:focus-within .input-icon {
+        color: var(--front-olive);
+    }
+
+    .btn-register {
+        width: 100%;
+        background: linear-gradient(135deg, var(--front-forest) 0%, var(--front-olive) 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.9rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 16px rgba(42, 90, 62, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-register::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+        transform: skewX(-20deg);
+        transition: all 0.7s ease;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px rgba(42, 90, 62, 0.3);
+    }
+
+    .btn-register:hover::after {
+        left: 200%;
+    }
+
+    .register-footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 1.8rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .register-link {
+        color: var(--front-olive);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .register-link::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--front-forest);
+        transition: width 0.3s ease;
+    }
+
+    .register-link:hover {
+        color: var(--front-forest);
+    }
+
+    .register-link:hover::after {
+        width: 100%;
+    }
+
+    .invalid-feedback-modern {
+        color: #dc3545;
+        font-size: 0.8rem;
+        margin-top: 0.3rem;
+        display: block;
+        margin-left: 0.5rem;
+    }
+
+    .alert-modern {
+        border-radius: 12px;
+        border: none;
+        background: #fff0f0;
+        color: #d32f2f;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        box-shadow: 0 4px 6px rgba(211, 47, 47, 0.05);
+        animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes floatIn {
+        0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes shake {
+        10%, 90% { transform: translateX(-1px); }
+        20%, 80% { transform: translateX(2px); }
+        30%, 50%, 70% { transform: translateX(-4px); }
+        40%, 60% { transform: translateX(4px); }
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-wrapper">
+        <div class="register-card">
+            <div class="register-header">
+                <div class="register-logo-container">
+                    <i class="fas fa-seedling"></i>
                 </div>
-                <div class="card-body px-4 pb-4">
-                    {% if registrationForm.vars.errors | length > 0 %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Erreurs de validation</h4>
+                <h1 class="register-title">Créer un compte</h1>
+                <p class="register-subtitle">Rejoignez la communauté Agrigo dès maintenant</p>
+            </div>
+            
+            <div class="register-body">
+                {% if registrationForm.vars.errors | length > 0 %}
+                    <div class="alert-modern">
+                        <i class="fas fa-exclamation-circle" style="margin-top: 0.2rem;"></i>
+                        <div>
+                            <strong>Erreurs de validation</strong><br>
                             {% for error in registrationForm.vars.errors %}
-                                <div class="mb-2">{{ error.message }}</div>
+                                {{ error.message }}<br>
                             {% endfor %}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                    {% endif %}
+                    </div>
+                {% endif %}
 
-                    {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    {{ form_label(registrationForm.nomUser) }}
-                                    {{ form_widget(registrationForm.nomUser, {
-                                        attr: {class: 'form-control ' ~ (registrationForm.nomUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                                    }) }}
-                                    {% if registrationForm.nomUser.vars.errors | length > 0 %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in registrationForm.nomUser.vars.errors %}
-                                                <i class="fas fa-times-circle"></i> {{ error.message }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    {{ form_label(registrationForm.prenomUser) }}
-                                    {{ form_widget(registrationForm.prenomUser, {
-                                        attr: {class: 'form-control ' ~ (registrationForm.prenomUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                                    }) }}
-                                    {% if registrationForm.prenomUser.vars.errors | length > 0 %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in registrationForm.prenomUser.vars.errors %}
-                                                <i class="fas fa-times-circle"></i> {{ error.message }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
+                {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                {{ form_label(registrationForm.nomUser, 'Nom', {'label_attr': {'class': 'd-block'}}) }}
+                                <i class="fas fa-user input-icon"></i>
+                                {{ form_widget(registrationForm.nomUser, {
+                                    attr: {
+                                        class: 'input-modern ' ~ (registrationForm.nomUser.vars.errors | length > 0 ? 'is-invalid' : ''),
+                                        placeholder: 'Votre nom'
+                                    }
+                                }) }}
+                                {% if registrationForm.nomUser.vars.errors | length > 0 %}
+                                    <div class="invalid-feedback-modern">
+                                        {% for error in registrationForm.nomUser.vars.errors %}
+                                            <i class="fas fa-times-circle"></i> {{ error.message }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
-
-                        <div class="form-group mb-3">
-                            {{ form_label(registrationForm.emailUser) }}
-                            {{ form_widget(registrationForm.emailUser, {
-                                attr: {class: 'form-control ' ~ (registrationForm.emailUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                            }) }}
-                            {% if registrationForm.emailUser.vars.errors | length > 0 %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in registrationForm.emailUser.vars.errors %}
-                                        <i class="fas fa-times-circle"></i> {{ error.message }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    {{ form_label(registrationForm.numUser) }}
-                                    {{ form_widget(registrationForm.numUser, {
-                                        attr: {class: 'form-control ' ~ (registrationForm.numUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                                    }) }}
-                                    {% if registrationForm.numUser.vars.errors | length > 0 %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in registrationForm.numUser.vars.errors %}
-                                                <i class="fas fa-times-circle"></i> {{ error.message }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    {{ form_label(registrationForm.adresseUser) }}
-                                    {{ form_widget(registrationForm.adresseUser, {
-                                        attr: {class: 'form-control ' ~ (registrationForm.adresseUser.vars.errors | length > 0 ? 'is-invalid' : '')}
-                                    }) }}
-                                    {% if registrationForm.adresseUser.vars.errors | length > 0 %}
-                                        <div class="invalid-feedback d-block">
-                                            {% for error in registrationForm.adresseUser.vars.errors %}
-                                                <i class="fas fa-times-circle"></i> {{ error.message }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                {{ form_label(registrationForm.prenomUser, 'Prénom', {'label_attr': {'class': 'd-block'}}) }}
+                                <i class="fas fa-user-tag input-icon"></i>
+                                {{ form_widget(registrationForm.prenomUser, {
+                                    attr: {
+                                        class: 'input-modern ' ~ (registrationForm.prenomUser.vars.errors | length > 0 ? 'is-invalid' : ''),
+                                        placeholder: 'Votre prénom'
+                                    }
+                                }) }}
+                                {% if registrationForm.prenomUser.vars.errors | length > 0 %}
+                                    <div class="invalid-feedback-modern">
+                                        {% for error in registrationForm.prenomUser.vars.errors %}
+                                            <i class="fas fa-times-circle"></i> {{ error.message }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="form-group mb-3">
-                            {{ form_label(registrationForm.password) }}
-                            {{ form_widget(registrationForm.password, {
-                                attr: {class: 'form-control ' ~ (registrationForm.password.vars.errors | length > 0 ? 'is-invalid' : '')}
-                            }) }}
-                            {% if registrationForm.password.vars.errors | length > 0 %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in registrationForm.password.vars.errors %}
-                                        <i class="fas fa-times-circle"></i> {{ error.message }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                    <div class="form-group-modern">
+                        {{ form_label(registrationForm.emailUser, 'Adresse Email', {'label_attr': {'class': 'd-block'}}) }}
+                        <i class="fas fa-envelope input-icon"></i>
+                        {{ form_widget(registrationForm.emailUser, {
+                            attr: {
+                                class: 'input-modern ' ~ (registrationForm.emailUser.vars.errors | length > 0 ? 'is-invalid' : ''),
+                                placeholder: 'agriculteur@exemple.tn'
+                            }
+                        }) }}
+                        {% if registrationForm.emailUser.vars.errors | length > 0 %}
+                            <div class="invalid-feedback-modern">
+                                {% for error in registrationForm.emailUser.vars.errors %}
+                                    <i class="fas fa-times-circle"></i> {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                {{ form_label(registrationForm.numUser, 'Téléphone', {'label_attr': {'class': 'd-block'}}) }}
+                                <i class="fas fa-phone input-icon"></i>
+                                {{ form_widget(registrationForm.numUser, {
+                                    attr: {
+                                        class: 'input-modern ' ~ (registrationForm.numUser.vars.errors | length > 0 ? 'is-invalid' : ''),
+                                        placeholder: '216XXXXXXXX'
+                                    }
+                                }) }}
+                                {% if registrationForm.numUser.vars.errors | length > 0 %}
+                                    <div class="invalid-feedback-modern">
+                                        {% for error in registrationForm.numUser.vars.errors %}
+                                            <i class="fas fa-times-circle"></i> {{ error.message }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
-
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-success btn-block w-100">
-                                <i class="fas fa-user-plus"></i> S'inscrire
-                            </button>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                {{ form_label(registrationForm.adresseUser, 'Adresse', {'label_attr': {'class': 'd-block'}}) }}
+                                <i class="fas fa-map-marker-alt input-icon"></i>
+                                {{ form_widget(registrationForm.adresseUser, {
+                                    attr: {
+                                        class: 'input-modern ' ~ (registrationForm.adresseUser.vars.errors | length > 0 ? 'is-invalid' : ''),
+                                        placeholder: 'Votre ville/adresse'
+                                    }
+                                }) }}
+                                {% if registrationForm.adresseUser.vars.errors | length > 0 %}
+                                    <div class="invalid-feedback-modern">
+                                        {% for error in registrationForm.adresseUser.vars.errors %}
+                                            <i class="fas fa-times-circle"></i> {{ error.message }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
+                    </div>
 
-                        <p class="text-center mt-3">
-                            Déjà un compte ? <a href="{{ path('app_login') }}" class="btn btn-link">Se connecter</a>
-                        </p>
-                    {{ form_end(registrationForm) }}
-                </div>
+                    <div class="form-group-modern">
+                        {{ form_label(registrationForm.password, 'Mot de passe', {'label_attr': {'class': 'd-block'}}) }}
+                        <i class="fas fa-lock input-icon"></i>
+                        {{ form_widget(registrationForm.password, {
+                            attr: {
+                                class: 'input-modern ' ~ (registrationForm.password.vars.errors | length > 0 ? 'is-invalid' : ''),
+                                placeholder: '••••••••'
+                            }
+                        }) }}
+                        {% if registrationForm.password.vars.errors | length > 0 %}
+                            <div class="invalid-feedback-modern">
+                                {% for error in registrationForm.password.vars.errors %}
+                                    <i class="fas fa-times-circle"></i> {{ error.message }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button class="btn-register" type="submit">
+                        <i class="fas fa-user-plus me-2"></i> S'INSCRIRE
+                    </button>
+
+                    <div class="register-footer">
+                        <span class="text-muted" style="font-size: 0.9rem;">Déjà un compte ? </span>
+                        <a href="{{ path('app_login') }}" class="register-link ms-2">
+                            Se connecter <i class="fas fa-arrow-right ms-1" style="font-size: 0.8em;"></i>
+                        </a>
+                    </div>
+                {{ form_end(registrationForm) }}
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .invalid-feedback {
-        color: #dc3545;
-        font-size: 0.875em;
-        margin-top: 0.25rem;
-        display: block !important;
-    }
-    .form-control.is-invalid {
-        border-color: #dc3545;
-    }
-</style>
 {% endblock %}

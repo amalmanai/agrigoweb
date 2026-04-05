@@ -239,6 +239,7 @@
             <a href="{{ path('app_home') }}"><i class="bi bi-house-door"></i> Dashboard</a>
             <a href="{{ path('admin_culture_index') }}"><i class="bi bi-flower1"></i> Cultures</a>
             <a href="{{ path('admin_parcelle_index') }}"><i class="bi bi-map"></i> Parcelles</a>
+            <a href="{{ path('admin_historique_culture_index') }}"><i class="bi bi-clock-history"></i> Historiques</a>
             {% if 'ROLE_ADMIN' in app.user.roles %}
                 <a href="{{ path('app_admin_users') }}"><i class="bi bi-people"></i> Manage Users</a>
             {% endif %}
@@ -267,8 +268,8 @@
                     <div class="stat-value">Tracking</div>
                 </article>
                 <article class="stat-box alt-danger">
-                    <div class="stat-label">Alertes</div>
-                    <div class="stat-value">Monitoring</div>
+                    <div class="stat-label">Utilisateurs</div>
+                    <div class="stat-value">Gestion</div>
                 </article>
             </section>
 

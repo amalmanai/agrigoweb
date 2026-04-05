@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -56,6 +58,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(name: 'reset_expires', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $resetExpiresAt = null;
+
+    #[ORM\OneToMany(targetEntity: Parcelle::class, mappedBy: 'owner')]
+    private Collection $parcelles;
+
+    #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'owner')]
+    private Collection $cultures;
+
+    public function __construct()
+    {
+        $this->parcelles = new ArrayCollection();
+        $this->cultures = new ArrayCollection();
+    }
 
     public function getIdUser(): ?int
     {
@@ -220,5 +234,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->resetToken !== null &&
             $this->resetExpiresAt !== null &&
             $this->resetExpiresAt > new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, Parcelle>
+     */
+    public function getParcelles(): Collection
+    {
+        return $this->parcelles;
+    }
+
+    /**
+     * @return Collection<int, Culture>
+     */
+    public function getCultures(): Collection
+    {
+        return $this->cultures;
     }
 }
