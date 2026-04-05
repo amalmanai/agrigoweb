@@ -25,7 +25,7 @@ class ParcelleFormType extends AbstractType
                 'label' => 'Nom de la Parcelle',
                 'trim' => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'Le nom de la parcelle est obligatoire.']),
+                    new NotBlank(message: 'Le nom de la parcelle est obligatoire.'),
                     new Length(min: 2, max: 100, minMessage: 'Le nom doit contenir au moins {{ limit }} caracteres.', maxMessage: 'Le nom ne doit pas depasser {{ limit }} caracteres.'),
                     new Regex(pattern: '/^[\p{L}0-9][\p{L}0-9\s\-\']*$/u', message: 'Le nom contient des caracteres invalides.'),
                 ],
@@ -40,8 +40,8 @@ class ParcelleFormType extends AbstractType
                 'html5' => true,
                 'scale' => 2,
                 'constraints' => [
-                    new NotBlank(['message' => 'La surface est obligatoire.']),
-                    new Positive(['message' => 'La surface doit etre strictement positive.']),
+                    new NotBlank(message: 'La surface est obligatoire.'),
+                    new Positive(message: 'La surface doit etre strictement positive.'),
                 ],
                 'attr' => [
                     'class' => 'form-control',
@@ -55,7 +55,7 @@ class ParcelleFormType extends AbstractType
                 'required' => true,
                 'trim' => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'Les coordonnees GPS sont obligatoires.']),
+                    new NotBlank(message: 'Les coordonnees GPS sont obligatoires.'),
                     new Regex(pattern: '/^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/', message: 'Format invalide. Utilisez: latitude, longitude.'),
                 ],
                 'attr' => [
@@ -69,7 +69,7 @@ class ParcelleFormType extends AbstractType
                 'required' => true,
                 'trim' => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'Le type de sol est obligatoire.']),
+                    new NotBlank(message: 'Le type de sol est obligatoire.'),
                     new Length(min: 2, max: 50, minMessage: 'Le type de sol doit contenir au moins {{ limit }} caracteres.', maxMessage: 'Le type de sol ne doit pas depasser {{ limit }} caracteres.'),
                 ],
                 'attr' => [

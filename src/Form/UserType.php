@@ -58,7 +58,7 @@ class UserType extends AbstractType
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password', 'class' => 'password-field'],
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer un mot de passe']),
+                    new NotBlank(message: 'Veuillez entrer un mot de passe'),
                     new Length(min: 8, minMessage: 'Votre mot de passe doit faire au moins {{ limit }} caractères', max: 4096),
                 ],
             ]);
