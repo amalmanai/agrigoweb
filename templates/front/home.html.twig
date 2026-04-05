@@ -5,280 +5,431 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        /* Modern Premium Aesthetics for Home */
         body {
-            background: #efefef;
+            background-color: var(--front-cream, #f8fbf7);
         }
 
         .front-nav {
-            background: #ffffff;
-            border-bottom: 1px solid #e6ece3;
-            backdrop-filter: none;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        .front-nav .nav-link,
+        .front-nav .nav-link, 
         .front-nav .navbar-brand {
-            color: #1f5d37;
+            color: var(--front-forest, #2a5a3e) !important;
         }
 
         .front-nav .nav-link:hover {
-            color: #144728;
+            color: var(--front-olive, #547045) !important;
         }
 
-        .front-hero {
-            display: none;
-        }
-
-        .front-shell {
-            background: transparent;
-            border: 0;
-            box-shadow: none;
-            border-radius: 0;
-            padding: 0;
+        .front-avatar-fallback {
+            border-color: var(--front-forest, #2a5a3e) !important;
+            color: var(--front-forest, #2a5a3e) !important;
         }
 
         .home-hero {
-            min-height: 78vh;
-            display: grid;
-            place-items: center;
+            position: relative;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             color: #ffffff;
-            background:
-                linear-gradient(rgba(17, 24, 18, 0.52), rgba(17, 24, 18, 0.52)),
-                url('https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1800&q=80') center/cover;
+            background: 
+                linear-gradient(135deg, rgba(42, 90, 62, 0.85) 0%, rgba(20, 71, 40, 0.9) 100%),
+                url('https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1800&q=80') center/cover fixed;
+            overflow: hidden;
+        }
+
+        .home-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
         }
 
         .hero-inner {
-            width: min(980px, 92vw);
-            animation: rise 0.8s ease;
+            position: relative;
+            z-index: 2;
+            width: min(1000px, 92vw);
+            animation: floatUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         .hero-kicker {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.6rem 1.8rem;
+            border-radius: 30px;
             text-transform: uppercase;
-            letter-spacing: 1.6px;
-            font-size: 0.82rem;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
             font-weight: 700;
-            opacity: 0.92;
-            margin-bottom: 0.55rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .hero-title {
             font-family: 'DM Serif Display', serif;
-            font-size: clamp(2rem, 5vw, 4rem);
-            line-height: 1.04;
+            font-size: clamp(2.5rem, 6vw, 4.8rem);
+            line-height: 1.1;
             margin: 0;
-            text-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .hero-subtitle {
-            font-size: clamp(1rem, 1.7vw, 1.2rem);
-            max-width: 72ch;
-            margin: 0.85rem auto 0;
-            color: rgba(248, 251, 247, 0.92);
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            max-width: 75ch;
+            margin: 1.8rem auto 0;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
         }
 
-        .section-light {
+        .section-wrapper {
             width: min(1260px, 94vw);
-            margin: 3rem auto;
+            margin: 6rem auto;
+            position: relative;
         }
 
         .section-eyebrow {
-            color: #1d7a4b;
+            color: var(--front-forest, #2a5a3e);
             text-transform: uppercase;
-            letter-spacing: 1.4px;
-            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            font-weight: 700;
             text-align: center;
-            margin-bottom: 0.35rem;
+            margin-bottom: 0.5rem;
         }
 
         .section-title {
             font-family: 'DM Serif Display', serif;
-            font-size: clamp(1.75rem, 3vw, 2.6rem);
-            color: #1d2f24;
+            font-size: clamp(2rem, 4vw, 3rem);
+            color: var(--front-ink, #22332a);
             text-align: center;
-            margin: 0;
+            margin: 0 0 3rem;
         }
 
-        .problem-grid {
-            margin-top: 1.6rem;
+        /* Glassmorphism Cards */
+        .glass-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
         }
 
-        .problem-card {
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 40px rgba(42, 90, 62, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--front-forest, #2a5a3e), var(--front-leaf, #87a95f));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(42, 90, 62, 0.12);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .glass-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .glass-card-icon {
+            width: 65px;
+            height: 65px;
             background: #ffffff;
-            border: 1px solid #d9ded6;
-            border-radius: 14px;
-            padding: 1rem;
-            box-shadow: 0 10px 20px rgba(37, 62, 40, 0.08);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--front-olive, #547045);
+            margin-bottom: 1.8rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+            transition: transform 0.3s ease;
         }
 
-        .problem-card h3 {
+        .glass-card:hover .glass-card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .glass-card h3 {
             font-family: 'DM Serif Display', serif;
-            margin: 0 0 0.45rem;
-            color: #1f3627;
+            color: var(--front-ink, #22332a);
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
         }
 
-        .problem-card p {
+        .glass-card p {
+            color: var(--front-muted, #647668);
+            line-height: 1.7;
             margin: 0;
-            color: #516356;
+            font-size: 1.05rem;
         }
 
+        /* Split Section */
         .split-feature {
-            margin-top: 3.1rem;
+            margin-top: 6rem;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            min-height: 520px;
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.15);
         }
 
         .split-image {
             background: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1200&q=80') center/cover;
+            min-height: 600px;
         }
 
         .split-content {
-            background: #0f6a35;
-            color: #edf7ef;
-            padding: clamp(1.2rem, 2.8vw, 2.4rem);
+            background: linear-gradient(135deg, var(--front-forest, #2a5a3e) 0%, var(--front-olive, #547045) 100%);
+            color: white;
+            padding: 5rem 4rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .split-content h3 {
-            font-family: 'DM Serif Display', serif;
-            font-size: clamp(1.6rem, 2.7vw, 2.5rem);
-            line-height: 1.08;
-            margin-top: 0.2rem;
-            margin-bottom: 0.7rem;
+        .split-content .section-eyebrow {
+            color: rgba(255,255,255,0.7);
+            text-align: left;
+            margin-bottom: 1rem;
         }
 
+        .split-content h3 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2rem, 3.5vw, 3rem);
+            margin: 0 0 1.5rem;
+            line-height: 1.1;
+        }
+        
         .split-content p {
-            color: rgba(230, 246, 235, 0.9);
-            max-width: 50ch;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.6;
+            margin-bottom: 2rem;
         }
 
         .split-content ul {
-            margin: 0.45rem 0 0;
-            padding-left: 1.1rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
         .split-content li {
-            margin-bottom: 0.35rem;
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
         }
 
-        .modules {
-            margin-top: 3rem;
+        .split-content li i {
+            position: absolute;
+            left: 0;
+            background: white;
+            color: var(--front-forest, #2a5a3e);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
+        /* Modules Section */
         .modules-grid {
-            margin-top: 1.2rem;
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 0.9rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
         }
 
         .module-card {
             background: #ffffff;
-            border: 1px solid #dce4da;
-            border-radius: 12px;
-            padding: 0.9rem;
-            min-height: 220px;
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            border-color: var(--front-leaf, #87a95f);
         }
 
         .module-index {
-            color: #97a49c;
-            font-size: 0.9rem;
+            font-family: 'DM Serif Display', serif;
+            font-size: 4rem;
             font-weight: 700;
-            margin-bottom: 0.45rem;
+            color: rgba(42, 90, 62, 0.05); /* very light transparent */
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+        
+        .module-card:hover .module-index {
+            color: rgba(42, 90, 62, 0.1);
         }
 
         .module-card h4 {
             font-family: 'DM Serif Display', serif;
-            color: #1d3024;
-            margin: 0 0 0.4rem;
-            font-size: 1.15rem;
+            color: var(--front-ink, #22332a);
+            font-size: 1.4rem;
+            margin: 1rem 0 0.8rem;
+            position: relative;
+            z-index: 2;
         }
 
         .module-card p {
-            color: #4b5f51;
+            color: var(--front-muted, #647668);
+            line-height: 1.6;
             margin: 0;
+            position: relative;
+            z-index: 2;
         }
 
+        /* Vision Panel */
         .vision-panel {
-            margin-top: 2rem;
-            background: #ffffff;
-            border: 1px solid #dce4da;
-            border-radius: 12px;
-            padding: 1rem;
+            margin-top: 5rem;
+            background: linear-gradient(120deg, #ffffff 0%, #f4f7f4 100%);
+            border-radius: 24px;
+            padding: 4rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            border: 1px solid rgba(255,255,255,1);
         }
 
         .vision-panel h3 {
             font-family: 'DM Serif Display', serif;
-            color: #193a2a;
-            margin-bottom: 0.5rem;
+            font-size: 2.2rem;
+            color: var(--front-ink, #22332a);
+            margin-bottom: 1.5rem;
         }
 
         .vision-panel p {
-            margin: 0;
-            color: #47594d;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--front-muted, #647668);
+            max-width: 800px;
+            margin: 0 auto;
         }
 
+        /* Newsletter */
         .newsletter {
-            margin-top: 3rem;
-            background: #ececec;
-            border-top: 1px solid #d9dfd6;
-            border-bottom: 1px solid #d9dfd6;
-            padding: 1.8rem 0;
+            margin-top: 6rem;
+            background: white;
+            padding: 6rem 0;
+            border-top: 1px solid rgba(0,0,0,0.05);
         }
 
         .newsletter-inner {
-            width: min(1260px, 94vw);
+            width: min(800px, 94vw);
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            align-items: center;
+            text-align: center;
         }
 
         .newsletter h4 {
             font-family: 'DM Serif Display', serif;
-            margin: 0;
-            color: #1b2f44;
-            font-size: clamp(1.25rem, 2vw, 1.95rem);
+            font-size: 2.5rem;
+            color: var(--front-ink, #22332a);
+            margin-bottom: 1rem;
         }
 
         .newsletter p {
-            margin: 0.35rem 0 0;
-            color: #65706a;
+            font-size: 1.1rem;
+            color: var(--front-muted, #647668);
+            margin-bottom: 2.5rem;
         }
 
-        .newsletter input {
-            border: 1px solid #0f6a35;
-            border-radius: 4px;
-            padding: 0.65rem;
+        .newsletter-input-group {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input-group input {
+            background: var(--front-cream, #f8fbf7);
+            border: 2px solid rgba(0,0,0,0.08);
+            border-radius: 50px;
+            padding: 1.2rem 2rem;
             width: 100%;
-            background: #ffffff;
-            color: #45614f;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: var(--front-ink, #22332a);
         }
 
+        .newsletter-input-group input:focus {
+            outline: none;
+            border-color: var(--front-forest, #2a5a3e);
+            box-shadow: 0 10px 20px rgba(42, 90, 62, 0.1);
+            background: white;
+        }
+        
+        .newsletter-input-group i {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--front-muted, #647668);
+            font-size: 1.2rem;
+        }
+
+        /* Footer overrides */
         .site-footer {
-            background: #0a0d12;
+            background: #111816;
             color: #d5dbd4;
-            padding: 2rem 0 1rem;
+            padding: 4rem 0 2rem;
         }
 
         .footer-inner {
             width: min(1260px, 94vw);
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.3fr repeat(4, 1fr);
-            gap: 1.2rem;
+            grid-template-columns: 1.5fr repeat(4, 1fr);
+            gap: 3rem;
         }
 
         .footer-title {
             color: #ffffff;
-            margin-bottom: 0.55rem;
-            font-weight: 700;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
         }
 
         .footer-inner ul {
@@ -288,138 +439,137 @@
         }
 
         .footer-inner li {
-            margin-bottom: 0.32rem;
-            color: #c1cbc1;
+            margin-bottom: 0.8rem;
+            color: #9ba69f;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .footer-inner li:hover {
+            color: #ffffff;
         }
 
         .footer-bottom {
             width: min(1260px, 94vw);
-            margin: 1rem auto 0;
-            border-top: 1px solid #20252f;
-            padding-top: 0.85rem;
-            color: #97a497;
+            margin: 3rem auto 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1.5rem;
+            color: #79837c;
             font-size: 0.95rem;
+            text-align: center;
         }
 
-        @keyframes rise {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .modules-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 992px) {
-            .problem-grid,
-            .split-feature,
-            .modules-grid,
-            .newsletter-inner,
-            .footer-inner {
-                grid-template-columns: 1fr;
-            }
-
-            .newsletter input {
-                margin-top: 0.45rem;
-            }
+            .split-feature { grid-template-columns: 1fr; }
+            .split-image { min-height: 400px; }
+            .split-content { padding: 4rem 2rem; }
+            .footer-inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+            .vision-panel { padding: 3rem 2rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .footer-inner { grid-template-columns: 1fr; }
+            .hero-title { font-size: 2.8rem; }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
 <section class="home-hero">
     <div class="hero-inner">
-        <p class="hero-kicker">AGRI GO - Tunisia 2026</p>
-        <h1 class="hero-title">Smart Agricultural Management Platform Built For Tunisia</h1>
-        <p class="hero-subtitle">AGRI GO modernizes agriculture by replacing manual and paper-based processes with an integrated digital ecosystem. The mission is simple: deliver practical, local, and accessible digital tools for real farming operations.</p>
+        <div class="hero-kicker">AGRI GO - Tunisia 2026</div>
+        <h1 class="hero-title">Plateforme Intelligente de Gestion Agricole</h1>
+        <p class="hero-subtitle">AGRI GO modernise l'agriculture en remplaçant les processus manuels par un écosystème numérique intégré. Notre mission : fournir des outils digitaux pratiques, locaux et accessibles pour l'exploitation agricole de demain.</p>
     </div>
 </section>
 
-<section class="section-light">
-    <p class="section-eyebrow">The Problem & Market Need</p>
-    <h2 class="section-title">Tunisian agriculture needs a local digital shift</h2>
-    <div class="problem-grid">
-        <article class="problem-card">
-            <h3>Efficiency losses</h3>
-            <p>Current manual practices still produce major losses, including around 30% yield loss and 40% water wastage due to delayed field decisions.</p>
+<div class="section-wrapper">
+    <p class="section-eyebrow">Les Défis Actuels</p>
+    <h2 class="section-title">L'agriculture tunisienne a besoin d'une transition digitale locale</h2>
+    <div class="glass-grid">
+        <article class="glass-card">
+            <div class="glass-card-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Pertes de rendement</h3>
+            <p>Les pratiques manuelles actuelles engendrent toujours des pertes majeures, dont environ 30% de perte de rendement et 40% de gaspillage d'eau dus à des décisions retardées sur le terrain.</p>
         </article>
-        <article class="problem-card">
-            <h3>Operational hurdles</h3>
-            <p>Farmers face fragmented land management, rising irrigation costs, and repeated human errors caused by paper notes and disconnected spreadsheets.</p>
+        <article class="glass-card">
+            <div class="glass-card-icon"><i class="fas fa-tractor"></i></div>
+            <h3>Obstacles opérationnels</h3>
+            <p>Les agriculteurs font face à une gestion morcelée, des coûts d'irrigation en hausse et des erreurs humaines récurrentes causées par les notes papier et les tableurs non connectés.</p>
         </article>
-        <article class="problem-card">
-            <h3>Solution gap</h3>
-            <p>Available products are often expensive, weak in predictive capability, and not sufficiently adapted to Tunisian climate and local operations.</p>
+        <article class="glass-card">
+            <div class="glass-card-icon"><i class="fas fa-satellite-dish"></i></div>
+            <h3>Manque d'outils adaptés</h3>
+            <p>Les produits disponibles sur le marché sont souvent onéreux, faibles en capacités prédictives et insuffisamment adaptés au climat et aux opérations locales tunisiennes.</p>
         </article>
     </div>
 
     <div class="split-feature">
         <div class="split-image" aria-hidden="true"></div>
         <div class="split-content">
-            <p class="section-eyebrow" style="text-align:left;color:#9ed4b2;">Proposed Solution</p>
-            <h3>Smart + Local + Accessible agriculture platform</h3>
-            <p>AGRI GO is designed for Tunisia 2026 with one clear objective: modernize farm operations through connected modules that improve productivity while reducing resource waste.</p>
+            <p class="section-eyebrow">Notre Solution</p>
+            <h3>Une agriculture intelligente, locale et accessible</h3>
+            <p>AGRI GO est conçu pour la Tunisie de 2026 avec un objectif clair : moderniser les opérations agricoles grâce à des modules connectés qui améliorent la productivité tout en réduisant le gaspillage des ressources.</p>
             <ul>
-                <li>Target impact: +25% productivity and -35% water usage</li>
-                <li>Field workflows adapted to fragmented farms and local constraints</li>
-                <li>From planning to harvest in one continuous ecosystem</li>
+                <li><i class="fas fa-check"></i> Impact visé : +25% de productivité et -35% d'eau</li>
+                <li><i class="fas fa-check"></i> Adapté aux exploitations morcelées et contraintes locales</li>
+                <li><i class="fas fa-check"></i> De la planification à la récolte dans un seul écosystème</li>
             </ul>
         </div>
     </div>
 
-    <section class="modules">
-        <p class="section-eyebrow">Platform Architecture</p>
-        <h2 class="section-title">Five interconnected modules</h2>
+    <div class="section-wrapper" style="margin-top: 8rem;">
+        <p class="section-eyebrow">Architecture de la plateforme</p>
+        <h2 class="section-title">Cinq modules interconnectés</h2>
         <div class="modules-grid">
             <article class="module-card">
                 <div class="module-index">01</div>
                 <h4>Cultures & Parcelles</h4>
-                <p>Interactive mapping, weather-context actions, and automated alerts for disease or water stress.</p>
+                <p>Cartographie interactive, actions liées à la météo et alertes automatisées pour les maladies ou le stress hydrique.</p>
             </article>
             <article class="module-card">
                 <div class="module-index">02</div>
-                <h4>Smart Irrigation</h4>
-                <p>Automatic irrigation piloting that triggers when soil humidity drops below 30%.</p>
+                <h4>Irrigation Intelligente</h4>
+                <p>Pilotage automatique de l'irrigation qui s'enclenche lorsque l'humidité du sol descend en dessous de 30%.</p>
             </article>
             <article class="module-card">
                 <div class="module-index">03</div>
-                <h4>Predictive Stocks</h4>
-                <p>Intelligent purchase recommendations to optimize inventory and reduce resource waste.</p>
+                <h4>Stocks Prédictifs</h4>
+                <p>Recommandations d'achats intelligentes pour optimiser les inventaires et réduire le gaspillage de ressources.</p>
             </article>
             <article class="module-card">
                 <div class="module-index">04</div>
-                <h4>Workforce Management</h4>
-                <p>Task planning and GPS check-ins for workers via a dedicated mobile workflow.</p>
+                <h4>Gestion de l'Équipe</h4>
+                <p>Planification des tâches et pointage GPS pour les travailleurs via un flux de travail mobile dédié.</p>
             </article>
             <article class="module-card">
                 <div class="module-index">05</div>
-                <h4>Harvests & Sales</h4>
-                <p>Automatic document generation and crop lifecycle tracking from harvest to sales follow-up.</p>
+                <h4>Récoltes & Ventes</h4>
+                <p>Génération automatique de documents et suivi du cycle de vie des cultures, de la récolte à la vente.</p>
             </article>
         </div>
-    </section>
+    </div>
 
-    <section class="vision-panel">
-        <h3>Project Vision</h3>
-        <p>AGRI GO transforms agriculture from manual management into a data-driven operational model that is understandable, affordable, and adapted to Tunisian realities. It is built to answer concrete field challenges with measurable impact, not just to digitize forms.</p>
-    </section>
-</section>
+    <div class="vision-panel">
+        <h3>Vision du Projet</h3>
+        <p>AGRI GO transforme l'agriculture d'une gestion manuelle vers un modèle opérationnel axé sur les données qui est compréhensible, abordable et adapté aux réalités tunisiennes. Construit pour répondre aux défis concrets du terrain avec un impact mesurable, et non pas juste pour digitaliser des formulaires.</p>
+    </div>
+</div>
 
 <section class="newsletter">
     <div class="newsletter-inner">
-        <div>
-            <h4>Follow AGRI GO Evolution</h4>
-            <p>Stay connected to project updates, module demos, deployment milestones, and agriculture-focused improvements.</p>
+        <h4>Suivre l'Évolution d'AGRI GO</h4>
+        <p>Restez connecté(e) aux mises à jour du projet, aux démonstrations des modules, aux étapes de déploiement et aux améliorations globales.</p>
+        <div class="newsletter-input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="text" value="agrigo.team@project.local" readonly aria-label="newsletter-contact">
         </div>
-        <input type="text" value="Newsletter contact: agrigo.team@project.local" readonly aria-label="newsletter-contact">
     </div>
 </section>
 
@@ -427,27 +577,26 @@
     <div class="footer-inner">
         <div>
             <h3 class="footer-title">AGRI GO</h3>
-            <p>Smart Agricultural Management Platform tailored for Tunisian agriculture in 2026.</p>
-            <p><strong>Positioning:</strong> Smart + Local + Accessible</p>
-            <p><strong>Contact:</strong> agrigo.team@project.local</p>
+            <p style="color:#9ba69f; margin-bottom: 1rem; line-height: 1.6;">Plateforme de gestion agricole intelligente conçue pour l'agriculture tunisienne de demain.</p>
+            <p style="color:#9ba69f;"><strong>Positionnement :</strong> Smart + Local + Accessible</p>
         </div>
         <div>
-            <h4 class="footer-title">Useful Links</h4>
-            <ul><li>Home</li><li>Cultures</li><li>Parcelles</li><li>Administration</li></ul>
+            <h4 class="footer-title">Liens Utiles</h4>
+            <ul><li>Accueil</li><li>Cultures</li><li>Parcelles</li><li>Administration</li></ul>
         </div>
         <div>
-            <h4 class="footer-title">Core Modules</h4>
-            <ul><li>Cultures & Parcelles</li><li>Smart Irrigation</li><li>Predictive Stocks</li><li>Workforce</li><li>Harvests & Sales</li></ul>
+            <h4 class="footer-title">Modules Principaux</h4>
+            <ul><li>Cultures & Parcelles</li><li>Irrigation Intelligente</li><li>Stocks Prédictifs</li><li>Équipe</li><li>Récoltes & Ventes</li></ul>
         </div>
         <div>
-            <h4 class="footer-title">Field Challenges</h4>
-            <ul><li>Yield Losses</li><li>Water Wastage</li><li>Fragmented Land</li><li>Manual Errors</li></ul>
+            <h4 class="footer-title">Défis du Terrain</h4>
+            <ul><li>Pertes de Rendement</li><li>Gaspillage d'Eau</li><li>Terres Morcelées</li><li>Erreurs Manuelles</li></ul>
         </div>
         <div>
-            <h4 class="footer-title">Expected Impact</h4>
-            <ul><li>+25% Yield</li><li>-35% Water Use</li><li>Faster Decisions</li><li>Integrated Management</li></ul>
+            <h4 class="footer-title">Impact Espéré</h4>
+            <ul><li>+25% de Récolte</li><li>-35% de Consommation d'Eau</li><li>Décisions Rapides</li><li>Gestion Intégrée</li></ul>
         </div>
     </div>
-    <div class="footer-bottom">Copyright AGRI GO. Built as a practical digital response to Tunisian agriculture challenges.</div>
+    <div class="footer-bottom">© 2026 AGRI GO. Construit comme une réponse numérique pratique aux défis de l'agriculture tunisienne.</div>
 </footer>
 {% endblock %}

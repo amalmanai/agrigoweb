@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Parcelle;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -34,7 +35,20 @@ class ParcelleRepository extends ServiceEntityRepository
      */
     public function findFiltered(?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC'): array
     {
+        return $this->findFilteredByOwner(null, $search, $sortField, $sortDirection);
+    }
+
+    /**
+     * @return Parcelle[]
+     */
+    public function findFilteredByOwner(?User $owner, ?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC'): array
+    {
         $qb = $this->createQueryBuilder('p');
+
+        if ($owner !== null) {
+            $qb->andWhere('p.owner = :owner')
+                ->setParameter('owner', $owner);
+        }
 
         if ($search !== null && $search !== '') {
             $qb->andWhere('LOWER(p.nomParcelle) LIKE :search OR LOWER(COALESCE(p.typeSol, :emptyType)) LIKE :search OR LOWER(COALESCE(p.coordonneesGps, :emptyCoords)) LIKE :search')
