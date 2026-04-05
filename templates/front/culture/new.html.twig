@@ -1,0 +1,17 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Nouvelle culture{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Ajouter une culture</h1>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% include 'front/culture/_form.html.twig' with {
+            form: form,
+            button_label: 'Enregistrer',
+            cancel_path: path('app_culture_list')
+        } %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier parcelle{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Modifier la parcelle</h1>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% include 'front/parcelle/_form.html.twig' with {
+            form: form,
+            button_label: 'Mettre a jour',
+            cancel_path: path('app_parcelle_show', {id: parcelle.id})
+        } %}
+    </div>
+</div>
+{% endblock %}

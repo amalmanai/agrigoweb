@@ -41,11 +41,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $newPassword = (string) $form->get('plainPassword')->getData();
-            if ($newPassword !== '') {
-                $user->setPassword($userPasswordHasher->hashPassword($user, $newPassword));
-            }
-
             $entityManager->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès.');
