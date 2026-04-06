@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la Tâche{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-gray-50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <div class="mb-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-900">{{ tache.tittre_tache }}</h1>
+                <span class="inline-block
+                    {% if tache.status_tache == 'Terminée' %}
+                        bg-green-100 text-green-800
+                    {% elseif tache.status_tache == 'En cours' %}
+                        bg-blue-100 text-blue-800
+                    {% elseif tache.status_tache == 'En attente' %}
+                        bg-yellow-100 text-yellow-800
+                    {% elseif tache.status_tache == 'Annulée' %}
+                        bg-red-100 text-red-800
+                    {% else %}
+                        bg-gray-100 text-gray-800
+                    {% endif %}
+                    px-4 py-2 rounded-full text-lg font-medium">
+                    {{ tache.status_tache }}
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Description</h3>
+                        <p class="mt-2 text-gray-900 text-lg">{{ tache.description_tache }}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Type</h3>
+                        <p class="mt-2 text-gray-900 text-lg">{{ tache.type_tache }}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Date</h3>
+                        <p class="mt-2 text-gray-900 text-lg">{{ tache.date_tache|date('d/m/Y') }}</p>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Horaires</h3>
+                        <p class="mt-2 text-gray-900 text-lg">
+                            <strong>Début:</strong> {{ tache.heure_debut_tache }}<br>
+                            <strong>Fin:</strong> {{ tache.heure_fin_tache }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Remarques</h3>
+                        <p class="mt-2 text-gray-900 text-lg">{{ tache.remarque_tache or 'Aucune remarque' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-8 pt-8 border-t border-gray-200 flex gap-4">
+                <a href="{{ path('app_tache_edit', {id: tache.id}) }}" class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200">
+                    Modifier
+                </a>
+                <form method="POST" action="{{ path('app_tache_delete', {id: tache.id}) }}" onsubmit="return confirm('Êtes-vous sûr?');" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tache.id) }}">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200">
+                        Supprimer
+                    </button>
+                </form>
+                <a href="{{ path('app_tache_index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-8 rounded-lg transition duration-200">
+                    Retour
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

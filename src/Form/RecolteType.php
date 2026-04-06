@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -38,11 +39,41 @@ class RecolteType extends AbstractType
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses, 'placeholder' => '100.5'],
             ])
-            ->add('unit', TextType::class, [
+            ->add('unit', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Unité',
                 'label_attr' => ['class' => $labelClasses],
-                'attr' => ['class' => $inputClasses, 'placeholder' => 'kg, tonnes...'],
+                'attr' => ['class' => $inputClasses],
+                'placeholder' => 'Sélectionnez une unité...',
+                'choices' => [
+                    // Unités pour Récoltes
+                    'Kilogramme (kg)' => 'kg',
+                    'Tonne (T)' => 'T',
+                    'Gramme (g)' => 'g',
+                    'Hectolitre (hl)' => 'hl',
+                    'Litre (L)' => 'L',
+                    'Millilitre (ml)' => 'ml',
+                    
+                    // Unités pour Parcelles
+                    'Hectare (ha)' => 'ha',
+                    'Mètre carré (m²)' => 'm²',
+                    'Centimètre (cm)' => 'cm',
+                    'Mètre (m)' => 'm',
+                    
+                    // Unités pour Tâches
+                    'Heure (h)' => 'h',
+                    'Jour (j)' => 'j',
+                    'Semaine (sem)' => 'sem',
+                    'Mois' => 'mois',
+                    'Minute (mn)' => 'mn',
+                    
+                    // Autres unités communes
+                    'Unité (u)' => 'u',
+                    'Paquet' => 'paquet',
+                    'Boîte' => 'boîte',
+                    'Sac' => 'sac',
+                    'Nombre' => 'nombre',
+                ],
             ])
             ->add('productionCost', NumberType::class, [
                 'required' => false,

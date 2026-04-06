@@ -29,8 +29,12 @@
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 font-medium">{{ recolte.quantity }} {{ recolte.unit }}</dd>
                 </div>
                 <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
-                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-text-align-left mr-2 text-gray-400"></i>Description</dt>
-                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{{ recolte.description ?: 'No description provided.' }}</dd>
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-tag mr-2 text-gray-400"></i>Unit</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 font-medium">{{ recolte.unit }}</dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-currency-dollar mr-2 text-gray-400"></i>Production Cost</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 font-medium">{{ recolte.productionCost ? recolte.productionCost ~ ' €' : 'N/A' }}</dd>
                 </div>
             </dl>
         </div>

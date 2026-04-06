@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une Tâche{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-gray-50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8">Modifier la Tâche</h1>
+
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+                {{ form_rest(form) }}
+                
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-200">
+                        Mettre à jour
+                    </button>
+                    <a href="{{ path('app_tache_index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-3 px-8 rounded-lg transition duration-200">
+                        Annuler
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
