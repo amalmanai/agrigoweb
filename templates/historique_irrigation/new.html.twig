@@ -1,0 +1,7 @@
+{% extends layout %}
+{% block title %}Nouvel historique d'irrigation{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Nouvel historique d'irrigation</h1>
+{{ include('historique_irrigation/_form.html.twig', { submit_label: 'Créer' }) }}
+{% endblock %}

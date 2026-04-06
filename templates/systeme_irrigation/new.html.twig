@@ -1,0 +1,7 @@
+{% extends layout %}
+{% block title %}Nouveau système d'irrigation{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Nouveau système d'irrigation</h1>
+{{ include('systeme_irrigation/_form.html.twig', { submit_label: 'Créer' }) }}
+{% endblock %}

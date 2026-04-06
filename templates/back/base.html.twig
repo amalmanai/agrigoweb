@@ -240,6 +240,8 @@
             <a href="{{ path('admin_culture_index') }}"><i class="bi bi-flower1"></i> Cultures</a>
             <a href="{{ path('admin_parcelle_index') }}"><i class="bi bi-map"></i> Parcelles</a>
             <a href="{{ path('admin_historique_culture_index') }}"><i class="bi bi-clock-history"></i> Historiques</a>
+            <a href="{{ path('admin_systeme_irrigation_index') }}"><i class="bi bi-droplet-half"></i> Irrigation</a>
+            <a href="{{ path('admin_historique_irrigation_index') }}"><i class="bi bi-calendar-check"></i> Hist. irrigation</a>
             {% if 'ROLE_ADMIN' in app.user.roles %}
                 <a href="{{ path('app_admin_users') }}"><i class="bi bi-people"></i> Manage Users</a>
             {% endif %}
