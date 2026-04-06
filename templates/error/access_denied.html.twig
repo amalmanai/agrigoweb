@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès Refusé</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+            <!-- Alert Icon -->
+            <div class="flex justify-center mb-4">
+                <div class="bg-red-100 rounded-full p-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0-10a9 9 0 110 18 9 9 0 010-18z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-center text-2xl font-bold text-gray-900 mb-4">Accès Refusé</h1>
+
+            <!-- Message -->
+            <p class="text-center text-gray-600 mb-6">
+                {{ message }}
+            </p>
+
+            <!-- Actions -->
+            <div class="space-y-3">
+                <a href="{{ path('app_home') }}" class="block w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg text-center transition duration-200">
+                    Retourner à l'accueil
+                </a>
+                {% if app.user %}
+                    <a href="{{ path('app_logout') }}" class="block w-full bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-2 px-4 rounded-lg text-center transition duration-200">
+                        Se déconnecter
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-center transition duration-200">
+                        Se connecter
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Help Text -->
+            <p class="text-center text-sm text-gray-500 mt-6">
+                Si vous pensez que c'est une erreur, <a href="mailto:support@agrigo.com" class="text-green-600 hover:underline">contactez le support</a>.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
