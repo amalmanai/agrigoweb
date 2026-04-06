@@ -1,0 +1,8 @@
+{{ form_start(form, {'attr': {'class': 'space-y-4', 'novalidate': 'novalidate'}}) }}
+    {{ form_widget(form) }}
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">{{ submit_label|default('Enregistrer') }}</button>
+        {% set pfx = app.request.attributes.get('_route') starts with 'admin_' ? 'admin_' : 'front_' %}
+        <a href="{{ path(pfx ~ 'historique_irrigation_index') }}" class="btn btn-outline-secondary">Annuler</a>
+    </div>
+{{ form_end(form) }}

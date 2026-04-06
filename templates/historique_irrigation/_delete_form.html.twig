@@ -1,0 +1,5 @@
+{% set pfx = app.request.attributes.get('_route') starts with 'admin_' ? 'admin_' : 'front_' %}
+<form method="post" action="{{ path(pfx ~ 'historique_irrigation_delete', {id: historique.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cet enregistrement ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ historique.id) }}">
+    <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
+</form>
