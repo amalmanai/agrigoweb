@@ -1,0 +1,10 @@
+{% extends layout %}
+{% block title %}Modifier le système{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Modifier le système</h1>
+{{ include('systeme_irrigation/_form.html.twig', { submit_label: 'Mettre à jour' }) }}
+<div class="mt-2">
+    {{ include('systeme_irrigation/_delete_form.html.twig') }}
+</div>
+{% endblock %}

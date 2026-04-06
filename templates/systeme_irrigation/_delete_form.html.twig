@@ -1,0 +1,5 @@
+{% set pfx = app.request.attributes.get('_route') starts with 'admin_' ? 'admin_' : 'front_' %}
+<form method="post" action="{{ path(pfx ~ 'systeme_irrigation_delete', {idSysteme: systeme.idSysteme}) }}" class="d-inline" onsubmit="return confirm('Supprimer ce système d\'irrigation ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ systeme.idSysteme) }}">
+    <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
+</form>
