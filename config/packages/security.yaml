@@ -40,6 +40,8 @@ security:
         - { path: ^/vente, roles: ROLE_USER }
         - { path: ^/culture, roles: ROLE_USER }
         - { path: ^/parcelle, roles: ROLE_USER }
+        - { path: ^/systeme-irrigation, roles: ROLE_USER }
+        - { path: ^/historique-irrigation, roles: ROLE_USER }
 
 when@test:
     security:
