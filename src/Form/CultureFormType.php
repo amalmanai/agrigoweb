@@ -6,7 +6,9 @@ namespace App\Form;
 
 use App\Entity\Culture;
 use App\Entity\Parcelle;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -19,14 +21,28 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 
 class CultureFormType extends AbstractType
 {
+    private $entityManager;
+    private $security;
+
+    public function __construct(EntityManagerInterface $entityManager, Security $security)
+    {
+        $this->entityManager = $entityManager;
+        $this->security = $security;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var \App\Entity\User $user */
+        $user = $this->security->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            throw new \LogicException('L\'utilisateur doit être connecté.');
+        }
+
         $builder
             ->add('nomCulture', TextType::class, [
                 'label' => 'Nom de la Culture',
@@ -92,26 +108,26 @@ class CultureFormType extends AbstractType
                     'step' => '0.01',
                 ],
             ])
-            ->add('parcelle', EntityType::class, [
-                'label' => 'Parcelle',
-                'class' => Parcelle::class,
-                'choices' => $options['parcelle_choices'],
-                'choice_label' => 'nomParcelle',
+            ->add('parcelle', TextType::class, [
+                'label' => 'Parcelle (Saisissez le nom)',
                 'required' => true,
-                'placeholder' => 'Selectionner une parcelle',
-                'constraints' => [
-                    new NotNull(message: 'Veuillez selectionner une parcelle.'),
-                ],
                 'attr' => [
                     'class' => 'form-control',
+                    'placeholder' => 'Ex: Parcelle Nord',
+                    'list' => 'parcelle-datalist',
+                    'autocomplete' => 'off',
                 ],
+                'invalid_message' => 'Cette parcelle n\'existe pas ou ne vous appartient pas.',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'attr' => [
-                    'class' => 'btn btn-primary',
+                    'class' => 'btn btn-primary w-100 mt-3',
                 ],
             ]);
+
+        $builder->get('parcelle')
+            ->addModelTransformer(new \App\Form\DataTransformer\ParcelleToNameTransformer($this->entityManager, $user));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

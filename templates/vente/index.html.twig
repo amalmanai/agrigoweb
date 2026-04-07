@@ -1,54 +1,57 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
-{% block title %}Ventes Index{% endblock %}
-{% block page_title %}Ventes Management{% endblock %}
+{% block title %}Ventes{% endblock %}
 
-{% block body %}
-<div class="flex flex-wrap items-center justify-between mb-8 gap-4">
-    <h2 class="text-3xl font-bold font-serif text-gray-800 tracking-tight">Ventes</h2>
-    <a href="{{ path('app_vente_new') }}" class="inline-flex items-center rounded-lg bg-white px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-        Créer une vente
-    </a>
-</div>
-
-<!-- Stats (Chiffre d'Affaires Total) styled neutrally -->
-<div class="mb-10 flex items-center gap-3 border-b border-gray-100 pb-8">
-    <div class="w-10 h-10 rounded-[0.7rem] bg-agri-green/10 flex items-center justify-center text-agri-green">
-        <i class="ph ph-chart-line-up text-xl"></i>
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Gestion des Ventes</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('app_vente_new') }}" class="btn btn-primary">Enregistrer une vente</a>
+        </div>
     </div>
-    <div>
-        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Chiffre d'Affaires Total</p>
-        <p class="text-xl font-bold font-serif text-gray-900">{{ total_revenue|number_format(2, '.', ',') }} TND</p>
-    </div>
-</div>
 
-<!-- Grid of cards instead of table -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-    {% for vente in ventes %}
-        <div class="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:border-gray-200 transition-all">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Vente #{{ vente.id }} - Mis à jour</h3>
-                <div class="space-y-2.5 text-[0.9rem] text-gray-600">
-                    <p><span class="font-semibold text-gray-800">Description:</span> {{ vente.description }}</p>
-                    <p><span class="font-semibold text-gray-800">Date de vente:</span> {{ vente.saleDate ? vente.saleDate|date('Y-m-d') : '-' }}</p>
-                    <p><span class="font-semibold text-gray-800">Prix:</span> {{ vente.price|number_format(2, '.', ',') }} TND</p>
-                </div>
-            </div>
-            
-            <div class="mt-8 flex space-x-2">
-                <a href="{{ path('app_vente_show', {'id': vente.id}) }}" class="inline-flex justify-center rounded-lg bg-agri-button px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-agri-button-hover transition-colors">
-                    Details
-                </a>
-                <a href="{{ path('app_vente_edit', {'id': vente.id}) }}" class="inline-flex justify-center rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                    Editer
-                </a>
-            </div>
+    {% if ventes is empty %}
+        <div class="alert alert-info">
+            Aucune vente trouvée. <a href="{{ path('app_vente_new') }}">Enregistrer une vente</a>
         </div>
     {% else %}
-        <div class="col-span-1 md:col-span-2 py-12 text-center text-gray-500 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-            <i class="ph ph-folder-open text-3xl text-gray-300 mb-2 block"></i>
-            <p class="text-sm">Aucune vente trouvée.</p>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Récolte</th>
+                        <th>Acheteur</th>
+                        <th>Prix (TND)</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vente in ventes %}
+                        <tr>
+                            <td>{{ vente.id }}</td>
+                            <td>{{ vente.recolte.nomRecolte|default('Vente anonyme') }}</td>
+                            <td>{{ vente.nomAcheteur|default('Particulier') }}</td>
+                            <td>{{ vente.prixVente }}</td>
+                            <td>{{ vente.dateVente|date('d/m/Y') }}</td>
+                            <td>
+                                <a href="{{ path('app_vente_pdf', {id: vente.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                                <a href="{{ path('app_vente_edit', {id: vente.id}) }}" class="btn btn-sm btn-warning">Éditer</a>
+                                <form method="post" action="{{ path('app_vente_delete', {id: vente.id}) }}" class="d-inline" onsubmit="return confirm('Etes-vous sûr de vouloir supprimer cet élément ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vente.id) }}">
+                                    <button class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}
+

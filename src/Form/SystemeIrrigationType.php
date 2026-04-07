@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Parcelle;
 use App\Entity\SystemeIrrigation;
+use App\Entity\User;
 use App\Repository\ParcelleRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -22,6 +23,7 @@ class SystemeIrrigationType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $parcelleOwner = $options['parcelle_owner'];
         $builder
             ->add('parcelle', EntityType::class, [
                 'class' => Parcelle::class,
@@ -30,7 +32,14 @@ class SystemeIrrigationType extends AbstractType
                 'mapped' => false,
                 'required' => true,
                 'placeholder' => '— Choisir une parcelle —',
-                'query_builder' => fn ($r) => $r->createQueryBuilder('x')->orderBy('x.nomParcelle', 'ASC'),
+                'query_builder' => function ($r) use ($parcelleOwner) {
+                    $qb = $r->createQueryBuilder('x')->orderBy('x.nomParcelle', 'ASC');
+                    if ($parcelleOwner instanceof User) {
+                        $qb->andWhere('x.owner = :o')->setParameter('o', $parcelleOwner);
+                    }
+
+                    return $qb;
+                },
             ])
             ->add('nomSysteme', TextType::class, [
                 'label' => 'Nom du système',
@@ -66,6 +75,8 @@ class SystemeIrrigationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => SystemeIrrigation::class,
+            'parcelle_owner' => null,
         ]);
+        $resolver->setAllowedTypes('parcelle_owner', ['null', User::class]);
     }
 }

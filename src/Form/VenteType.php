@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Recolte;
+use App\Entity\User;
 use App\Entity\Vente;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -12,11 +13,13 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityRepository;
 
 class VenteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $owner = $options['recolte_owner'];
         $inputClasses = 'py-2.5 px-4 transition duration-200 ease-in-out shadow-sm';
         $labelClasses = 'block text-sm font-semibold leading-6 text-gray-900 mb-1';
 
@@ -33,6 +36,14 @@ class VenteType extends AbstractType
                 'placeholder' => 'Sélectionner une récolte',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses],
+                'query_builder' => function (EntityRepository $r) use ($owner) {
+                    $qb = $r->createQueryBuilder('rec')->orderBy('rec.name', 'ASC');
+                    if ($owner instanceof User) {
+                        $qb->andWhere('rec.userId = :uid')->setParameter('uid', $owner->getIdUser());
+                    }
+
+                    return $qb;
+                },
             ])
             ->add('saleDate', DateType::class, [
                 'widget' => 'single_text',
@@ -67,6 +78,8 @@ class VenteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Vente::class,
+            'recolte_owner' => null,
         ]);
+        $resolver->setAllowedTypes('recolte_owner', ['null', User::class]);
     }
 }

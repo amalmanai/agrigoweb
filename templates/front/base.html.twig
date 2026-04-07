@@ -175,11 +175,13 @@
             <a class="nav-link" href="{{ path('app_front_home') }}">Accueil</a>
             <a class="nav-link" href="{{ path('app_culture_list') }}">Cultures</a>
             <a class="nav-link" href="{{ path('app_parcelle_list') }}">Parcelles</a>
-            <a class="nav-link" href="{{ path('app_recolte_index') }}">Recoltes</a>
-            <a class="nav-link" href="{{ path('app_vente_index') }}">Vente</a>
+            <a class="nav-link" href="{{ path('app_recolte_list') }}">Récoltes</a>
+            <a class="nav-link" href="{{ path('app_vente_list') }}">Ventes</a>
+            <a class="nav-link" href="{{ path('app_produit_list') }}">Produits</a>
+            <a class="nav-link" href="{{ path('app_mouvement_stock_list') }}">Mouvements de Stock</a>
             <a class="nav-link" href="{{ path('front_systeme_irrigation_index') }}">Irrigation</a>
             {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
-                <a class="nav-link" href="{{ path('admin_culture_index') }}">Administration</a>
+                <a class="nav-link" href="{{ path('app_admin_dashboard') }}">Administration</a>
             {% endif %}
             {% if app.user %}
                 {% set userPhoto = app.user.photoPath %}

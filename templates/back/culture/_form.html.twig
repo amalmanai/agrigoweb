@@ -1,4 +1,4 @@
-﻿{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 <div class="mb-3">
     {{ form_label(form.nomCulture) }}
     {{ form_widget(form.nomCulture) }}
@@ -22,6 +22,11 @@
 <div class="mb-3">
     {{ form_label(form.parcelle) }}
     {{ form_widget(form.parcelle) }}
+    <datalist id="parcelle-datalist">
+        {% for parcelle in parcelle_choices|default([]) %}
+            <option value="{{ parcelle.nomParcelle }}">
+        {% endfor %}
+    </datalist>
     {{ form_errors(form.parcelle) }}
 </div>
 <div class="d-flex gap-2">

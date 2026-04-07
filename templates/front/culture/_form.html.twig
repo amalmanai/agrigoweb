@@ -22,7 +22,13 @@
 <div class="mb-3">
     {{ form_label(form.parcelle) }}
     {{ form_widget(form.parcelle) }}
+    <datalist id="parcelle-datalist">
+        {% for parcelle in parcelle_choices|default([]) %}
+            <option value="{{ parcelle.nomParcelle }}">
+        {% endfor %}
+    </datalist>
     {{ form_errors(form.parcelle) }}
+    <small class="text-muted">Commencez à taper le nom de votre parcelle pour voir les suggestions.</small>
 </div>
 <div class="d-flex gap-2">
     {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}

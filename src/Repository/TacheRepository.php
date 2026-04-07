@@ -15,4 +15,17 @@ class TacheRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Tache::class);
     }
+
+    /**
+     * @return Tache[]
+     */
+    public function findByOwnerId(int $userId): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.id_user = :uid')
+            ->setParameter('uid', $userId)
+            ->orderBy('t.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -1,0 +1,104 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Ventes{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h1 class="h3 mb-0 text-gray-800">Mes Ventes</h1>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{{ path('app_vente_new') }}" class="btn btn-primary shadow-sm glass-button">
+            <i class="bi bi-plus text-white-50"></i> Nouvelle Vente
+        </a>
+    </div>
+</div>
+
+<div class="card shadow mb-4 glass-panel border-0">
+    <div class="card-header py-3 bg-transparent border-0 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Historique des Ventes</h6>
+        <form class="d-none d-sm-inline-block form-inline ml-auto mr-md-3 my-2 my-md-0 mw-100 navbar-search" method="get" action="{{ path('app_vente_list') }}">
+            <div class="input-group glass-input flex-nowrap">
+                <input type="text" class="form-control bg-transparent border-0 small" placeholder="Rechercher..." name="search" value="{{ search }}">
+                <button class="btn btn-primary border-0" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover glass-table" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="{{ path('app_vente_list', {'sort': 'description', 'direction': sort == 'description' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
+                                Description {% if sort == 'description' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ path('app_vente_list', {'sort': 'price', 'direction': sort == 'price' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
+                                Prix {% if sort == 'price' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ path('app_vente_list', {'sort': 'saleDate', 'direction': sort == 'saleDate' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
+                                Date {% if sort == 'saleDate' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ path('app_vente_list', {'sort': 'buyerName', 'direction': sort == 'buyerName' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
+                                Acheteur {% if sort == 'buyerName' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="{{ path('app_vente_list', {'sort': 'status', 'direction': sort == 'status' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
+                                Statut {% if sort == 'status' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                            </a>
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vente in ventes %}
+                    <tr>
+                        <td class="font-weight-bold">{{ vente.description }}</td>
+                        <td class="text-success font-weight-bold">{{ vente.price }} €</td>
+                        <td>{{ vente.saleDate|date('d/m/Y') }}</td>
+                        <td>{{ vente.buyerName }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if vente.status == 'terminee' or vente.status == 'terminée' %}bg-success
+                                {% elseif vente.status == 'en attente' %}bg-warning text-dark
+                                {% else %}bg-secondary{% endif %} glass-badge">
+                                {{ vente.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group gap-2">
+                                <a href="{{ path('app_vente_show', {'id': vente.id}) }}" class="btn btn-sm btn-info text-white rounded shadow-sm" title="Voir">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('app_vente_edit', {'id': vente.id}) }}" class="btn btn-sm btn-warning text-white rounded shadow-sm" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_vente_delete', {'id': vente.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette vente ?');" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_front_vente_' ~ vente.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger rounded shadow-sm" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Aucune vente trouvée.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
