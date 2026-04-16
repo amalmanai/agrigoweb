@@ -9,8 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -55,10 +55,11 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // Automatic QR Code Generation
-            $qrCodePath = 'C:\Users\Amal\AgriGo\user-qrs\user_'.$user->getIdUser().'_'.$user->getEmailUser().'.png';
-            if (!file_exists('C:\Users\Amal\AgriGo\user-qrs')) {
-                mkdir('C:\Users\Amal\AgriGo\user-qrs', 0777, true);
+            $qrDir = $this->getParameter('user_qr_codes_directory');
+            if (!is_dir($qrDir)) {
+                mkdir($qrDir, 0775, true);
             }
+            $qrCodePath = $qrDir.\DIRECTORY_SEPARATOR.'user_'.$user->getIdUser().'_'.$user->getEmailUser().'.svg';
 
             $result = $qrCodeBuilder->build(
                 data: 'AGRIGO-USER:'.$user->getIdUser().':'.$user->getEmailUser(),
@@ -73,7 +74,7 @@ class RegistrationController extends AbstractController
             $request->getSession()->set('registration_success_user', [
                 'id' => $user->getIdUser(),
                 'name' => $user->getPrenomUser(),
-                'qr_path' => 'user_'.$user->getIdUser().'_'.$user->getEmailUser().'.png'
+                'qr_path' => 'user_'.$user->getIdUser().'_'.$user->getEmailUser().'.svg'
             ]);
 
             return $this->redirectToRoute('app_registration_success');
@@ -105,7 +106,8 @@ class RegistrationController extends AbstractController
     #[Route('/qr-code/download/{filename}', name: 'app_qr_download')]
     public function downloadQr(string $filename): Response
     {
-        $path = 'C:\Users\Amal\AgriGo\user-qrs\\' . $filename;
+        $filename = basename($filename);
+        $path = $this->getParameter('user_qr_codes_directory').\DIRECTORY_SEPARATOR.$filename;
         if (!file_exists($path)) {
             throw $this->createNotFoundException('QR Code non trouvé.');
         }
@@ -116,7 +118,8 @@ class RegistrationController extends AbstractController
     #[Route('/qr-code/view/{filename}', name: 'app_qr_view')]
     public function viewQr(string $filename): Response
     {
-        $path = 'C:\Users\Amal\AgriGo\user-qrs\\' . $filename;
+        $filename = basename($filename);
+        $path = $this->getParameter('user_qr_codes_directory').\DIRECTORY_SEPARATOR.$filename;
         if (!file_exists($path)) {
             throw $this->createNotFoundException('QR Code non trouvé.');
         }
