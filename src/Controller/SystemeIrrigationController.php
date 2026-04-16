@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\SystemeIrrigation;
+use App\Entity\User;
 use App\Form\SystemeIrrigationType;
 use App\Repository\ParcelleRepository;
 use App\Repository\SystemeIrrigationRepository;
@@ -23,12 +24,27 @@ class SystemeIrrigationController extends AbstractController
             : 'front/base.html.twig';
     }
 
+    private function isAdminArea(Request $request): bool
+    {
+        return str_starts_with($request->getPathInfo(), '/admin');
+    }
+
+    private function requireUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $user;
+    }
+
     /**
      * @return array{0: list<SystemeIrrigation>, 1: array<int, \App\Entity\Parcelle>}
      */
-    private function parcellesParId(SystemeIrrigationRepository $repository, ParcelleRepository $parcelleRepository, ?string $q, string $tri): array
+    private function parcellesParId(SystemeIrrigationRepository $repository, ParcelleRepository $parcelleRepository, ?string $q, string $tri, ?User $parcelleOwner): array
     {
-        $systemes = $repository->findAllWithExistingParcelle($q ?: null, $tri);
+        $systemes = $repository->findAllWithExistingParcelle($q ?: null, $tri, $parcelleOwner);
         $ids = array_unique(array_filter(array_map(fn (SystemeIrrigation $s) => $s->getIdParcelle(), $systemes)));
         if ($ids === []) {
             return [$systemes, []];
@@ -48,7 +64,8 @@ class SystemeIrrigationController extends AbstractController
     {
         $q = $request->query->getString('q', '');
         $tri = $request->query->getString('tri', 'nom_asc');
-        [$systemes, $parcellesParId] = $this->parcellesParId($repository, $parcelleRepository, '' !== $q ? $q : null, $tri);
+        $owner = $this->isAdminArea($request) ? null : $this->requireUser();
+        [$systemes, $parcellesParId] = $this->parcellesParId($repository, $parcelleRepository, '' !== $q ? $q : null, $tri, $owner);
 
         return $this->render('systeme_irrigation/index.html.twig', [
             'layout' => $this->layoutFromRequest($request),
@@ -69,7 +86,9 @@ class SystemeIrrigationController extends AbstractController
         $systeme->setMode('MANUEL');
         $systeme->setStatut('ACTIF');
 
-        $form = $this->createForm(SystemeIrrigationType::class, $systeme);
+        $form = $this->createForm(SystemeIrrigationType::class, $systeme, [
+            'parcelle_owner' => $this->isAdminArea($request) ? null : $this->requireUser(),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -95,7 +114,8 @@ class SystemeIrrigationController extends AbstractController
     #[Route(path: '/admin/systeme-irrigation/{idSysteme}', name: 'admin_systeme_irrigation_show', requirements: ['idSysteme' => '\d+'], methods: ['GET'])]
     public function show(int $idSysteme, SystemeIrrigationRepository $repository, ParcelleRepository $parcelleRepository, Request $request): Response
     {
-        $systeme = $repository->findOneWithExistingParcelle($idSysteme);
+        $owner = $this->isAdminArea($request) ? null : $this->requireUser();
+        $systeme = $repository->findOneWithExistingParcelle($idSysteme, $owner);
         if (!$systeme) {
             throw $this->createNotFoundException();
         }
@@ -112,12 +132,15 @@ class SystemeIrrigationController extends AbstractController
     #[Route(path: '/admin/systeme-irrigation/{idSysteme}/edit', name: 'admin_systeme_irrigation_edit', requirements: ['idSysteme' => '\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, int $idSysteme, SystemeIrrigationRepository $repository, EntityManagerInterface $em): Response
     {
-        $systeme = $repository->findOneWithExistingParcelle($idSysteme);
+        $owner = $this->isAdminArea($request) ? null : $this->requireUser();
+        $systeme = $repository->findOneWithExistingParcelle($idSysteme, $owner);
         if (!$systeme) {
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm(SystemeIrrigationType::class, $systeme);
+        $form = $this->createForm(SystemeIrrigationType::class, $systeme, [
+            'parcelle_owner' => $this->isAdminArea($request) ? null : $this->requireUser(),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -144,7 +167,10 @@ class SystemeIrrigationController extends AbstractController
     #[Route(path: '/admin/systeme-irrigation/{idSysteme}', name: 'admin_systeme_irrigation_delete', requirements: ['idSysteme' => '\d+'], methods: ['POST'])]
     public function delete(Request $request, int $idSysteme, SystemeIrrigationRepository $repository, EntityManagerInterface $em): Response
     {
-        $systeme = $repository->find($idSysteme);
+        $owner = $this->isAdminArea($request) ? null : $this->requireUser();
+        $systeme = $owner
+            ? $repository->findOneWithExistingParcelle($idSysteme, $owner)
+            : $repository->find($idSysteme);
         if (!$systeme) {
             throw $this->createNotFoundException();
         }

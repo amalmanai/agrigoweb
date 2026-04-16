@@ -242,6 +242,38 @@
         animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     }
 
+    #address-map-container {
+        position: relative;
+    }
+
+    .map-controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 10px;
+    }
+
+    .btn-map-control {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .loader-address {
+        display: none;
+        position: absolute;
+        right: 1rem;
+        bottom: 0.85rem;
+        color: var(--front-forest);
+        animation: rotate 1s linear infinite;
+        z-index: 5;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
     @keyframes floatIn {
         0% { opacity: 0; transform: translateY(30px) scale(0.95); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -367,11 +399,28 @@
                                 {{ form_label(registrationForm.adresseUser, 'Adresse', {'label_attr': {'class': 'd-block'}}) }}
                                 <i class="fas fa-map-marker-alt input-icon"></i>
                                 {{ form_widget(registrationForm.adresseUser, {
+                                    id: 'adresse_user_input',
                                     attr: {
                                         class: 'input-modern ' ~ (registrationForm.adresseUser.vars.errors | length > 0 ? 'is-invalid' : ''),
-                                        placeholder: 'Votre ville/adresse'
+                                        placeholder: 'Cliquez sur la carte ou tapez ici',
+                                        'data-map-target': 'input'
                                     }
                                 }) }}
+                                <i class="fas fa-spinner loader-address" id="address-loader"></i>
+                                
+                                <div class="map-controls">
+                                    <button type="button" id="btn-toggle-map" class="btn btn-outline-secondary btn-map-control">
+                                        <i class="fas fa-map"></i> Carte
+                                    </button>
+                                    <button type="button" id="btn-locate-me" class="btn btn-outline-success btn-map-control" style="display: none;">
+                                        <i class="fas fa-location-arrow"></i> Ma position
+                                    </button>
+                                </div>
+
+                                <div id="address-map-container" style="display: none; margin-top: 10px;">
+                                    <div id="address-map" style="height: 250px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); z-index: 1;"></div>
+                                    <small class="text-muted" style="display:block; margin-top: 5px;"><i class="fas fa-info-circle"></i> Cliquez sur la carte pour définir votre adresse.</small>
+                                </div>
                                 {% if registrationForm.adresseUser.vars.errors | length > 0 %}
                                     <div class="invalid-feedback-modern">
                                         {% for error in registrationForm.adresseUser.vars.errors %}
@@ -401,6 +450,30 @@
                         {% endif %}
                     </div>
 
+                    <div style="margin-top: 2rem; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1.5rem; margin-bottom: 1.5rem;">
+                        <h5 class="register-subtitle mb-2" style="font-weight: 700; color: var(--front-forest);">
+                            <i class="fas fa-id-card-clip me-2"></i> BIOMÉTRIE (Optionnel)
+                        </h5>
+                        
+                        <div id="face-reg-section" style="text-align: center;">
+                            <p class="text-muted small mb-3">Configurez la reconnaissance faciale pour une connexion sécurisée.</p>
+                            <div style="position: relative; width: 100%; max-width: 300px; margin: 0 auto; height: 220px; background: #000; border-radius: 16px; overflow: hidden; border: 4px solid var(--front-cream); box-shadow: 0 8px 16px rgba(0,0,0,0.1);">
+                                <video id="reg-video" width="100%" height="100%" autoplay muted playsinline style="object-fit: cover;"></video>
+                                <canvas id="reg-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                                <div id="camera-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); color: white; cursor: pointer; z-index: 10;">
+                                    <div class="text-center">
+                                        <i class="fas fa-camera fa-2x mb-2"></i><br><span id="camera-msg">Activer caméra</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="face-status" class="mt-2 small" style="min-height: 20px; font-weight: 600;"></div>
+                            
+                            <button type="button" id="capture-face-btn" class="btn btn-sm mt-2" style="display:none; border-radius: 20px; padding: 0.4rem 1.2rem; background: var(--front-olive); color: white;">
+                                <i class="fas fa-user-check me-2"></i> Capturer mon visage
+                            </button>
+                        </div>
+                    </div>
+
                     <button class="btn-register" type="submit">
                         <i class="fas fa-user-plus me-2"></i> S'INSCRIRE
                     </button>
@@ -416,4 +489,209 @@
         </div>
     </div>
 </div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnToggleMap = document.getElementById('btn-toggle-map');
+        const btnLocateMe = document.getElementById('btn-locate-me');
+        const mapContainer = document.getElementById('address-map-container');
+        const addressInput = document.getElementById('adresse_user_input');
+        const loader = document.getElementById('address-loader');
+        
+        let map = null;
+        let marker = null;
+
+        function setAddressFromLatLng(lat, lng) {
+            loader.style.display = 'block';
+            
+            // Nominatim Reverse Geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`, {
+                headers: {
+                    'Accept-Language': 'fr'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.address) {
+                    const addr = data.address;
+                    let parts = [];
+                    
+                    // Build a readable address
+                    if (addr.house_number) parts.push(addr.house_number);
+                    if (addr.road) parts.push(addr.road);
+                    if (addr.suburb) parts.push(addr.suburb);
+                    if (addr.city || addr.town || addr.village) parts.push(addr.city || addr.town || addr.village);
+                    if (addr.postcode) parts.push(addr.postcode);
+                    if (addr.state) parts.push(addr.state);
+                    
+                    const formatted = parts.length > 0 ? parts.join(', ') : data.display_name;
+                    addressInput.value = formatted;
+                    
+                    // Trigger change event for any listeners
+                    addressInput.dispatchEvent(new Event('change'));
+                }
+            })
+            .catch(err => console.error('Geocoding error:', err))
+            .finally(() => {
+                loader.style.display = 'none';
+            });
+        }
+
+        function updateMarker(lat, lng) {
+            if (!marker) {
+                marker = L.marker([lat, lng]).addTo(map);
+            } else {
+                marker.setLatLng([lat, lng]);
+            }
+        }
+
+        btnToggleMap.addEventListener('click', function() {
+            if (mapContainer.style.display === 'none') {
+                mapContainer.style.display = 'block';
+                btnLocateMe.style.display = 'inline-block';
+                btnToggleMap.innerHTML = '<i class="fas fa-times"></i> Fermer';
+                
+                if (!map) {
+                    // Tunis default
+                    map = L.map('address-map').setView([36.8065, 10.1815], 11);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap'
+                    }).addTo(map);
+
+                    map.on('click', function(e) {
+                        updateMarker(e.latlng.lat, e.latlng.lng);
+                        setAddressFromLatLng(e.latlng.lat, e.latlng.lng);
+                    });
+                } else {
+                    map.invalidateSize();
+                }
+            } else {
+                mapContainer.style.display = 'none';
+                btnLocateMe.style.display = 'none';
+                btnToggleMap.innerHTML = '<i class="fas fa-map"></i> Carte';
+            }
+        });
+
+        btnLocateMe.addEventListener('click', function() {
+            if (navigator.geolocation) {
+                btnLocateMe.disabled = true;
+                btnLocateMe.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
+                
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 15);
+                    updateMarker(lat, lng);
+                    setAddressFromLatLng(lat, lng);
+                    
+                    btnLocateMe.disabled = false;
+                    btnLocateMe.innerHTML = '<i class="fas fa-location-arrow"></i> Ma position';
+                }, function() {
+                    alert("Impossible d'obtenir votre position.");
+                    btnLocateMe.disabled = false;
+                    btnLocateMe.innerHTML = '<i class="fas fa-location-arrow"></i> Ma position';
+                });
+            }
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+    const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/';
+    let isModelsLoaded = false;
+    let videoStream = null;
+    let detectionInterval = null;
+    const video = document.getElementById('reg-video');
+    const canvas = document.getElementById('reg-canvas');
+    const overlay = document.getElementById('camera-overlay');
+    const statusEl = document.getElementById('face-status');
+    const captureBtn = document.getElementById('capture-face-btn');
+    const faceInput = document.getElementById('user_faceDescriptor'); // Based on Symfony field naming convention
+
+    async function loadModels() {
+        if (isModelsLoaded) return true;
+        statusEl.innerText = "Chargement de l'intelligence artificielle...";
+        try {
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            isModelsLoaded = true;
+            return true;
+        } catch (e) {
+            statusEl.innerText = "Erreur de chargement des modèles IA.";
+            return false;
+        }
+    }
+
+    async function toggleCamera() {
+        if (!videoStream) {
+            if (!(await loadModels())) return;
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                video.srcObject = videoStream;
+                overlay.style.display = 'none';
+                captureBtn.style.display = 'inline-block';
+                statusEl.innerText = "🔍 Recherche de visage...";
+                
+                video.onplay = () => {
+                    const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
+                    faceapi.matchDimensions(canvas, displaySize);
+                    
+                    detectionInterval = setInterval(async () => {
+                        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                        if (detections) {
+                            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                            faceapi.draw.drawDetections(canvas, resizedDetections);
+                            statusEl.innerText = "✅ Visage détecté !";
+                            statusEl.style.color = "var(--front-olive)";
+                        } else {
+                            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                            statusEl.innerText = "🔍 Positionnez votre visage au centre";
+                            statusEl.style.color = "var(--front-muted)";
+                        }
+                    }, 500);
+                };
+            } catch (e) {
+                statusEl.innerText = "Accès caméra refusé ou non disponible.";
+            }
+        }
+    }
+
+    captureBtn.onclick = async function() {
+        statusEl.innerText = "Analyse en cours...";
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+            
+        if (!detections) {
+            statusEl.innerText = "❌ Échec : Aucun visage détecté.";
+            statusEl.style.color = "red";
+            return;
+        }
+
+        // Store descriptor in hidden field
+        faceInput.value = JSON.stringify(Array.from(detections.descriptor));
+        statusEl.innerText = "✨ Signature faciale enregistrée !";
+        statusEl.style.color = "var(--front-forest)";
+        captureBtn.innerHTML = '<i class="fas fa-check"></i> Visage enregistré';
+        captureBtn.disabled = true;
+        
+        // Stop camera to save resources
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+        clearInterval(detectionInterval);
+        video.style.opacity = '0.5';
+    };
+
+    overlay.onclick = toggleCamera;
+</script>
 {% endblock %}

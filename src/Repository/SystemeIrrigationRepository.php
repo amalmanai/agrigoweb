@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Parcelle;
 use App\Entity\SystemeIrrigation;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -29,7 +30,7 @@ class SystemeIrrigationRepository extends ServiceEntityRepository
      *
      * @return list<SystemeIrrigation>
      */
-    public function findAllWithExistingParcelle(?string $recherche = null, string $tri = 'nom_asc'): array
+    public function findAllWithExistingParcelle(?string $recherche = null, string $tri = 'nom_asc', ?User $parcelleOwner = null): array
     {
         if (!\in_array($tri, self::TRIS_VALIDES, true)) {
             $tri = 'nom_asc';
@@ -37,6 +38,10 @@ class SystemeIrrigationRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('s')
             ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = s.id_parcelle');
+
+        if ($parcelleOwner instanceof User) {
+            $qb->andWhere('p.owner = :owner')->setParameter('owner', $parcelleOwner);
+        }
 
         if (null !== $recherche && '' !== trim($recherche)) {
             $term = '%'.\mb_strtolower(trim($recherche)).'%';
@@ -58,13 +63,17 @@ class SystemeIrrigationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findOneWithExistingParcelle(int $idSysteme): ?SystemeIrrigation
+    public function findOneWithExistingParcelle(int $idSysteme, ?User $parcelleOwner = null): ?SystemeIrrigation
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = s.id_parcelle')
             ->andWhere('s.id_systeme = :id')
-            ->setParameter('id', $idSysteme)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('id', $idSysteme);
+
+        if ($parcelleOwner instanceof User) {
+            $qb->andWhere('p.owner = :owner')->setParameter('owner', $parcelleOwner);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

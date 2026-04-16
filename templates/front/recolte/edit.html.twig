@@ -1,0 +1,26 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier une Récolte{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Modifier Récolte : {{ recolte.name }}</h1>
+    <a href="{{ path('app_recolte_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm glass-button">
+        <i class="bi bi-arrow-left text-white-50"></i> Retour
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-9">
+        <div class="card shadow mb-4 glass-panel border-0">
+            <div class="card-body p-4 p-md-5">
+                {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                    {{ form_widget(form) }}
+                    <hr class="my-4">
+                    <button type="submit" class="btn btn-warning text-white glass-button w-100">Mettre à jour la récolte</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

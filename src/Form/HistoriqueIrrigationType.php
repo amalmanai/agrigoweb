@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\HistoriqueIrrigation;
+use App\Entity\Parcelle;
 use App\Entity\SystemeIrrigation;
+use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -20,6 +22,7 @@ class HistoriqueIrrigationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $systemeOwner = $options['systeme_owner'];
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data = $event->getData();
             if (!\is_array($data)) {
@@ -40,8 +43,16 @@ class HistoriqueIrrigationType extends AbstractType
                 'label' => 'Système d\'irrigation',
                 'placeholder' => '— Choisir —',
                 'required' => true,
-                'query_builder' => fn (EntityRepository $r) => $r->createQueryBuilder('s')
-                    ->orderBy('s.nom_systeme', 'ASC'),
+                'query_builder' => function (EntityRepository $r) use ($systemeOwner) {
+                    $qb = $r->createQueryBuilder('s')
+                        ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = s.id_parcelle')
+                        ->orderBy('s.nom_systeme', 'ASC');
+                    if ($systemeOwner instanceof User) {
+                        $qb->andWhere('p.owner = :o')->setParameter('o', $systemeOwner);
+                    }
+
+                    return $qb;
+                },
             ])
             ->add('dateIrrigation', DateTimeType::class, [
                 'label' => 'Date et heure',
@@ -73,6 +84,8 @@ class HistoriqueIrrigationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => HistoriqueIrrigation::class,
+            'systeme_owner' => null,
         ]);
+        $resolver->setAllowedTypes('systeme_owner', ['null', User::class]);
     }
 }

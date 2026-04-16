@@ -236,13 +236,16 @@
             <span>AgriGo Admin</span>
         </a>
         <nav class="admin-nav">
-            <a href="{{ path('app_home') }}"><i class="bi bi-house-door"></i> Dashboard</a>
+            <a href="{{ path('app_admin_dashboard') }}"><i class="bi bi-house-door"></i> Dashboard</a>
             <a href="{{ path('admin_culture_index') }}"><i class="bi bi-flower1"></i> Cultures</a>
             <a href="{{ path('admin_parcelle_index') }}"><i class="bi bi-map"></i> Parcelles</a>
-            <a href="{{ path('admin_historique_culture_index') }}"><i class="bi bi-clock-history"></i> Historiques</a>
-            <a href="{{ path('admin_systeme_irrigation_index') }}"><i class="bi bi-droplet-half"></i> Irrigation</a>
-            <a href="{{ path('admin_historique_irrigation_index') }}"><i class="bi bi-calendar-check"></i> Hist. irrigation</a>
-            {% if 'ROLE_ADMIN' in app.user.roles %}
+            <a href="{{ path('admin_systeme_irrigation_index') }}"><i class="bi bi-droplet"></i> Système Irrigation</a>
+            <a href="{{ path('admin_historique_irrigation_index') }}"><i class="bi bi-clock-history"></i> Historique Irrigation</a>
+            <a href="{{ path('admin_recolte_index') }}"><i class="bi bi-basket"></i> Récoltes</a>
+            <a href="{{ path('admin_vente_index') }}"><i class="bi bi-cash"></i> Ventes</a>
+            <a href="{{ path('admin_produit_index') }}"><i class="bi bi-box"></i> Produits</a>
+            <a href="{{ path('admin_mouvement_stock_index') }}"><i class="bi bi-arrow-left-right"></i> Mouvements de Stock</a>
+            {% if is_granted('ROLE_ADMIN') %}
                 <a href="{{ path('app_admin_users') }}"><i class="bi bi-people"></i> Manage Users</a>
             {% endif %}
             <a href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>

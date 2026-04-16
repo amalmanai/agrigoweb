@@ -1,0 +1,58 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Détails Produit{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 m-0 text-dark">Détails Produit #{{ produit.idProduit }}</h1>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_produit_edit', {'id_produit': produit.idProduit}) }}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        <a href="{{ path('admin_produit_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th class="w-25">ID</th>
+                    <td>{{ produit.idProduit }}</td>
+                </tr>
+                <tr>
+                    <th>Nom du Produit</th>
+                    <td>{{ produit.nomProduit }}</td>
+                </tr>
+                <tr>
+                    <th>Catégorie</th>
+                    <td>{{ produit.categorie }}</td>
+                </tr>
+                <tr>
+                    <th>Quantité Disponible</th>
+                    <td>
+                        <span class="badge {% if produit.quantiteDisponible <= produit.seuilAlerte %}bg-danger{% else %}bg-success{% endif %}">
+                            {{ produit.quantiteDisponible }} {{ produit.unite }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Seuil d'Alerte</th>
+                    <td>{{ produit.seuilAlerte }} {{ produit.unite }}</td>
+                </tr>
+                <tr>
+                    <th>Date d'expiration</th>
+                    <td>{{ produit.dateExpiration ?: '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Prix Unitaire</th>
+                    <td>{{ produit.prixUnitaire }} €</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

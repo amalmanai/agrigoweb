@@ -15,4 +15,22 @@ class MouvementStockRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, MouvementStock::class);
     }
+
+    public function adminSearch(?string $search, string $sort = 'id_mouvement', string $direction = 'ASC'): array
+    {
+        $qb = $this->createQueryBuilder('m');
+
+        if ($search) {
+            $qb->andWhere('m.type_mouvement LIKE :search OR m.motif LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        $allowedSorts = ['id_mouvement', 'type_mouvement', 'date_mouvement', 'quantite', 'motif', 'id_produit'];
+        if (in_array($sort, $allowedSorts)) {
+            $direction = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
+            $qb->orderBy('m.' . $sort, $direction);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -59,6 +59,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'reset_expires', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $resetExpiresAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $loginToken = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $faceDescriptor = null;
+
     #[ORM\OneToMany(targetEntity: Parcelle::class, mappedBy: 'owner')]
     private Collection $parcelles;
 
@@ -250,5 +256,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getCultures(): Collection
     {
         return $this->cultures;
+    }
+
+    public function getLoginToken(): ?string
+    {
+        return $this->loginToken;
+    }
+
+    public function setLoginToken(?string $loginToken): static
+    {
+        $this->loginToken = $loginToken;
+        return $this;
+    }
+
+    public function getFaceDescriptor(): ?string
+    {
+        return $this->faceDescriptor;
+    }
+
+    public function setFaceDescriptor(?string $faceDescriptor): static
+    {
+        $this->faceDescriptor = $faceDescriptor;
+        return $this;
     }
 }

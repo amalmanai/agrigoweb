@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\HistoriqueIrrigation;
+use App\Entity\Parcelle;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -26,14 +28,19 @@ class HistoriqueIrrigationRepository extends ServiceEntityRepository
     /**
      * @return list<HistoriqueIrrigation>
      */
-    public function findAllFiltered(?string $rechercheNomSysteme = null, string $tri = 'date_desc'): array
+    public function findAllFiltered(?string $rechercheNomSysteme = null, string $tri = 'date_desc', ?User $parcelleOwner = null): array
     {
         if (!\in_array($tri, self::TRIS_VALIDES, true)) {
             $tri = 'date_desc';
         }
 
         $qb = $this->createQueryBuilder('h')
-            ->innerJoin('h.systemeIrrigation', 'sys')->addSelect('sys');
+            ->innerJoin('h.systemeIrrigation', 'sys')->addSelect('sys')
+            ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = sys.id_parcelle');
+
+        if ($parcelleOwner instanceof User) {
+            $qb->andWhere('p.owner = :owner')->setParameter('owner', $parcelleOwner);
+        }
 
         if (null !== $rechercheNomSysteme && '' !== trim($rechercheNomSysteme)) {
             $term = '%'.\mb_strtolower(trim($rechercheNomSysteme)).'%';

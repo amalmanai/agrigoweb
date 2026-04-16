@@ -229,7 +229,7 @@
             <div class="profile-header">
                 <div class="profile-avatar-container">
                     {% if user.photoPath %}
-                        {% set userPhotoSrc = user.photoPath starts with 'http' ? user.photoPath : asset('uploads/users/' ~ user.photoPath) %}
+                        {% set userPhotoSrc = user.photoPath starts with 'http' ? user.photoPath : asset('uploads/profiles/' ~ user.photoPath) %}
                         <img src="{{ userPhotoSrc }}" alt="Photo de profil" class="profile-avatar">
                     {% else %}
                         <div class="profile-avatar-placeholder">
@@ -286,6 +286,38 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="info-item" style="grid-column: span 2; background: rgba(135, 169, 95, 0.05);">
+                        <div class="info-icon"><i class="fas fa-user-lock"></i></div>
+                        <div class="info-content">
+                            <div class="info-label">Sécurité Biométrique</div>
+                            <div class="info-value">
+                                {% if user.faceDescriptor %}
+                                    <span class="status-badge status-active"><i class="fas fa-user-check"></i> Visage enregistré</span>
+                                {% else %}
+                                    <span class="status-badge" style="background: rgba(0,0,0,0.05); color: #666;"><i class="fas fa-user-slash"></i> Visage non configuré</span>
+                                {% endif %}
+                            </div>
+                            <div id="face-reg-container" style="display:none; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px;">
+                                <div style="position: relative; width: 100%; max-width: 400px; margin: 0 auto;">
+                                    <video id="reg-video" width="100%" height="250" autoplay muted playsinline style="border-radius: 12px; object-fit: cover;"></video>
+                                    <canvas id="reg-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                                </div>
+                                <div id="reg-status" class="info-label mt-2" style="text-align: center;">Veuillez regarder la caméra...</div>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button type="button" class="btn-edit" id="capture-face-btn" style="margin-top:0; padding: 0.6rem; font-size: 0.9rem;">
+                                        <i class="fas fa-camera"></i> Capturer mon visage
+                                    </button>
+                                    <button type="button" class="btn-edit" id="cancel-face-btn" style="margin-top:0; padding: 0.6rem; font-size: 0.9rem; background: #666;">
+                                        Annuler
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-edit" id="open-face-reg-btn" style="margin-top: 1rem; width: auto; padding: 0.6rem 1.5rem; font-size: 0.9rem; background: var(--front-olive);">
+                                <i class="fas fa-fingerprint"></i> Configurer la reconnaissance faciale
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <a href="{{ path('app_profile_edit') }}" class="btn-edit">
@@ -295,4 +327,109 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+    const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/';
+    let isModelsLoaded = false;
+    let videoStream = null;
+    let detectionInterval = null;
+
+    async function loadModels() {
+        if (isModelsLoaded) return true;
+        updateStatus("Chargement de l'IA...");
+        try {
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            isModelsLoaded = true;
+            return true;
+        } catch (e) {
+            updateStatus("Erreur chargement IA.");
+            return false;
+        }
+    }
+
+    function updateStatus(msg, color = null) {
+        const el = document.getElementById('reg-status');
+        el.innerText = msg;
+        if(color) el.style.color = color;
+    }
+
+    document.getElementById('open-face-reg-btn').onclick = async function() {
+        if (!(await loadModels())) return;
+        
+        this.style.display = 'none';
+        document.getElementById('face-reg-container').style.display = 'block';
+        
+        const video = document.getElementById('reg-video');
+        const canvas = document.getElementById('reg-canvas');
+        
+        try {
+            videoStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+            video.srcObject = videoStream;
+            video.onplay = () => {
+                const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
+                faceapi.matchDimensions(canvas, displaySize);
+                
+                detectionInterval = setInterval(async () => {
+                    const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                    if (detections) {
+                        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                        faceapi.draw.drawDetections(canvas, resizedDetections);
+                        updateStatus("✨ Visage détecté. Cliquez sur Capturer.", "var(--front-olive)");
+                    } else {
+                        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                        updateStatus("🔍 Recherche de visage...");
+                    }
+                }, 500);
+            };
+        } catch (e) {
+            updateStatus("Erreur accès caméra.", "red");
+        }
+    };
+
+    document.getElementById('capture-face-btn').onclick = async function() {
+        const video = document.getElementById('reg-video');
+        updateStatus("Analyse de la signature...");
+        
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+            
+        if (!detections) {
+            updateStatus("❌ Échec : Aucun visage détecté.", "red");
+            return;
+        }
+
+        saveDescriptor(detections.descriptor);
+    };
+
+    function saveDescriptor(descriptor) {
+        fetch('{{ path("api_profile_save_face") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ descriptor: Array.from(descriptor) })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                updateStatus("❌ Erreur: " + data.message, "red");
+            }
+        });
+    }
+
+    document.getElementById('cancel-face-btn').onclick = function() {
+        if (videoStream) videoStream.getTracks().forEach(t => t.stop());
+        if (detectionInterval) clearInterval(detectionInterval);
+        document.getElementById('face-reg-container').style.display = 'none';
+        document.getElementById('open-face-reg-btn').style.display = 'inline-block';
+    };
+</script>
 {% endblock %}
