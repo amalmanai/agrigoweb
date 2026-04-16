@@ -1,0 +1,105 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Mouvements de Stock - Back{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 m-0 text-dark">Mouvements de Stock</h1>
+        <p class="text-muted small mb-0">Historique des entrées et sorties de stock.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_mouvement_stock_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Nouveau Mouvement
+        </a>
+    </div>
+</div>
+
+<div class="mb-4">
+    <form method="get" action="{{ path('admin_mouvement_stock_index') }}" class="d-flex w-50">
+        <input type="text" name="search" class="form-control me-2" placeholder="Rechercher (Type, Motif)..." value="{{ search|default('') }}">
+        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+        {% if search|default('') %}
+            <a href="{{ path('admin_mouvement_stock_index') }}" class="btn btn-outline-secondary ms-2"><i class="bi bi-x"></i></a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover border">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    <a href="{{ path('admin_mouvement_stock_index', {'sort': 'id_mouvement', 'direction': sort == 'id_mouvement' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
+                        ID {% if sort == 'id_mouvement' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_mouvement_stock_index', {'sort': 'type_mouvement', 'direction': sort == 'type_mouvement' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
+                        Type {% if sort == 'type_mouvement' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_mouvement_stock_index', {'sort': 'id_produit', 'direction': sort == 'id_produit' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
+                        Produit ID {% if sort == 'id_produit' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_mouvement_stock_index', {'sort': 'quantite', 'direction': sort == 'quantite' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
+                        Quantité {% if sort == 'quantite' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_mouvement_stock_index', {'sort': 'date_mouvement', 'direction': sort == 'date_mouvement' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
+                        Date {% if sort == 'date_mouvement' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ path('admin_mouvement_stock_index', {'sort': 'motif', 'direction': sort == 'motif' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
+                        Motif {% if sort == 'motif' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
+                    </a>
+                </th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mouvement in mouvements %}
+            <tr>
+                <td class="fw-bold">#{{ mouvement.idMouvement }}</td>
+                <td>
+                    <span class="badge {% if mouvement.typeMouvement == 'Entrée' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                        {{ mouvement.typeMouvement }}
+                    </span>
+                </td>
+                <td>{{ mouvement.idProduit }}</td>
+                <td class="fw-bold">{{ mouvement.quantite }}</td>
+                <td>{{ mouvement.dateMouvement }}</td>
+                <td>{{ mouvement.motif }}</td>
+                <td class="text-center">
+                    <div class="btn-group">
+                        <a href="{{ path('admin_mouvement_stock_show', {'id_mouvement': mouvement.idMouvement}) }}" class="btn btn-sm btn-info text-white" title="Voir">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ path('admin_mouvement_stock_edit', {'id_mouvement': mouvement.idMouvement}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="post" action="{{ path('admin_mouvement_stock_delete', {'id_mouvement': mouvement.idMouvement}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ mouvement.idMouvement) }}">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                    Aucun mouvement enregistré
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

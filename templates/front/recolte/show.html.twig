@@ -1,0 +1,55 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Détails Récolte{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Détails de la Récolte</h1>
+    <a href="{{ path('app_recolte_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm glass-button">
+        <i class="bi bi-arrow-left text-white-50"></i> Retour
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-9">
+        <div class="card shadow mb-4 glass-panel border-0">
+            <div class="card-header py-3 bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">{{ recolte.name }}</h6>
+                <a href="{{ path('app_recolte_edit', {'id': recolte.id}) }}" class="btn btn-sm btn-warning text-white glass-button">
+                    <i class="bi bi-pencil"></i> Modifier
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table glass-table">
+                    <tbody>
+                        <tr>
+                            <th class="w-25 text-muted">Auteur</th>
+                            <td>Utilisateur ID {{ recolte.userId }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Nom du produit</th>
+                            <td>{{ recolte.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Quantité</th>
+                            <td>
+                                <span class="badge bg-success glass-badge">
+                                    {{ recolte.quantity }} {{ recolte.unit }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Date de récolte</th>
+                            <td>{{ recolte.harvestDate|date('d/m/Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Coût de production</th>
+                            <td class="text-primary font-weight-bold">{{ recolte.productionCost }} €</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

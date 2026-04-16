@@ -1,0 +1,73 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Récolte #{{ recolte.id }} - Admin AgriGo{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {# Header #}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <p class="text-xs font-semibold tracking-widest uppercase text-agri-green mb-1">Administration</p>
+            <h1 class="text-3xl font-serif font-bold text-gray-900">Détails de la récolte #{{ recolte.id }}</h1>
+            <p class="text-gray-500 mt-1 text-sm">Informations complètes sur cette récolte.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ path('admin_recolte_edit', {'id': recolte.id}) }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Modifier
+            </a>
+            <a href="{{ path('admin_recolte_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    {# Details Card #}
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h3 class="text-muted text-uppercase small font-weight-bold mb-3">Informations générales</h3>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="w-50 text-muted">ID de la récolte</th>
+                            <td class="font-weight-bold">#{{ recolte.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Auteur (ID User)</th>
+                            <td>{{ recolte.userId }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Nom du Produit</th>
+                            <td class="font-weight-bold">{{ recolte.name ?: 'Non défini' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Quantité récoltée</th>
+                            <td class="text-success font-weight-bold">
+                                {{ recolte.quantity ? recolte.quantity|number_format(2, ',', ' ') : '-' }} {{ recolte.unit ?: 'kg' }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+                    <h3 class="text-muted text-uppercase small font-weight-bold mb-3">Détails financiers et temporels</h3>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="w-50 text-muted">Coût de production</th>
+                            <td class="text-warning font-weight-bold">
+                                {{ recolte.productionCost ? recolte.productionCost|number_format(2, ',', ' ') : '-' }} €
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Date de récolte</th>
+                            <td>
+                                {{ recolte.harvestDate ? recolte.harvestDate|date('d/m/Y') : '-' }}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

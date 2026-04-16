@@ -1,0 +1,114 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Bienvenue chez AgriGo{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .success-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem 1rem;
+    }
+    .success-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(42, 90, 62, 0.1);
+        padding: 3rem;
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+        animation: scaleIn 0.5s ease-out forwards;
+    }
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+    }
+    .qr-container {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 16px;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .qr-image {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+    }
+    .btn-download {
+        background: var(--front-forest);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .btn-download:hover {
+        background: var(--front-olive);
+        color: white;
+        transform: translateY(-2px);
+    }
+    .btn-finish {
+        display: block;
+        margin-top: 2rem;
+        color: var(--front-muted);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    .btn-finish:hover {
+        color: var(--front-forest);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 class="mb-2" style="font-family: 'DM Serif Display', serif;">Bienvenue, {{ user.name }} !</h1>
+        <p class="text-muted">Votre compte AgriGo a été créé avec succès.</p>
+        
+        <div class="qr-container">
+            <p class="small text-muted mb-3" style="font-weight: 600;">VOTRE QR CODE DE SÉCURITÉ</p>
+            <img src="{{ path('app_qr_view', {'filename': user.qr_path}) }}" alt="QR Code" class="qr-image">
+        </div>
+        
+        <p class="small text-muted mb-4">
+            Scannez ou téléchargez ce code. Il vous permettra de vous connecter instantanément sans mot de passe.
+        </p>
+        
+        <a href="{{ path('app_qr_download', {'filename': user.qr_path}) }}" class="btn-download">
+            <i class="fas fa-download"></i> TÉLÉCHARGER LE QR CODE
+        </a>
+        
+        <a href="{{ path('app_login') }}" class="btn-finish">
+            Aller vers la page de connexion <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

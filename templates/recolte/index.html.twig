@@ -1,102 +1,57 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
-{% block title %}Recoltes Index{% endblock %}
-{% block page_title %}Recoltes Management{% endblock %}
+{% block title %}Récoltes{% endblock %}
 
-{% block body %}
-<div class="flex flex-wrap items-center justify-between mb-8 gap-4">
-    <h2 class="text-3xl font-bold font-serif text-gray-800 tracking-tight">Récoltes</h2>
-    <a href="{{ path('app_recolte_new') }}" class="inline-flex items-center rounded-lg bg-white px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-        Créer une récolte
-    </a>
-</div>
-
-<!-- Search Form Area mimicking the screenshot -->
-<form method="GET" action="{{ path('app_recolte_index') }}" class="mb-10">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end border-b border-gray-100 pb-8">
-        <!-- Recherche (Search) -->
-        <div class="md:col-span-5 lg:col-span-6">
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Recherche</label>
-            <input type="text" name="q" value="{{ current_query }}" class="block w-full rounded-lg border border-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] py-2.5 px-3 text-sm focus:ring-1 focus:ring-agri-button focus:border-agri-button focus:outline-none transition-colors" placeholder="Rechercher...">
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Gestion des Récoltes</h1>
         </div>
-        
-        <!-- Tri (Sort Column) -->
-        <div class="md:col-span-3 lg:col-span-2">
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Tri</label>
-            <div class="relative">
-                <select class="block w-full appearance-none bg-white rounded-lg border border-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] py-2.5 pl-3 pr-8 text-sm focus:ring-1 focus:ring-agri-button focus:border-agri-button focus:outline-none" disabled>
-                    <option>Nom</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                    <i class="ph ph-caret-down"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ordre (Direction) -->
-        <div class="md:col-span-2 lg:col-span-2">
-            <label class="block text-sm font-semibold text-gray-800 mb-2">Ordre</label>
-            <div class="relative">
-                <select name="sort" class="block w-full appearance-none bg-white rounded-lg border border-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] py-2.5 pl-3 pr-8 text-sm focus:ring-1 focus:ring-agri-button focus:border-agri-button focus:outline-none">
-                    <option value="ASC" {% if current_sort == 'ASC' %}selected{% endif %}>Croissant</option>
-                    <option value="DESC" {% if current_sort == 'DESC' %}selected{% endif %}>Décroissant</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                    <i class="ph ph-caret-down"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="md:col-span-2 lg:col-span-2 flex items-center space-x-2">
-            <button type="submit" class="flex-1 justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-agri-button hover:bg-agri-button-hover active:bg-agri-dark focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-agri-button transition-colors">
-                Appliquer
-            </button>
-            <a href="{{ path('app_recolte_index') }}" class="inline-flex justify-center py-2.5 px-4 border border-gray-200 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-agri-button transition-colors">
-                Reset
-            </a>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('app_recolte_new') }}" class="btn btn-primary">Ajouter une récolte</a>
         </div>
     </div>
-</form>
 
-<!-- Stats (Coût de production) styled neutrally -->
-<div class="mb-6 flex items-center gap-3">
-    <div class="w-10 h-10 rounded-[0.7rem] bg-agri-green/10 flex items-center justify-center text-agri-green">
-        <i class="ph ph-coins text-xl"></i>
-    </div>
-    <div>
-        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Coût de Production Total</p>
-        <p class="text-xl font-bold font-serif text-gray-900">{{ total_cost|number_format(2, '.', ',') }} TND</p>
-    </div>
-</div>
-
-<!-- Grid of cards instead of table -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-    {% for recolte in recoltes %}
-        <div class="rounded-2xl border border-gray-100 bg-white shadow-sm p-6 flex flex-col justify-between hover:shadow-md hover:border-gray-200 transition-all">
-            <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ recolte.name }} - Mis à jour</h3>
-                <div class="space-y-2.5 text-[0.9rem] text-gray-600">
-                    <p><span class="font-semibold text-gray-800">Date de récolte:</span> {{ recolte.harvestDate ? recolte.harvestDate|date('Y-m-d') : '-' }}</p>
-                    <p><span class="font-semibold text-gray-800">Quantité:</span> {{ recolte.quantity }} {{ recolte.unit }}</p>
-                    <p><span class="font-semibold text-gray-800">Coût de production:</span> {{ recolte.productionCost|number_format(2, '.', ',') }} TND</p>
-                </div>
-            </div>
-            
-            <div class="mt-8 flex space-x-2">
-                <a href="{{ path('app_recolte_show', {'id': recolte.id}) }}" class="inline-flex justify-center rounded-lg bg-agri-button px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-agri-button-hover transition-colors">
-                    Details
-                </a>
-                <a href="{{ path('app_recolte_edit', {'id': recolte.id}) }}" class="inline-flex justify-center rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                    Editer
-                </a>
-            </div>
+    {% if recoltes is empty %}
+        <div class="alert alert-info">
+            Aucune récolte trouvée. <a href="{{ path('app_recolte_new') }}">Créer une récolte</a>
         </div>
     {% else %}
-        <div class="col-span-1 md:col-span-2 py-12 text-center text-gray-500 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-            <i class="ph ph-folder-open text-3xl text-gray-300 mb-2 block"></i>
-            <p class="text-sm">Aucune récolte trouvée.</p>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Coût Production</th>
+                        <th>Date récolte</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recolte in recoltes %}
+                        <tr>
+                            <td>{{ recolte.id }}</td>
+                            <td>{{ recolte.nomRecolte }}</td>
+                            <td>{{ recolte.quantite }}</td>
+                            <td>{{ recolte.coutProduction }}</td>
+                            <td>{{ recolte.dateRecolte|date('d/m/Y') }}</td>
+                            <td>
+                                <a href="{{ path('app_recolte_show', {id: recolte.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                                <a href="{{ path('app_recolte_edit', {id: recolte.id}) }}" class="btn btn-sm btn-warning">Éditer</a>
+                                <form method="post" action="{{ path('app_recolte_delete', {id: recolte.id}) }}" class="d-inline" onsubmit="return confirm('Etes-vous sûr de vouloir supprimer cet élément ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ recolte.id) }}">
+                                    <button class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}
+

@@ -1,0 +1,63 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Détails Produit{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Détails du Produit</h1>
+    <a href="{{ path('app_produit_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm glass-button">
+        <i class="bi bi-arrow-left text-white-50"></i> Retour
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-xl-8 col-lg-9">
+        <div class="card shadow mb-4 glass-panel border-0">
+            <div class="card-header py-3 bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">{{ produit.nomProduit }}</h6>
+                <a href="{{ path('app_produit_edit', {'id_produit': produit.idProduit}) }}" class="btn btn-sm btn-warning text-white glass-button">
+                    <i class="bi bi-pencil"></i> Modifier
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table glass-table">
+                    <tbody>
+                        <tr>
+                            <th class="w-25 text-muted">ID</th>
+                            <td class="font-weight-bold">{{ produit.idProduit }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Nom</th>
+                            <td>{{ produit.nomProduit }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Catégorie</th>
+                            <td>{{ produit.categorie }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Quantité</th>
+                            <td>
+                                <span class="badge {% if produit.quantiteDisponible <= produit.seuilAlerte %}bg-danger{% else %}bg-success{% endif %} glass-badge">
+                                    {{ produit.quantiteDisponible }} {{ produit.unite }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Seuil d'Alerte</th>
+                            <td>{{ produit.seuilAlerte }} {{ produit.unite }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Date d'Expiration</th>
+                            <td>{{ produit.dateExpiration ?: 'Non spécifiée' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Prix Unitaire</th>
+                            <td class="text-success font-weight-bold">{{ produit.prixUnitaire }} €</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

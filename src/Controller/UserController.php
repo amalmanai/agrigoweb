@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UserController extends AbstractController
 {
@@ -41,6 +43,23 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $photoFile */
+            $photoFile = $form->get('photoPath')->getData();
+
+            if ($photoFile) {
+                $newFilename = uniqid().'.'.$photoFile->guessExtension();
+
+                try {
+                    $photoFile->move($this->getParameter('profile_photos_directory'), $newFilename);
+                    
+                    if ($user->getPhotoPath()) {
+                        $oldPath = $this->getParameter('profile_photos_directory').'/'.$user->getPhotoPath();
+                        if (file_exists($oldPath)) @unlink($oldPath);
+                    }
+
+                    $user->setPhotoPath($newFilename);
+                } catch (FileException $e) {}
+            }
             $entityManager->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès.');
@@ -131,6 +150,20 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
+                /** @var UploadedFile $photoFile */
+                $photoFile = $form->get('photoPath')->getData();
+
+                if ($photoFile) {
+                    $newFilename = uniqid().'.'.$photoFile->guessExtension();
+                    try {
+                        $photoFile->move($this->getParameter('profile_photos_directory'), $newFilename);
+                        if ($user->getPhotoPath()) {
+                            $oldPath = $this->getParameter('profile_photos_directory').'/'.$user->getPhotoPath();
+                            if (file_exists($oldPath)) @unlink($oldPath);
+                        }
+                        $user->setPhotoPath($newFilename);
+                    } catch (FileException $e) {}
+                }
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Utilisateur modifié avec succès.');
@@ -168,5 +201,26 @@ class UserController extends AbstractController
 
         $this->addFlash('success', 'Utilisateur supprimé.');
         return $this->redirectToRoute('app_admin_users');
+    }
+
+    #[Route('/profile/save-face-descriptor', name: 'api_profile_save_face', methods: ['POST'])]
+    public function saveFaceDescriptor(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return new JsonResponse(['success' => false, 'message' => 'Utilisateur non connecté.'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $descriptor = $data['descriptor'] ?? null;
+
+        if (!$descriptor || !is_array($descriptor)) {
+            return new JsonResponse(['success' => false, 'message' => 'Données faciales invalides.'], 400);
+        }
+
+        $user->setFaceDescriptor(json_encode($descriptor));
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true, 'message' => 'Signature faciale enregistrée avec succès !']);
     }
 }

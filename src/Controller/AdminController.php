@@ -11,6 +11,15 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
+    /**
+     * Point d’entrée back-office : même layout que les écrans /admin/* (sidebar AgriGo Admin).
+     */
+    #[Route('', name: 'app_admin_entry', methods: ['GET'])]
+    public function entry(): Response
+    {
+        return $this->redirectToRoute('admin_culture_index');
+    }
+
     #[Route('/dashboard', name: 'app_admin_dashboard')]
     public function dashboard(RecolteRepository $recolteRepository, VenteRepository $venteRepository): Response
     {

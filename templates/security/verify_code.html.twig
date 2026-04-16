@@ -40,8 +40,12 @@
 
             <div class="text-center mt-3">
                 <p class="small text-muted mb-0">Vous n'avez pas reçu le code ?</p>
-                <a href="{{ path('app_forgot_password') }}" class="text-decoration-none text-success small fw-bold">
+                <a href="{{ path('app_resend_code') }}" class="text-decoration-none text-success small fw-bold">
                     Renvoyer le code <i class="fas fa-redo ms-1"></i>
+                </a>
+                <span class="mx-2 text-muted">|</span>
+                <a href="{{ path('app_forgot_password') }}" class="text-decoration-none text-muted small">
+                    <i class="fas fa-arrow-left ms-1"></i> Retour
                 </a>
             </div>
         </div>

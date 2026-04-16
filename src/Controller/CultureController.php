@@ -28,9 +28,7 @@ class CultureController extends AbstractController
         $direction = (string) $request->query->get('direction', 'DESC');
 
         $currentUser = $this->getCurrentUserEntity();
-        $cultures = $this->isGranted('ROLE_ADMIN')
-            ? $cultureRepository->findFiltered($search, $sort, $direction)
-            : $cultureRepository->findFilteredByOwner($currentUser, $search, $sort, $direction);
+        $cultures = $cultureRepository->findFilteredByOwner($currentUser, $search, $sort, $direction);
 
         return $this->render('front/culture/list.html.twig', [
             'cultures' => $cultures,
@@ -52,9 +50,7 @@ class CultureController extends AbstractController
     public function frontNew(Request $request, EntityManagerInterface $entityManager, ParcelleRepository $parcelleRepository): Response
     {
         $currentUser = $this->getCurrentUserEntity();
-        $parcelleChoices = $this->isGranted('ROLE_ADMIN')
-            ? $parcelleRepository->findAllOrderedByName()
-            : $parcelleRepository->findFilteredByOwner($currentUser);
+        $parcelleChoices = $parcelleRepository->findFilteredByOwner($currentUser);
 
         $culture = new Culture();
         $form = $this->createForm(CultureFormType::class, $culture, [
@@ -63,14 +59,12 @@ class CultureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted('ROLE_ADMIN')) {
-                $selectedParcelle = $culture->getParcelle();
-                if (!$selectedParcelle instanceof Parcelle || $selectedParcelle->getOwner() !== $currentUser) {
-                    throw $this->createAccessDeniedException('Vous ne pouvez selectionner que vos parcelles.');
-                }
+            $selectedParcelle = $culture->getParcelle();
+            if (!$selectedParcelle instanceof Parcelle || $selectedParcelle->getOwner() !== $currentUser) {
+                throw $this->createAccessDeniedException('Vous ne pouvez selectionner que vos parcelles.');
             }
 
-            $culture->setOwner($this->isGranted('ROLE_ADMIN') ? $culture->getParcelle()?->getOwner() : $currentUser);
+            $culture->setOwner($currentUser);
 
             if ($culture->getDateSemis() === null) {
                 $culture->setDateSemis(new \DateTimeImmutable('now'));
@@ -85,6 +79,7 @@ class CultureController extends AbstractController
 
         return $this->render('front/culture/new.html.twig', [
             'form' => $form->createView(),
+            'parcelle_choices' => $parcelleChoices,
         ]);
     }
 
@@ -106,9 +101,7 @@ class CultureController extends AbstractController
         $this->denyCultureAccessIfNeeded($culture);
 
         $currentUser = $this->getCurrentUserEntity();
-        $parcelleChoices = $this->isGranted('ROLE_ADMIN')
-            ? $parcelleRepository->findAllOrderedByName()
-            : $parcelleRepository->findFilteredByOwner($currentUser);
+        $parcelleChoices = $parcelleRepository->findFilteredByOwner($currentUser);
 
         $form = $this->createForm(CultureFormType::class, $culture, [
             'parcelle_choices' => $parcelleChoices,
@@ -116,14 +109,12 @@ class CultureController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted('ROLE_ADMIN')) {
-                $selectedParcelle = $culture->getParcelle();
-                if (!$selectedParcelle instanceof Parcelle || $selectedParcelle->getOwner() !== $currentUser) {
-                    throw $this->createAccessDeniedException('Vous ne pouvez selectionner que vos parcelles.');
-                }
+            $selectedParcelle = $culture->getParcelle();
+            if (!$selectedParcelle instanceof Parcelle || $selectedParcelle->getOwner() !== $currentUser) {
+                throw $this->createAccessDeniedException('Vous ne pouvez selectionner que vos parcelles.');
             }
 
-            $culture->setOwner($this->isGranted('ROLE_ADMIN') ? $culture->getParcelle()?->getOwner() : $currentUser);
+            $culture->setOwner($currentUser);
 
             $entityManager->flush();
             $this->addFlash('success', 'Culture mise a jour avec succes.');
@@ -134,6 +125,7 @@ class CultureController extends AbstractController
         return $this->render('front/culture/edit.html.twig', [
             'culture' => $culture,
             'form' => $form->createView(),
+            'parcelle_choices' => $parcelleChoices,
         ]);
     }
 
@@ -204,6 +196,7 @@ class CultureController extends AbstractController
         return $this->render('back/culture/new.html.twig', [
             'culture' => $culture,
             'form' => $form->createView(),
+            'parcelle_choices' => $parcelleRepository->findAllOrderedByName(),
         ]);
     }
 
@@ -233,6 +226,7 @@ class CultureController extends AbstractController
         return $this->render('back/culture/edit.html.twig', [
             'culture' => $culture,
             'form' => $form->createView(),
+            'parcelle_choices' => $parcelleRepository->findAllOrderedByName(),
         ]);
     }
 
@@ -253,10 +247,6 @@ class CultureController extends AbstractController
 
     private function denyCultureAccessIfNeeded(Culture $culture): void
     {
-        if ($this->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
         if ($culture->getOwner() !== $this->getCurrentUserEntity()) {
             throw $this->createAccessDeniedException('Vous ne pouvez acceder qu a vos cultures.');
         }

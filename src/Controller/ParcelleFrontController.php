@@ -26,9 +26,7 @@ class ParcelleFrontController extends AbstractController
         $direction = (string) $request->query->get('direction', 'ASC');
 
         $currentUser = $this->getCurrentUserEntity();
-        $parcelles = $this->isGranted('ROLE_ADMIN')
-            ? $parcelleRepository->findFiltered($search, $sort, $direction)
-            : $parcelleRepository->findFilteredByOwner($currentUser, $search, $sort, $direction);
+        $parcelles = $parcelleRepository->findFilteredByOwner($currentUser, $search, $sort, $direction);
 
         return $this->render('front/parcelle/list.html.twig', [
             'parcelles' => $parcelles,
@@ -115,10 +113,6 @@ class ParcelleFrontController extends AbstractController
 
     private function denyParcelleAccessIfNeeded(Parcelle $parcelle): void
     {
-        if ($this->isGranted('ROLE_ADMIN')) {
-            return;
-        }
-
         if ($parcelle->getOwner() !== $this->getCurrentUserEntity()) {
             throw $this->createAccessDeniedException('Vous ne pouvez acceder qu a vos parcelles.');
         }
