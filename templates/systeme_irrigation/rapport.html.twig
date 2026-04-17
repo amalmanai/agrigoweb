@@ -1,0 +1,64 @@
+{% extends layout %}
+{% block title %}Rapport irrigation PDF{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Rapport irrigation PDF</h1>
+        <p class="text-muted mb-0">Génération Dompdf, envoi email et SMS (Twilio) dans le flux irrigation.</p>
+    </div>
+    <a href="{{ path('front_systeme_irrigation_index') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+</div>
+
+<form method="post" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Début</label>
+                <input type="date" class="form-control" name="period_start" value="{{ period_start_default }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Fin</label>
+                <input type="date" class="form-control" name="period_end" value="{{ period_end_default }}" required>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="submit">Générer le rapport</button>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="1" id="send_mail" name="send_mail" checked>
+                    <label class="form-check-label" for="send_mail">Envoyer par email</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="1" id="send_sms" name="send_sms">
+                    <label class="form-check-label" for="send_sms">Envoyer par SMS</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% if result %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h2 class="h5">Résultat</h2>
+            <ul class="mb-3">
+                <li>Fichier: {{ result.file_name }}</li>
+                <li>Mail envoyé: {{ result.sent_mail ? 'Oui' : 'Non' }}</li>
+                {% if result.mail_error %}
+                    <li class="text-danger">Erreur mail: {{ result.mail_error }}</li>
+                {% endif %}
+                <li>SMS rapport envoyé: {{ result.sent_sms ? 'Oui' : 'Non' }}</li>
+                {% if result.sms_error %}
+                    <li class="text-danger">Erreur SMS: {{ result.sms_error }}</li>
+                {% endif %}
+                <li>SMS automatiques envoyés: {{ result.auto_sms_count }}</li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

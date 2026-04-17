@@ -27,6 +27,12 @@
     </div>
     <div class="col-md-auto ms-md-auto">
         <a href="{{ path(pfx ~ 'systeme_irrigation_new') }}" class="btn btn-sm btn-primary">Nouveau système</a>
+        {% if pfx == 'front_' %}
+            <a href="{{ path('front_systeme_irrigation_meteo') }}" class="btn btn-sm btn-outline-info">Météo</a>
+            <a href="{{ path('front_systeme_irrigation_rapport') }}" class="btn btn-sm btn-outline-dark">Rapport PDF</a>
+            <a href="{{ path('front_systeme_irrigation_planning') }}" class="btn btn-sm btn-outline-success">Planning</a>
+            <a href="{{ path('front_systeme_irrigation_anomalies') }}" class="btn btn-sm btn-outline-warning">Anomalies</a>
+        {% endif %}
     </div>
 </form>
 
