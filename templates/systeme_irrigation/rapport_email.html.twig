@@ -1,0 +1,10 @@
+<p>Bonjour {{ user.fullName ?: user.userIdentifier }},</p>
+
+<p>Votre rapport AgriGo est prêt pour la période du {{ period_start|date('d/m/Y') }} au {{ period_end|date('d/m/Y') }}.</p>
+
+<p>
+    Vous pouvez aussi le télécharger via ce lien (valable 24h):
+    <a href="{{ download_url }}">{{ download_url }}</a>
+</p>
+
+<p>Cordialement,<br>AgriGo</p>

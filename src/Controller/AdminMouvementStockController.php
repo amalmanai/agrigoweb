@@ -88,7 +88,7 @@ class AdminMouvementStockController extends AbstractController
     #[Route('/{id_mouvement}', name: 'admin_mouvement_stock_delete', methods: ['POST'])]
     public function delete(Request $request, MouvementStock $mouvementStock, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$mouvementStock->getIdMouvement(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $mouvementStock->getIdMouvement(), $request->request->get('_token'))) {
             $entityManager->remove($mouvementStock);
             $entityManager->flush();
             $this->addFlash('success', 'Mouvement de stock supprimé avec succès.');
