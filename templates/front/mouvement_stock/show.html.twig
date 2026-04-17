@@ -28,7 +28,7 @@
                         </tr>
                         <tr>
                             <th class="text-muted">Date</th>
-                            <td>{{ mouvement_stock.dateMouvement }}</td>
+                            <td>{{ mouvement_stock.dateMouvement ? mouvement_stock.dateMouvement|date('d/m/Y H:i') : '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-muted">Type</th>

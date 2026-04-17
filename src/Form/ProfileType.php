@@ -24,7 +24,7 @@ class ProfileType extends AbstractType
                 'attr' => ['placeholder' => 'Entrez votre prenom'],
             ])
             ->add('emailUser', \Symfony\Component\Form\Extension\Core\Type\EmailType::class, [
-                'label' => 'Email',
+                'label' => 'E-mail personnel',
                 'attr' => ['placeholder' => 'exemple@agri.tn']
             ])
             ->add('numUser', \Symfony\Component\Form\Extension\Core\Type\TelType::class, [

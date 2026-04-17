@@ -84,7 +84,7 @@
                     </div>
                 </td>
                 <td class="fw-bold text-primary">{{ mouvement.quantite }}</td>
-                <td>{{ mouvement.dateMouvement }}</td>
+                <td>{{ mouvement.dateMouvement ? mouvement.dateMouvement|date('d/m/Y H:i') : '-' }}</td>
                 <td>{{ mouvement.motif }}</td>
                 <td class="text-center">
                     <div class="btn-group">

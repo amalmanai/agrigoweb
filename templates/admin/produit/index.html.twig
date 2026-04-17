@@ -1,3 +1,4 @@
+
 {% extends 'back/base.html.twig' %}
 
 {% block title %}Gestion des Produits - Back{% endblock %}
@@ -9,12 +10,6 @@
         <p class="text-muted small mb-0">Consultez et gérez le catalogue de produits.</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ path('admin_produit_ai_waste_detection') }}" class="btn btn-outline-danger">
-            <i class="bi bi-exclamation-triangle"></i> IA Gaspillage
-        </a>
-        <a href="{{ path('admin_produit_ai_stock_recommendation') }}" class="btn btn-outline-success">
-            <i class="bi bi-cpu"></i> IA Stock Optimal
-        </a>
         <a href="{{ path('admin_produit_stats') }}" class="btn btn-outline-info">
             <i class="bi bi-bar-chart-line"></i> Statistiques
         </a>
@@ -59,6 +54,7 @@
                     </a>
                 </th>
                 <th>Unité</th>
+                <th>Commentaire</th>
                 <th>
                     <a href="{{ path('admin_produit_index', {'sort': 'prix_unitaire', 'direction': sort == 'prix_unitaire' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search|default('')}) }}" class="text-white text-decoration-none">
                         Prix unitaire {% if sort == 'prix_unitaire' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
@@ -79,11 +75,15 @@
                     </span>
                 </td>
                 <td>{{ produit.unite }}</td>
+                <td>{{ produit.commentaire ?: '-' }}</td>
                 <td>{{ produit.prixUnitaire }} €</td>
                 <td class="text-center">
                     <div class="btn-group">
                         <a href="{{ path('admin_produit_show', {'id_produit': produit.idProduit}) }}" class="btn btn-sm btn-info text-white" title="Voir">
                             <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ path('app_produit_show', {'id_produit': produit.idProduit}) }}" class="btn btn-sm btn-secondary" title="Commenter">
+                            <i class="bi bi-chat-left-text"></i>
                         </a>
                         <a href="{{ path('admin_produit_edit', {'id_produit': produit.idProduit}) }}" class="btn btn-sm btn-warning" title="Modifier">
                             <i class="bi bi-pencil"></i>
@@ -99,7 +99,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" class="text-center py-4 text-muted">
+                <td colspan="8" class="text-center py-4 text-muted">
                     Aucun produit enregistré
                 </td>
             </tr>

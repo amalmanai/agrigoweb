@@ -21,7 +21,7 @@ class ProduitComment
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide.')]
     private ?string $contenu = null;
 
-    #[ORM\Column(name: 'date_commentaire', type: 'datetime_immutable')]
+    #[ORM\Column(name: 'date_commentaire', type: 'date_immutable')]
     private ?\DateTimeImmutable $date_commentaire = null;
 
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'comments')]

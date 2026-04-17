@@ -203,12 +203,12 @@ class Produit
         return $this;
     }
 
-    public function getDateExpiration(): ?string
+    public function getDateExpiration(): ?\DateTimeInterface
     {
         return $this->date_expiration;
     }
 
-    public function setDateExpiration(?string $date_expiration): static
+    public function setDateExpiration(?\DateTimeInterface $date_expiration): static
     {
         $this->date_expiration = $date_expiration;
 

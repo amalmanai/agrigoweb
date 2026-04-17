@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Produit;
+use App\Entity\ProduitComment;
 use App\Form\ProduitType;
+use App\Repository\ProduitCommentRepository;
 use App\Repository\ProduitRepository;
 use App\Service\InventoryAiService;
 use App\Service\StockMailerService;
@@ -98,11 +100,34 @@ class AdminProduitController extends AbstractController
         ]);
     }
 
+    #[Route('/{id_produit}/comment/{id_commentaire}/delete', name: 'admin_produit_comment_delete', methods: ['POST'])]
+    public function deleteComment(
+        Request $request,
+        Produit $produit,
+        ProduitComment $commentaire,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        if ($commentaire->getProduit()?->getIdProduit() !== $produit->getIdProduit()) {
+            throw $this->createNotFoundException('Commentaire introuvable pour ce produit.');
+        }
+
+        if ($this->isCsrfTokenValid('delete_admin_comment_'.$commentaire->getIdCommentaire(), (string) $request->request->get('_token'))) {
+            $entityManager->remove($commentaire);
+            $entityManager->flush();
+            $this->addFlash('success', 'Commentaire supprimé.');
+        } else {
+            $this->addFlash('danger', 'Jeton de sécurité invalide.');
+        }
+
+        return $this->redirectToRoute('admin_produit_show', ['id_produit' => $produit->getIdProduit()]);
+    }
+
     #[Route('/{id_produit}', name: 'admin_produit_show', methods: ['GET'])]
-    public function show(Produit $produit): Response
+    public function show(Produit $produit, ProduitCommentRepository $commentRepository): Response
     {
         return $this->render('admin/produit/show.html.twig', [
             'produit' => $produit,
+            'comments' => $commentRepository->findByProduitNewestFirst($produit),
         ]);
     }
 

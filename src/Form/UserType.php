@@ -31,7 +31,7 @@ class UserType extends AbstractType
                 'attr' => ['placeholder' => 'Entrez votre prénom']
             ])
             ->add('emailUser', EmailType::class, [
-                'label' => 'Email',
+                'label' => 'E-mail personnel',
                 'attr' => ['placeholder' => 'exemple@agri.tn']
             ])
             ->add('numUser', TelType::class, [

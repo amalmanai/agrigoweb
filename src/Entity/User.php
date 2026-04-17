@@ -60,6 +60,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'reset_expires', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $resetExpiresAt = null;
 
+    /** Nombre de tentatives de commentaire contenant des mots interdits (bad words). */
+    #[ORM\Column(name: 'bad_word_comment_strikes', type: 'integer', options: ['default' => 0])]
+    private int $badWordCommentStrikes = 0;
+
     #[ORM\OneToMany(targetEntity: Parcelle::class, mappedBy: 'owner')]
     private Collection $parcelles;
 
@@ -108,6 +112,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function getEmailUser(): ?string
+    {
+        return $this->emailUser;
+    }
+
+    /**
+     * E-mail personnel de l'agriculteur (notifications, avertissements).
+     * Même valeur que l'e-mail de connexion.
+     */
+    public function getEmailPersonnel(): ?string
     {
         return $this->emailUser;
     }
@@ -243,6 +256,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->resetToken !== null &&
             $this->resetExpiresAt !== null &&
             $this->resetExpiresAt > new \DateTimeImmutable();
+    }
+
+    public function getBadWordCommentStrikes(): int
+    {
+        return $this->badWordCommentStrikes;
+    }
+
+    public function incrementBadWordCommentStrikes(): void
+    {
+        $this->badWordCommentStrikes++;
     }
 
     /**

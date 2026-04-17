@@ -9,6 +9,9 @@ use App\Form\ProduitCommentType;
 use App\Form\ProduitType;
 use App\Repository\ProduitCommentRepository;
 use App\Repository\ProduitRepository;
+use App\Service\BadWordStrikeService;
+use App\Service\CommentAnimalModerationService;
+use App\Service\CommentWarningMailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -75,8 +78,15 @@ class ProduitFrontController extends AbstractController
     }
 
     #[Route('/{id_produit}/comment', name: 'app_produit_comment', methods: ['POST'])]
-    public function comment(Request $request, Produit $produit, EntityManagerInterface $entityManager, ProduitCommentRepository $commentRepository): Response
-    {
+    public function comment(
+        Request $request,
+        Produit $produit,
+        EntityManagerInterface $entityManager,
+        ProduitCommentRepository $commentRepository,
+        CommentAnimalModerationService $commentAnimalModeration,
+        CommentWarningMailerService $commentWarningMailer,
+        BadWordStrikeService $badWordStrikeService,
+    ): Response {
         $currentUser = $this->getUser();
         if (!$currentUser instanceof User) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour commenter.');
@@ -87,10 +97,27 @@ class ProduitFrontController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($commentAnimalModeration->containsAnimalName((string) $commentaire->getContenu())) {
+                $strikes = $this->processBadWordViolation($currentUser, $badWordStrikeService, $commentWarningMailer, false);
+                if ($strikes >= 3) {
+                    $request->getSession()->invalidate();
+
+                    return $this->redirectToRoute('app_login');
+                }
+
+                return $this->redirectToRoute('app_produit_show', ['id_produit' => $produit->getIdProduit()]);
+            }
+
+            $commentsBefore = $commentRepository->countByUser($currentUser);
+
             $commentaire->setProduit($produit);
             $commentaire->setUser($currentUser);
             $entityManager->persist($commentaire);
             $entityManager->flush();
+
+            if ($commentsBefore === 1 && !$this->isGranted('ROLE_ADMIN')) {
+                $commentWarningMailer->sendSecondCommentWarning($currentUser, $produit);
+            }
 
             $this->addFlash('success', 'Votre commentaire a bien été ajouté.');
             return $this->redirectToRoute('app_produit_show', ['id_produit' => $produit->getIdProduit()]);
@@ -136,8 +163,16 @@ class ProduitFrontController extends AbstractController
     }
 
     #[Route('/{id_produit}/comment/{id_commentaire}/edit', name: 'app_produit_comment_edit', methods: ['GET', 'POST'])]
-    public function editComment(Request $request, Produit $produit, ProduitComment $commentaire, EntityManagerInterface $entityManager, ProduitCommentRepository $commentRepository): Response
-    {
+    public function editComment(
+        Request $request,
+        Produit $produit,
+        ProduitComment $commentaire,
+        EntityManagerInterface $entityManager,
+        ProduitCommentRepository $commentRepository,
+        CommentAnimalModerationService $commentAnimalModeration,
+        CommentWarningMailerService $commentWarningMailer,
+        BadWordStrikeService $badWordStrikeService,
+    ): Response {
         $currentUser = $this->getUser();
         if (!$currentUser instanceof User) {
             throw $this->createAccessDeniedException('Vous devez être connecté.');
@@ -151,6 +186,19 @@ class ProduitFrontController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($commentAnimalModeration->containsAnimalName((string) $commentaire->getContenu())) {
+                $strikes = $this->processBadWordViolation($currentUser, $badWordStrikeService, $commentWarningMailer, true);
+                $entityManager->remove($commentaire);
+                $entityManager->flush();
+                if ($strikes >= 3) {
+                    $request->getSession()->invalidate();
+
+                    return $this->redirectToRoute('app_login');
+                }
+
+                return $this->redirectToRoute('app_produit_show', ['id_produit' => $produit->getIdProduit()]);
+            }
+
             $commentaire->setDateCommentaire(new \DateTimeImmutable());
             $entityManager->flush();
             $this->addFlash('success', 'Votre commentaire a bien été modifié.');
@@ -165,25 +213,58 @@ class ProduitFrontController extends AbstractController
     }
 
     #[Route('/{id_produit}/comment/{id_commentaire}/delete', name: 'app_produit_comment_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function deleteComment(Request $request, Produit $produit, ProduitComment $commentaire, EntityManagerInterface $entityManager): Response
     {
-        $currentUser = $this->getUser();
-        if (!$currentUser instanceof User) {
-            throw $this->createAccessDeniedException('Vous devez être connecté.');
-        }
-
-        if ($commentaire->getUser()->getIdUser() !== $currentUser->getIdUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres commentaires.');
+        if ($commentaire->getProduit()?->getIdProduit() !== $produit->getIdProduit()) {
+            throw $this->createNotFoundException('Commentaire introuvable pour ce produit.');
         }
 
         if ($this->isCsrfTokenValid('delete_comment_'.$commentaire->getIdCommentaire(), (string) $request->request->get('_token'))) {
             $entityManager->remove($commentaire);
             $entityManager->flush();
-            $this->addFlash('success', 'Votre commentaire a bien été supprimé.');
+            $this->addFlash('success', 'Commentaire supprimé.');
         } else {
             $this->addFlash('danger', 'Token CSRF invalide.');
         }
 
         return $this->redirectToRoute('app_produit_show', ['id_produit' => $produit->getIdProduit()]);
+    }
+
+    /**
+     * 1re violation : refus sans e-mail. 2e : e-mail d'avertissement. 3e : compte bloqué (isActive=false) + e-mail + déconnexion.
+     *
+     * @return int nombre de strikes après incrément (0 si admin)
+     */
+    private function processBadWordViolation(
+        User $user,
+        BadWordStrikeService $badWordStrikeService,
+        CommentWarningMailerService $commentWarningMailer,
+        bool $isEditContext,
+    ): int {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('warning', $isEditContext
+                ? 'Votre commentaire a été supprimé automatiquement : termes non autorisés.'
+                : 'Votre commentaire n\'a pas été publié : termes non autorisés.');
+
+            return 0;
+        }
+
+        $strikes = $badWordStrikeService->incrementStrikesForUser($user);
+        if ($strikes === 1) {
+            $this->addFlash('warning', $isEditContext
+                ? 'Votre commentaire a été supprimé automatiquement : termes non autorisés. Une nouvelle tentative pourra déclencher un e-mail d\'avertissement sur votre e-mail personnel.'
+                : 'Votre commentaire n\'a pas été publié : termes non autorisés. Une nouvelle tentative pourra déclencher un e-mail d\'avertissement sur votre e-mail personnel.');
+        } elseif ($strikes === 2) {
+            $commentWarningMailer->sendBadWordViolationWarning($user);
+            $this->addFlash('warning', $isEditContext
+                ? 'Votre commentaire a été supprimé automatiquement : termes non autorisés. Un e-mail d\'avertissement vous a été envoyé sur votre e-mail personnel.'
+                : 'Votre commentaire n\'a pas été publié : termes non autorisés. Un e-mail d\'avertissement vous a été envoyé sur votre e-mail personnel.');
+        } else {
+            $commentWarningMailer->sendAccountBlockedDueToBadWords($user);
+            $this->addFlash('danger', 'Votre compte a été bloqué après plusieurs violations. Un e-mail vous a été envoyé. Vous allez être déconnecté.');
+        }
+
+        return $strikes;
     }
 }
