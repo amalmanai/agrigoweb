@@ -26,26 +26,32 @@ class UserType extends AbstractType
         $builder
             ->add('nomUser', TextType::class, [
                 'label' => 'Nom',
+                'required' => false,
                 'attr' => ['placeholder' => 'Entrez votre nom']
             ])
             ->add('prenomUser', TextType::class, [
                 'label' => 'Prénom',
+                'required' => false,
                 'attr' => ['placeholder' => 'Entrez votre prénom']
             ])
             ->add('emailUser', EmailType::class, [
                 'label' => 'Email',
+                'required' => false,
                 'attr' => ['placeholder' => 'exemple@agri.tn']
             ])
             ->add('numUser', TelType::class, [
                 'label' => 'Numéro de Téléphone',
+                'required' => false,
                 'attr' => ['placeholder' => '8 chiffres']
             ])
             ->add('adresseUser', TextType::class, [
                 'label' => 'Adresse',
+                'required' => false,
                 'attr' => ['placeholder' => 'Votre adresse complète']
             ])
             ->add('roleUser', ChoiceType::class, [
                 'label' => 'Rôle',
+                'required' => false,
                 'choices' => [
                     'Agriculteur' => 'ROLE_USER',
                     'Administrateur' => 'ROLE_ADMIN',
@@ -58,6 +64,7 @@ class UserType extends AbstractType
             $builder->add('password', PasswordType::class, [
                 'label' => 'Mot de passe',
                 'mapped' => false,
+                'required' => false,
                 'attr' => ['autocomplete' => 'new-password', 'class' => 'password-field'],
                 'constraints' => [
                     new NotBlank(message: 'Veuillez entrer un mot de passe'),

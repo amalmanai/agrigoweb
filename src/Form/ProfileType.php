@@ -19,22 +19,27 @@ class ProfileType extends AbstractType
         $builder
             ->add('nomUser', TextType::class, [
                 'label' => 'Nom',
+                'required' => false,
                 'attr' => ['placeholder' => 'Entrez votre nom'],
             ])
             ->add('prenomUser', TextType::class, [
                 'label' => 'Prenom',
+                'required' => false,
                 'attr' => ['placeholder' => 'Entrez votre prenom'],
             ])
             ->add('emailUser', \Symfony\Component\Form\Extension\Core\Type\EmailType::class, [
                 'label' => 'Email',
+                'required' => false,
                 'attr' => ['placeholder' => 'exemple@agri.tn']
             ])
             ->add('numUser', \Symfony\Component\Form\Extension\Core\Type\TelType::class, [
                 'label' => 'Numéro de Téléphone',
+                'required' => false,
                 'attr' => ['placeholder' => '8 chiffres']
             ])
             ->add('adresseUser', TextType::class, [
                 'label' => 'Adresse',
+                'required' => false,
                 'attr' => ['placeholder' => 'Votre adresse complète']
             ])
             ->add('photoPath', FileType::class, [

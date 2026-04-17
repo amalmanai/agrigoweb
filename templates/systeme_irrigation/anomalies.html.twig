@@ -1,0 +1,43 @@
+{% extends layout %}
+{% block title %}Anomalies de consommation d'eau{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-1">Anomalies de consommation d'eau</h1>
+        <p class="text-muted mb-0">Détection sur la base des 10 dernières irrigations par système actif.</p>
+    </div>
+    <a href="{{ path('front_systeme_irrigation_index') }}" class="btn btn-outline-secondary btn-sm">Retour aux systèmes</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>ID système</th>
+                <th>Nom système</th>
+                <th>Volume moyen</th>
+                <th>Dernière irrigation</th>
+                <th>Écart</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for anomalie in anomalies %}
+            <tr>
+                <td>{{ anomalie.id_systeme }}</td>
+                <td>{{ anomalie.nom_systeme }}</td>
+                <td>{{ anomalie.volume_moyen }}</td>
+                <td>{{ anomalie.volume_dernier }}</td>
+                <td>{{ anomalie.ecart_pourcentage > 0 ? '+' : '' }}{{ anomalie.ecart_pourcentage }}%</td>
+                <td>
+                    <span class="badge {{ anomalie.badge_class }}">{{ anomalie.type_anomalie }}</span>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6" class="text-muted text-center py-4">Aucune anomalie détectée.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

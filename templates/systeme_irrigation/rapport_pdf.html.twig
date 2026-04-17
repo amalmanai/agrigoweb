@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; color: #1f2937; font-size: 12px; }
+        .header { border-bottom: 2px solid #14532d; margin-bottom: 16px; padding-bottom: 10px; }
+        .logo { font-size: 20px; font-weight: 700; color: #14532d; }
+        .meta { color: #4b5563; font-size: 11px; margin-top: 4px; }
+        h2 { font-size: 14px; margin: 14px 0 8px; color: #166534; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #d1d5db; padding: 6px; text-align: left; }
+        th { background: #f3f4f6; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">AgriGo</div>
+    <div class="meta">Date de génération: {{ generated_at|date('d/m/Y H:i') }}</div>
+    <div class="meta">Période couverte: {{ period_start|date('d/m/Y') }} - {{ period_end|date('d/m/Y') }}</div>
+</div>
+
+<h2>Section 1 - Irrigations</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Système</th>
+        <th>Volume</th>
+        <th>Durée (min)</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for h in historiques %}
+        <tr>
+            <td>{{ h.dateIrrigation ? h.dateIrrigation|date('d/m/Y H:i') : '—' }}</td>
+            <td>{{ h.systemeIrrigation ? h.systemeIrrigation.nomSysteme : '—' }}</td>
+            <td>{{ h.volumeEau ?? '—' }}</td>
+            <td>{{ h.dureeMinutes ?? '—' }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4">Aucune irrigation sur la période.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h2>Section 2 - Alertes de risques</h2>
+<p>Fonctionnalité non activée dans ce flux irrigation-only.</p>
+
+<h2>Section 3 - Récoltes</h2>
+<p>Fonctionnalité non activée dans ce flux irrigation-only.</p>
+</body>
+</html>
