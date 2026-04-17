@@ -15,9 +15,12 @@
     </div>
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm glass-panel">
+    <div class="card-header bg-white border-0 py-3">
+        <h2 class="h5 mb-0">Résumé du mouvement</h2>
+    </div>
     <div class="card-body">
-        <table class="table">
+        <table class="table table-borderless mb-0">
             <tbody>
                 <tr>
                     <th class="w-25">ID</th>
@@ -32,12 +35,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>ID Produit</th>
-                    <td>{{ mouvement_stock.idProduit }}</td>
+                    <th>Produit</th>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <span class="fw-bold">{{ mouvement_stock.produit.nomProduit ?? 'Produit inconnu' }}</span>
+                            <small class="text-muted">#{{ mouvement_stock.idProduit }}</small>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <th>Quantité</th>
-                    <td class="fw-bold">{{ mouvement_stock.quantite }}</td>
+                    <td class="fw-bold text-primary">{{ mouvement_stock.quantite }}</td>
                 </tr>
                 <tr>
                     <th>Date</th>

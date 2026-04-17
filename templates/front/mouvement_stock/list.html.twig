@@ -42,14 +42,19 @@
                 <tbody>
                     {% for mouvement in mouvements %}
                     <tr>
-                        <td>{{ mouvement.dateMouvement }}</td>
+                        <td>{{ mouvement.dateMouvement ? mouvement.dateMouvement|date('Y-m-d') : '' }}</td>
                         <td>
                             <span class="badge {% if mouvement.typeMouvement == 'Entrée' %}bg-success{% else %}bg-warning{% endif %} glass-badge text-white">
                                 {{ mouvement.typeMouvement }}
                             </span>
                         </td>
-                        <td class="font-weight-bold">#{{ mouvement.idProduit }}</td>
-                        <td class="text-primary font-weight-bold">{{ mouvement.quantite }}</td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold">{{ mouvement.produit.nomProduit ?? 'Produit inconnu' }}</span>
+                                <small class="text-muted">#{{ mouvement.idProduit }}</small>
+                            </div>
+                        </td>
+                        <td class="text-primary fw-bold">{{ mouvement.quantite }}</td>
                         <td>{{ mouvement.motif }}</td>
                         <td>
                             <div class="btn-group gap-2">

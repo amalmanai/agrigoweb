@@ -39,12 +39,17 @@
                             </td>
                         </tr>
                         <tr>
-                            <th class="text-muted">ID Produit</th>
-                            <td class="font-weight-bold">#{{ mouvement_stock.idProduit }}</td>
+                            <th class="text-muted">Produit</th>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">{{ mouvement_stock.produit.nomProduit ?? 'Produit inconnu' }}</span>
+                                    <small class="text-muted">#{{ mouvement_stock.idProduit }}</small>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
                             <th class="text-muted">Quantité</th>
-                            <td class="text-primary font-weight-bold">{{ mouvement_stock.quantite }}</td>
+                            <td class="text-primary fw-bold">{{ mouvement_stock.quantite }}</td>
                         </tr>
                         <tr>
                             <th class="text-muted">Motif</th>

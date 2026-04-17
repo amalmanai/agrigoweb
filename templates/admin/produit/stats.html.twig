@@ -1,0 +1,219 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Statistiques Produits{% endblock %}
+
+{% block content %}
+{% set lowStockPercent = statistics.totalProducts > 0 ? (statistics.lowStockCount / statistics.totalProducts) * 100 : 0 %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
+    <div>
+        <h1 class="h3 m-0 text-dark">Statistiques des Produits</h1>
+        <p class="text-muted small mb-0">Analyse rapide du catalogue de produits.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ path('admin_produit_index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+
+<style>
+    .circle-stat-card {
+        min-height: 320px;
+    }
+    .circle-chart {
+        width: 240px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient(#f46a6a calc(var(--percent) * 1%), #f3f6fb 0);
+        display: grid;
+        place-items: center;
+        box-shadow: inset 0 0 0 22px #ffffff;
+        margin: 0 auto 1rem;
+    }
+    .circle-chart__inner {
+        width: 140px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+    }
+    .circle-chart__value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #2f3f56;
+        line-height: 1;
+    }
+    .circle-chart__label {
+        font-size: 0.95rem;
+        color: #6e7b94;
+    }
+</style>
+
+<div class="row gy-4 mb-4">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm glass-panel p-4 circle-stat-card">
+            <h5 class="mb-4">Indicateur stock faible</h5>
+            <div class="circle-chart" style="--percent: {{ lowStockPercent|round(1) }};">
+                <div class="circle-chart__inner">
+                    <div class="circle-chart__value">{{ lowStockPercent|round(1) }}%</div>
+                    <div class="circle-chart__label">Produits en stock critique</div>
+                </div>
+            </div>
+            <p class="text-center text-muted mb-0">{{ statistics.lowStockCount }} produit(s) sur {{ statistics.totalProducts }} sont au seuil d'alerte.</p>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm glass-panel p-4">
+            <h5 class="mb-4">Résumé rapide</h5>
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="stat-box alt-ok p-3">
+                        <div class="stat-label">Total produits</div>
+                        <div class="stat-value">{{ statistics.totalProducts }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-box alt-ok p-3">
+                        <div class="stat-label">Quantité totale</div>
+                        <div class="stat-value">{{ statistics.totalQuantity }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-box alt-warn p-3">
+                        <div class="stat-label">Prix moyen</div>
+                        <div class="stat-value">{{ statistics.averagePrice|number_format(2, ',', ' ') }} €</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-box alt-danger p-3">
+                        <div class="stat-label">Stock faible</div>
+                        <div class="stat-value">{{ statistics.lowStockCount }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gy-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm glass-panel p-4">
+            <h5 class="mb-3">Total des produits</h5>
+            <p class="display-6 fw-bold mb-1">{{ statistics.totalProducts }}</p>
+            <p class="text-muted mb-0">Articles enregistrés dans le catalogue.</p>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm glass-panel p-4">
+            <h5 class="mb-3">Quantité totale</h5>
+            <p class="display-6 fw-bold mb-1">{{ statistics.totalQuantity }}</p>
+            <p class="text-muted mb-0">Unités disponibles sur l'ensemble des produits.</p>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm glass-panel p-4">
+            <h5 class="mb-3">Prix moyen</h5>
+            <p class="display-6 fw-bold mb-1">{{ statistics.averagePrice|number_format(2, ',', ' ') }} €</p>
+            <p class="text-muted mb-0">Prix unitaire moyen des produits.</p>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm glass-panel p-4">
+            <h5 class="mb-3">Stock faible</h5>
+            <p class="display-6 fw-bold mb-1">{{ statistics.lowStockCount }}</p>
+            <p class="text-muted mb-0">Produits dont la quantité est au seuil d'alerte ou moins.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm glass-panel mt-4">
+    <div class="card-header bg-white border-0 py-3">
+        <h5 class="mb-0">Répartition par catégorie</h5>
+    </div>
+    <div class="card-body p-4">
+        {% set categoryLabels = [] %}
+        {% set categoryValues = [] %}
+        {% for category in categoryCounts %}
+            {% set categoryLabels = categoryLabels|merge([category.categorie]) %}
+            {% set categoryValues = categoryValues|merge([category.productCount]) %}
+        {% endfor %}
+
+        <div class="mb-4">
+            <canvas id="categoryBarChart" height="120"></canvas>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-borderless mb-0">
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th class="text-end">Nombre de produits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categoryCounts %}
+                        <tr>
+                            <td>{{ category.categorie }}</td>
+                            <td class="text-end fw-bold">{{ category.productCount }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">Aucune catégorie trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+        const labels = {{ categoryLabels|json_encode|raw }};
+        const values = {{ categoryValues|json_encode|raw }};
+        const canvas = document.getElementById('categoryBarChart');
+
+        if (!canvas || labels.length === 0) {
+            return;
+        }
+
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Nombre de produits',
+                    data: values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.65)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    })();
+</script>
+{% endblock %}

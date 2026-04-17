@@ -12,12 +12,16 @@
     </a>
 </div>
 
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm glass-panel">
+    <div class="card-header bg-white border-0 py-3">
+        <h2 class="h5 mb-1">Créer un nouveau mouvement</h2>
+        <p class="text-muted small mb-0">Entrez les détails du mouvement de stock.</p>
+    </div>
     <div class="card-body p-4">
         {{ form_start(form) }}
             {{ form_widget(form) }}
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">Enregistrer</button>
             </div>
         {{ form_end(form) }}
     </div>

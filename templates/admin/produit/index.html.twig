@@ -3,12 +3,21 @@
 {% block title %}Gestion des Produits - Back{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
     <div>
         <h1 class="h3 m-0 text-dark">Gestion des Produits</h1>
         <p class="text-muted small mb-0">Consultez et gérez le catalogue de produits.</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ path('admin_produit_ai_waste_detection') }}" class="btn btn-outline-danger">
+            <i class="bi bi-exclamation-triangle"></i> IA Gaspillage
+        </a>
+        <a href="{{ path('admin_produit_ai_stock_recommendation') }}" class="btn btn-outline-success">
+            <i class="bi bi-cpu"></i> IA Stock Optimal
+        </a>
+        <a href="{{ path('admin_produit_stats') }}" class="btn btn-outline-info">
+            <i class="bi bi-bar-chart-line"></i> Statistiques
+        </a>
         <a href="{{ path('admin_produit_new') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i> Nouveau Produit
         </a>

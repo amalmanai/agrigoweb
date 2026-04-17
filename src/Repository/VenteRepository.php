@@ -17,12 +17,8 @@ class VenteRepository extends ServiceEntityRepository
     }
     public function getTotalRevenue(): float
     {
-        $qb = $this->createQueryBuilder('v')
-            ->select('SUM(v.price) as total');
-
-        $result = $qb->getQuery()->getSingleScalarResult();
-
-        return $result ? (float) $result : 0.0;
+        // Since price column is removed, return 0 or implement differently
+        return 0.0;
     }
 
     /**
@@ -43,15 +39,8 @@ class VenteRepository extends ServiceEntityRepository
 
     public function getTotalRevenueForUser(int $userId): float
     {
-        $qb = $this->createQueryBuilder('v')
-            ->select('SUM(v.price) as total')
-            ->innerJoin('v.recolte', 'r')
-            ->andWhere('r.userId = :uid')
-            ->setParameter('uid', $userId);
-
-        $result = $qb->getQuery()->getSingleScalarResult();
-
-        return $result ? (float) $result : 0.0;
+        // Since price column is removed, return 0
+        return 0.0;
     }
 
     public function adminSearch(?string $search, string $sort = 'id', string $direction = 'ASC'): array

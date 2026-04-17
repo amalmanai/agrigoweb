@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\ProduitComment;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
@@ -65,10 +66,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'owner')]
     private Collection $cultures;
 
+    #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: 'owner')]
+    private Collection $produits;
+
+    #[ORM\OneToMany(targetEntity: ProduitComment::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $produitCommentaires;
+
     public function __construct()
     {
         $this->parcelles = new ArrayCollection();
         $this->cultures = new ArrayCollection();
+        $this->produits = new ArrayCollection();
+        $this->produitCommentaires = new ArrayCollection();
     }
 
     public function getIdUser(): ?int
@@ -250,5 +259,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getCultures(): Collection
     {
         return $this->cultures;
+    }
+
+    /**
+     * @return Collection<int, Produit>
+     */
+    public function getProduits(): Collection
+    {
+        return $this->produits;
+    }
+
+    /**
+     * @return Collection<int, ProduitComment>
+     */
+    public function getProduitCommentaires(): Collection
+    {
+        return $this->produitCommentaires;
     }
 }

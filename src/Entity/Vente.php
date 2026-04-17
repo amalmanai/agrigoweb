@@ -25,16 +25,7 @@ class Vente
     #[ORM\JoinColumn(name: 'recolte_id', referencedColumnName: 'id_recolte', nullable: true, onDelete: 'SET NULL')]
     private ?Recolte $recolte = null;
 
-    #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Assert\NotBlank(message: "Le prix est obligatoire.")]
-    #[Assert\Positive(message: "Le prix doit être strictement positif.")]
-    private ?string $price = null;
-
-    #[ORM\Column(name: 'date_vente', type: Types::DATE_MUTABLE)]
-    #[Assert\NotBlank(message: "La date de vente est obligatoire.")]
-    private ?\DateTimeInterface $saleDate = null;
-
-    #[ORM\Column(name: 'buyerName', length: 255, nullable: true)]
+    #[ORM\Column(name: 'buyer_name', length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le nom de l'acheteur est obligatoire.")]
     private ?string $buyerName = null;
 
@@ -66,28 +57,6 @@ class Vente
     public function setRecolte(?Recolte $recolte): static
     {
         $this->recolte = $recolte;
-        return $this;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): static
-    {
-        $this->price = $price;
-        return $this;
-    }
-
-    public function getSaleDate(): ?\DateTimeInterface
-    {
-        return $this->saleDate;
-    }
-
-    public function setSaleDate(?\DateTimeInterface $saleDate): static
-    {
-        $this->saleDate = $saleDate;
         return $this;
     }
 

@@ -58,6 +58,41 @@
                 </table>
             </div>
         </div>
+
+        <div class="card shadow mb-4 glass-panel border-0">
+            <div class="card-header py-3 bg-transparent border-0">
+                <h6 class="m-0 font-weight-bold text-primary">Commentaires</h6>
+            </div>
+            <div class="card-body">
+                {% if comments|length > 0 %}
+                    <ul class="list-group mb-4">
+                        {% for comment in comments %}
+                            <li class="list-group-item border-0 shadow-sm mb-2">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <strong>{{ comment.user.prenomUser }} {{ comment.user.nomUser }}</strong>
+                                    <small class="text-muted">{{ comment.dateCommentaire ? comment.dateCommentaire|date('d/m/Y H:i') : '' }}</small>
+                                </div>
+                                <p class="mb-0">{{ comment.contenu }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucun commentaire pour le moment.</p>
+                {% endif %}
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="font-weight-bold">Ajouter un commentaire</h6>
+                        {{ form_start(commentForm, {
+                            action: path('app_produit_comment', {'id_produit': produit.idProduit}),
+                        }) }}
+                            {{ form_row(commentForm.contenu) }}
+                            <button type="submit" class="btn btn-primary glass-button">Envoyer</button>
+                        {{ form_end(commentForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -28,7 +28,12 @@ class MouvementStockRepository extends ServiceEntityRepository
         $allowedSorts = ['id_mouvement', 'type_mouvement', 'date_mouvement', 'quantite', 'motif', 'id_produit'];
         if (in_array($sort, $allowedSorts)) {
             $direction = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
-            $qb->orderBy('m.' . $sort, $direction);
+            if ($sort === 'id_produit') {
+                $qb->leftJoin('m.produit', 'p')
+                   ->orderBy('p.id_produit', $direction);
+            } else {
+                $qb->orderBy('m.' . $sort, $direction);
+            }
         }
 
         return $qb->getQuery()->getResult();

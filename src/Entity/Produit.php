@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\ProduitComment;
+use App\Entity\User;
 use App\Repository\ProduitRepository;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
@@ -12,9 +15,17 @@ use App\Repository\ProduitRepository;
 class Produit
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[ORM\Column(type: 'integer')]
     private ?int $id_produit = null;
+
+    #[ORM\OneToMany(targetEntity: ProduitComment::class, mappedBy: 'produit', orphanRemoval: true, cascade: ['persist'])]
+    private Collection $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
 
     public function getId_produit(): ?int
     {
@@ -27,7 +38,9 @@ class Produit
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'Le nom du produit est obligatoire.')]
+    #[Assert\Length(min: 2, max: 255, minMessage: 'Le nom doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $nom_produit = null;
 
     public function getNom_produit(): ?string
@@ -41,7 +54,9 @@ class Produit
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'La catégorie est obligatoire.')]
+    #[Assert\Length(min: 2, max: 255, minMessage: 'La catégorie doit contenir au moins {{ limit }} caractères.', maxMessage: 'La catégorie ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $categorie = null;
 
     public function getCategorie(): ?string
@@ -56,6 +71,8 @@ class Produit
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
+    #[Assert\NotNull(message: 'La quantité disponible est obligatoire.')]
+    #[Assert\PositiveOrZero(message: 'La quantité disponible doit être positive ou nulle.')]
     private ?int $quantite_disponible = null;
 
     public function getQuantite_disponible(): ?int
@@ -69,7 +86,9 @@ class Produit
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'L\'unité est obligatoire.')]
+    #[Assert\Length(min: 1, max: 50, minMessage: 'L\'unité doit contenir au moins {{ limit }} caractère.', maxMessage: 'L\'unité ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $unite = null;
 
     public function getUnite(): ?string
@@ -84,6 +103,8 @@ class Produit
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
+    #[Assert\NotNull(message: 'Le seuil d\'alerte est obligatoire.')]
+    #[Assert\Positive(message: 'Le seuil d\'alerte doit être positif.')]
     private ?int $seuil_alerte = null;
 
     public function getSeuil_alerte(): ?int
@@ -97,21 +118,23 @@ class Produit
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $date_expiration = null;
+    #[ORM\Column(type: 'date', nullable: true)]
+    private ?\DateTimeInterface $date_expiration = null;
 
-    public function getDate_expiration(): ?string
+    public function getDate_expiration(): ?\DateTimeInterface
     {
         return $this->date_expiration;
     }
 
-    public function setDate_expiration(?string $date_expiration): static
+    public function setDate_expiration(?\DateTimeInterface $date_expiration): static
     {
         $this->date_expiration = $date_expiration;
         return $this;
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
+    #[Assert\NotNull(message: 'Le prix unitaire est obligatoire.')]
+    #[Assert\Positive(message: 'Le prix unitaire doit être positif.')]
     private ?int $prix_unitaire = null;
 
     public function getPrix_unitaire(): ?int
@@ -122,6 +145,20 @@ class Produit
     public function setPrix_unitaire(int $prix_unitaire): static
     {
         $this->prix_unitaire = $prix_unitaire;
+        return $this;
+    }
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $commentaire = null;
+
+    public function getCommentaire(): ?string
+    {
+        return $this->commentaire;
+    }
+
+    public function setCommentaire(?string $commentaire): static
+    {
+        $this->commentaire = $commentaire;
         return $this;
     }
 
@@ -187,6 +224,43 @@ class Produit
     {
         $this->prix_unitaire = $prix_unitaire;
 
+        return $this;
+    }
+
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(ProduitComment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(ProduitComment $comment): static
+    {
+        $this->comments->removeElement($comment);
+
+        return $this;
+    }
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id_user', nullable: true, onDelete: 'CASCADE')]
+    private ?User $owner = null;
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
         return $this;
     }
 

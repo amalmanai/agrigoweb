@@ -9,8 +9,10 @@ return function (array $context) {
     $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
     $kernel->boot();
     
-    /** @var MailerInterface $mailer */
-    $mailer = $kernel->getContainer()->get('mailer.mailer');
+    /** @var \Symfony\Component\Mailer\Transport\Transports $transports */
+    $transports = $kernel->getContainer()->get('mailer.transports');
+    
+    $transport = $transports->get('default');
     
     $email = (new Email())
         ->from('amalmanai658@gmail.com')
@@ -19,7 +21,7 @@ return function (array $context) {
         ->text('Si vous recevez cet e-mail, la configuration SMTP est correcte.');
 
     try {
-        $mailer->send($email);
+        $transport->send($email);
         echo "E-mail de test envoyé avec succès !\n";
     } catch (\Exception $e) {
         echo "Erreur lors de l'envoi : " . $e->getMessage() . "\n";
