@@ -1,0 +1,163 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Vente #{{ vente.id }} - Admin AgriGo{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {# Header #}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <p class="text-xs font-semibold tracking-widest uppercase text-agri-green mb-1">Administration</p>
+            <h1 class="text-3xl font-serif font-bold text-gray-900">Détails de la vente #{{ vente.id }}</h1>
+            <p class="text-gray-500 mt-1 text-sm">Informations complètes sur cette vente.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ path('admin_vente_edit', {'id': vente.id}) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition shadow-sm">
+                <i class="ph ph-pencil"></i> Modifier
+            </a>
+            <a href="{{ path('admin_vente_index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition">
+                <i class="ph ph-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    {# Details Card #}
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {# Left Column #}
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Informations générales</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">ID de la vente</p>
+                                <p class="text-lg font-semibold text-gray-900">#{{ vente.id }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Description</p>
+                                <p class="text-lg text-gray-900">{{ vente.description }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Prix</p>
+                                <p class="text-2xl font-bold text-emerald-600">{{ vente.price|number_format(2, ',', ' ') }} €</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Right Column #}
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Détails de la transaction</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">Date de vente</p>
+                                <p class="text-lg text-gray-900">{{ vente.saleDate ? vente.saleDate|date('d/m/Y') : '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Acheteur</p>
+                                <p class="text-lg text-gray-900">{{ vente.buyerName ?: 'Non spécifié' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Statut</p>
+                                {% if vente.status %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                                        {% if vente.status == 'terminée' %}bg-green-100 text-green-800
+                                        {% elseif vente.status == 'en attente' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ vente.status }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-400">Non défini</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Récolte associée #}
+            {% if vente.recolte %}
+            <div class="mt-8 pt-8 border-t border-gray-100">
+                <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Récolte associée</h3>
+                <div class="bg-lime-50 border border-lime-200 rounded-xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ vente.recolte.culture ? vente.recolte.culture.nomCulture : 'Récolte #' ~ vente.recolte.id }}</p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Quantité: {{ vente.recolte.quantity ? vente.recolte.quantity|number_format(2, ',', ' ') : '-' }} kg
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Coût de production</p>
+                            <p class="text-lg font-semibold text-lime-600">
+                                {{ vente.recolte.coutProduction ? vente.recolte.coutProduction|number_format(2, ',', ' ') : '-' }} €
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Map Section #}
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <i class="ph ph-map-pin text-2xl text-agri-green"></i>
+                Localisation et Traçabilité
+            </h3>
+            
+            <div 
+                data-controller="map"
+                data-map-map-url-value="{{ path('api_vente_map_locations', {'id': vente.id}) }}"
+                data-map-vente-id-value="{{ vente.id }}"
+                data-map-target="container"
+                style="height: 500px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                <div class="flex items-center justify-center h-full bg-gray-50">
+                    <div class="text-center">
+                        <i class="ph ph-spinning text-3xl text-agri-green mb-2 inline-block animate-spin"></i>
+                        <p class="text-gray-600">Chargement de la carte...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-8 w-8 rounded-md bg-green-100">
+                            <i class="ph ph-map-pin text-green-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Lieu de vente</p>
+                        <p class="text-sm text-gray-600 mt-1">
+                            {% if vente.recolte and vente.recolte.adresse %}
+                                {{ vente.recolte.adresse }}
+                            {% else %}
+                                Adresse non disponible
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                {% if vente.deliveryLocation %}
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-8 w-8 rounded-md bg-red-100">
+                            <i class="ph ph-map-pin text-red-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Lieu de livraison</p>
+                        <p class="text-sm text-gray-600 mt-1">{{ vente.deliveryLocation }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

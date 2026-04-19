@@ -1,0 +1,29 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier une Récolte{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 mb-1 text-gray-800 fw-bold" style="letter-spacing: -0.5px;">Modifier Récolte : {{ recolte.name }}</h1>
+            <p class="text-muted mb-0">Renseignez les nouvelles informations de votre récolte.</p>
+        </div>
+        <a href="{{ path('app_recolte_list') }}" class="btn btn-light shadow-sm rounded-pill px-4 text-primary fw-bold transition-all" style="background-color: white;">
+            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="position-relative">
+                <!-- Background decorative elements for the WOW factor -->
+                <div class="position-absolute top-0 start-0 translate-middle rounded-circle opacity-25" style="width: 300px; height: 300px; background-color: #f6c23e; filter: blur(50px); z-index: -1;"></div>
+                <div class="position-absolute bottom-0 end-0 rounded-circle opacity-10" style="width: 200px; height: 200px; background-color: #1cc88a; filter: blur(40px); z-index: -1;"></div>
+                
+                {{ include('front/recolte/_form.html.twig', {'button_label': 'Mettre à jour la Récolte', 'is_edit': true}) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
