@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Parcelle;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -33,15 +34,22 @@ class ParcelleRepository extends ServiceEntityRepository
     /**
      * @return Parcelle[]
      */
-    public function findFiltered(?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC'): array
+    public function findFiltered(?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC', ?User $owner = null): array
     {
-        return $this->findFilteredByOwner(null, $search, $sortField, $sortDirection);
+        return $this->findFilteredQueryBuilder($search, $sortField, $sortDirection, $owner)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
      * @return Parcelle[]
      */
-    public function findFilteredByOwner(?User $owner, ?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC'): array
+    public function findFilteredByOwner(User $owner, ?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC'): array
+    {
+        return $this->findFiltered($search, $sortField, $sortDirection, $owner);
+    }
+
+    public function findFilteredQueryBuilder(?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC', ?User $owner = null): QueryBuilder
     {
         $qb = $this->createQueryBuilder('p');
 
@@ -70,25 +78,33 @@ class ParcelleRepository extends ServiceEntityRepository
 
         return $qb
             ->orderBy($sortExpression, $sortDirection)
-            ->addOrderBy('p.id', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->addOrderBy('p.id', 'ASC');
     }
 
-    public function countAll(): int
+    public function countAll(?User $owner = null): int
     {
-        return (int) $this->createQueryBuilder('p')
-            ->select('COUNT(p.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $qb = $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)');
+
+        if ($owner !== null) {
+            $qb->andWhere('p.owner = :owner')
+                ->setParameter('owner', $owner);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function getTotalSurface(): float
+    public function getTotalSurface(?User $owner = null): float
     {
-        $result = $this->createQueryBuilder('p')
-            ->select('SUM(p.surface)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $qb = $this->createQueryBuilder('p')
+            ->select('SUM(p.surface)');
+
+        if ($owner !== null) {
+            $qb->andWhere('p.owner = :owner')
+                ->setParameter('owner', $owner);
+        }
+
+        $result = $qb->getQuery()->getSingleScalarResult();
 
         return $result !== null ? (float) $result : 0.0;
     }
@@ -96,18 +112,26 @@ class ParcelleRepository extends ServiceEntityRepository
     /**
      * @return array<int, array{id:int, nomParcelle:string, surface:float, coordonneesGps:?string, typeSol:?string, cultureCount:int}>
      */
-    public function findParcelleSummariesWithCultureCount(): array
+    public function findParcelleSummariesWithCultureCount(?User $owner = null): array
     {
-        $rows = $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('p.id AS id, p.nomParcelle AS nomParcelle, p.surface AS surface, p.coordonneesGps AS coordonneesGps, p.typeSol AS typeSol, COUNT(c.id) AS cultureCount')
-            ->leftJoin('p.cultures', 'c')
+            ->leftJoin('p.cultures', 'c');
+
+        if ($owner !== null) {
+            $qb->andWhere('p.owner = :owner')
+                ->setParameter('owner', $owner)
+                ->andWhere('c.owner = :owner');
+        }
+
+        $rows = $qb
             ->groupBy('p.id, p.nomParcelle, p.surface, p.coordonneesGps, p.typeSol')
             ->orderBy('p.nomParcelle', 'ASC')
             ->getQuery()
             ->getArrayResult();
 
         return array_map(
-            static fn (array $row): array => [
+            static fn(array $row): array => [
                 'id' => (int) $row['id'],
                 'nomParcelle' => (string) $row['nomParcelle'],
                 'surface' => (float) $row['surface'],

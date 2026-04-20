@@ -15,9 +15,11 @@
         <div class="card shadow mb-4 glass-panel border-0">
             <div class="card-header py-3 bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary">Vente #{{ vente.id }}</h6>
-                <a href="{{ path('app_vente_edit', {'id': vente.id}) }}" class="btn btn-sm btn-warning text-white glass-button">
-                    <i class="bi bi-pencil"></i> Modifier
-                </a>
+                {% if is_owner %}
+                    <a href="{{ path('app_vente_edit', {'id': vente.id}) }}" class="btn btn-sm btn-warning text-white glass-button">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                {% endif %}
             </div>
             <div class="card-body">
                 <table class="table glass-table">
@@ -51,6 +53,10 @@
                             <td>{{ vente.saleDate|date('d/m/Y') }}</td>
                         </tr>
                         <tr>
+                            <th class="text-muted">Pickup Location</th>
+                            <td>{{ pickup_location_label }}</td>
+                        </tr>
+                        <tr>
                             <th class="text-muted">Statut</th>
                             <td>
                                 <span class="badge 
@@ -61,8 +67,82 @@
                                 </span>
                             </td>
                         </tr>
+                        <tr>
+                            <th class="text-muted">Adresse de livraison</th>
+                            <td>{{ delivery_location_label|default('Adresse de livraison non renseignee') }}</td>
+                        </tr>
                     </tbody>
                 </table>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 border" style="background:#f1fff7;border-color:#caecd9 !important;">
+                            <div class="fw-bold text-success mb-1"><i class="bi bi-geo-alt-fill"></i> Pickup</div>
+                            <div class="small text-muted">{{ pickup_location_label }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 border" style="background:#fff8f0;border-color:#ffe1c4 !important;">
+                            <div class="fw-bold" style="color:#d26d08;"><i class="bi bi-truck"></i> Delivery</div>
+                            <div class="small text-muted">{{ delivery_location_label|default('Adresse de livraison non renseignee') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="card shadow mb-4 glass-panel border-0">
+            <div class="card-header py-3 bg-transparent border-0">
+                <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-map"></i> Localisation</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 p-3 rounded-3 border" style="background:#f8faf8;border-color:#dfeadb !important;">
+                    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold text-success">Pickup</div>
+                            <div class="small text-muted">{{ pickup_location_label }}</div>
+                        </div>
+                        <div>
+                            <div class="fw-bold" style="color:#d26d08;">Delivery</div>
+                            <div class="small text-muted">{{ delivery_location_label|default('Adresse de livraison non renseignee') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div 
+                    data-controller="map"
+                    data-map-map-url-value="{{ path('api_vente_map_locations', {'id': vente.id}) }}"
+                    data-map-vente-id-value="{{ vente.id }}"
+                    style="height: 400px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div data-map-target="container" class="d-flex align-items-center justify-content-center" style="height: 100%; background: #f8faf8;">
+                        <div class="text-center text-muted">
+                            <div class="spinner-border text-success mb-3" role="status" aria-hidden="true"></div>
+                            <div><i class="bi bi-geo-alt me-2"></i> Chargement de la carte...</div>
+                        </div>
+                    </div>
+                </div>
+                {% if map_fallback_view_url %}
+                    <div class="mt-2">
+                        <a href="{{ map_fallback_view_url }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary">
+                            Ouvrir la carte dans OpenStreetMap
+                        </a>
+                    </div>
+                {% endif %}
+                <div class="mt-3 p-3 rounded-3 border" style="background:#fff; border-color:#e9ecef !important;">
+                    <div class="fw-bold mb-2">Route preview</div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap small text-muted">
+                        <span class="badge rounded-pill text-bg-success">1</span> Pickup
+                        <span style="font-size: 1.1rem;">→</span>
+                        <span class="badge rounded-pill text-bg-danger">2</span> Delivery
+                    </div>
+                    <div class="mt-2 small text-muted">The interactive map should draw these two points and a line between them. If it does not, the loader is showing a fallback path instead of freezing.</div>
+                </div>
+                <div class="mt-3 text-sm text-muted">
+                    <p><i class="bi bi-geo-alt text-success"></i> <strong>Vert:</strong> Lieu de vente (récolte)</p>
+                    <p><i class="bi bi-geo-alt text-danger"></i> <strong>Rouge:</strong> Lieu de livraison</p>
+                    <p class="mb-0 text-xs">La carte utilise OpenStreetMap - © contributeurs OpenStreetMap</p>
+                </div>
             </div>
         </div>
     </div>

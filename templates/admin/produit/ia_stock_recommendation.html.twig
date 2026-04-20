@@ -1,0 +1,81 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}IA Stock Optimal{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 m-0 text-dark">IA Recommandation Automatique de Stock Optimal</h1>
+        <p class="text-muted small mb-0">
+            Modèle: prévision (moyenne mobile pondérée + tendance) + stock de sécurité (variabilité).
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_produit_ai_waste_detection') }}" class="btn btn-outline-danger">
+            <i class="bi bi-exclamation-triangle"></i> Gaspillage
+        </a>
+        <a href="{{ path('admin_produit_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour Produits
+        </a>
+    </div>
+</div>
+
+<form method="get" action="{{ path('admin_produit_ai_stock_recommendation') }}" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <label class="form-label">Délai livraison (jours)</label>
+        <input type="number" name="delai" class="form-control" min="1" value="{{ delaiLivraison }}">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Marge sécurité (jours)</label>
+        <input type="number" name="marge" class="form-control" min="0" value="{{ margeSecuriteJours }}">
+    </div>
+    <div class="col-md-3 align-self-end">
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-arrow-repeat"></i> Recalculer
+        </button>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover border">
+        <thead class="table-dark">
+            <tr>
+                <th>Produit</th>
+                <th>Consommation / jour</th>
+                <th>Délai livraison</th>
+                <th>Marge sécurité</th>
+                <th>Stock optimal</th>
+                <th>Stock actuel</th>
+                <th>Tendance / mois</th>
+                <th>Historique</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in recommandations %}
+            <tr>
+                <td>{{ item.produit.nomProduit }}</td>
+                <td>{{ item.consommationJour }}</td>
+                <td>{{ item.delaiLivraison }} j</td>
+                <td>{{ item.margeSecurite }}</td>
+                <td><strong>{{ item.stockOptimal }}</strong></td>
+                <td>{{ item.stockActuel }}</td>
+                <td>{{ item.tendanceMensuelle }}</td>
+                <td>{{ item.historiqueMois }} mois</td>
+                <td>
+                    {% if item.risqueRupture %}
+                        <span class="badge bg-danger">Commander {{ item.stockOptimal - item.stockActuel }} kg</span>
+                    {% else %}
+                        <span class="badge bg-success">Niveau correct ({{ item.ecart }} kg)</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9" class="text-center text-muted py-4">Aucune donnée disponible.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

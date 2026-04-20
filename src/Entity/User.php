@@ -65,6 +65,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $faceDescriptor = null;
 
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $googleId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $hostedDomain = null;
+
     #[ORM\OneToMany(targetEntity: Parcelle::class, mappedBy: 'owner')]
     private Collection $parcelles;
 
@@ -277,6 +283,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFaceDescriptor(?string $faceDescriptor): static
     {
         $this->faceDescriptor = $faceDescriptor;
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
+    public function getHostedDomain(): ?string
+    {
+        return $this->hostedDomain;
+    }
+
+    public function setHostedDomain(?string $hostedDomain): static
+    {
+        $this->hostedDomain = $hostedDomain;
         return $this;
     }
 }

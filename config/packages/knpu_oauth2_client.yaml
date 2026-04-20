@@ -1,0 +1,14 @@
+knpu_oauth2_client:
+    clients:
+        # the key "google" can be anything, it will be the "name" of the client
+        google:
+            # this must be "google" - it selects the GoogleProvider
+            type: google
+            # add and configure these in your .env file
+            client_id: '%env(GOOGLE_CLIENT_ID)%'
+            client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+            # a route name you'll create in the next step
+            redirect_route: connect_google_check
+            redirect_params: {}
+            # whether to check for the state cookie or not
+            use_state: true

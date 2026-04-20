@@ -42,6 +42,13 @@ class Recolte
     #[ORM\Column(name: 'id_user', nullable: true)]
     private ?int $userId = null;
 
+    #[ORM\Column(name: 'adresse', length: 255, nullable: true)]
+    private ?string $adresse = null;
+
+    #[ORM\ManyToOne(targetEntity: Parcelle::class)]
+    #[ORM\JoinColumn(name: 'parcelle_id', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'SET NULL')]
+    private ?Parcelle $parcelle = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -116,5 +123,29 @@ class Recolte
     public function __toString(): string
     {
         return $this->name ?? 'Recolte #'.$this->id;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?string $adresse): static
+    {
+        $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    public function getParcelle(): ?Parcelle
+    {
+        return $this->parcelle;
+    }
+
+    public function setParcelle(?Parcelle $parcelle): static
+    {
+        $this->parcelle = $parcelle;
+
+        return $this;
     }
 }

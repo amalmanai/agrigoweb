@@ -1,0 +1,75 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}IA Détection de Gaspillage{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 m-0 text-dark">IA Détection de Gaspillage Invisible</h1>
+        <p class="text-muted small mb-0">
+            Modèle: baseline pondérée + z-score robuste (MAD) sur la consommation sortante.
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ path('admin_produit_ai_stock_recommendation') }}" class="btn btn-outline-success">
+            <i class="bi bi-cpu"></i> Stock Optimal
+        </a>
+        <a href="{{ path('admin_produit_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour Produits
+        </a>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <strong>Anomalies détectées:</strong> {{ anomaliesCount }}
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover border">
+        <thead class="table-dark">
+            <tr>
+                <th>Produit</th>
+                <th>Moyenne mensuelle</th>
+                <th>Écart-type</th>
+                <th>Seuil dynamique</th>
+                <th>Consommation dernier mois</th>
+                <th>Z-score</th>
+                <th>Confiance</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in analyses %}
+            <tr>
+                <td>{{ item.produit.nomProduit }}</td>
+                <td>{{ item.moyenne }}</td>
+                <td>{{ item.ecartType }}</td>
+                <td>{{ item.seuil }}</td>
+                <td>{{ item.consommationDernierMois }}</td>
+                <td>{{ item.zScore }}</td>
+                <td>
+                    {% if item.confiance == 'Élevée' %}
+                        <span class="badge bg-primary">{{ item.confiance }}</span>
+                    {% elseif item.confiance == 'Moyenne' %}
+                        <span class="badge bg-warning text-dark">{{ item.confiance }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ item.confiance }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.anomalie %}
+                        <span class="badge bg-danger">Anomalie probable</span>
+                    {% else %}
+                        <span class="badge bg-success">Normal</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="text-center text-muted py-4">Aucune donnée disponible.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -56,6 +56,23 @@
                         </span>
                     </dd>
                 </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <dt class="text-sm font-medium text-gray-900 flex items-center"><i class="ph ph-star mr-2 text-gray-400"></i>Rating</dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {% if vente.status == 'Completed' %}
+                            <div class="flex items-center gap-1" id="star-rating-container" data-url="{{ path('app_vente_rate', {id: vente.id}) }}" data-rating="{{ vente.rating|default(0) }}">
+                                {% for i in 1..5 %}
+                                    <button type="button" class="star-btn focus:outline-none transition-transform hover:scale-110" data-value="{{ i }}">
+                                        <i class="ph {% if vente.rating and vente.rating >= i %}ph-fill text-yellow-400{% else %}ph-star text-gray-300{% endif %} text-2xl transition-colors"></i>
+                                    </button>
+                                {% endfor %}
+                            </div>
+                            <p id="rating-message" class="text-xs mt-1 text-gray-500 hidden"></p>
+                        {% else %}
+                            <span class="text-gray-500 italic text-sm">Rating is only available for completed sales.</span>
+                        {% endif %}
+                    </dd>
+                </div>
             </dl>
         </div>
         <div class="px-4 py-4 sm:px-6 bg-gray-50">
@@ -66,4 +83,72 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('star-rating-container');
+        if (!container) return;
+
+        const url = container.dataset.url;
+        let currentRating = parseInt(container.dataset.rating) || 0;
+        const stars = Array.from(container.querySelectorAll('.star-btn'));
+        const message = document.getElementById('rating-message');
+
+        const updateUI = (ratingVal) => {
+            stars.forEach(s => {
+                const sVal = parseInt(s.dataset.value);
+                const icon = s.querySelector('i');
+                if (sVal <= ratingVal) {
+                    icon.classList.remove('text-gray-300');
+                    icon.classList.remove('ph-star');
+                    icon.classList.add('ph-fill', 'text-yellow-400');
+                } else {
+                    icon.classList.add('ph-star', 'text-gray-300');
+                    icon.classList.remove('ph-fill', 'text-yellow-400');
+                }
+            });
+        };
+
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', () => {
+                updateUI(parseInt(star.dataset.value));
+            });
+
+            star.addEventListener('click', async () => {
+                const val = parseInt(star.dataset.value);
+                currentRating = val;
+                updateUI(currentRating);
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ rating: val })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    message.classList.remove('hidden', 'text-red-500');
+                    if (response.ok && data.success) {
+                        message.textContent = 'Rating saved successfully!';
+                        message.classList.add('text-green-600');
+                    } else {
+                        throw new Error(data.error || 'Failed to save rating');
+                    }
+                } catch (error) {
+                    message.classList.remove('hidden', 'text-green-600');
+                    message.classList.add('text-red-500');
+                    message.textContent = error.message;
+                }
+            });
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            updateUI(currentRating);
+        });
+    });
+</script>
 {% endblock %}

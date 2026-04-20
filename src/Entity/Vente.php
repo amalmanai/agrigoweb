@@ -25,16 +25,16 @@ class Vente
     #[ORM\JoinColumn(name: 'recolte_id', referencedColumnName: 'id_recolte', nullable: true, onDelete: 'SET NULL')]
     private ?Recolte $recolte = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Assert\NotBlank(message: "Le prix est obligatoire.")]
     #[Assert\Positive(message: "Le prix doit être strictement positif.")]
     private ?string $price = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_vente', type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: "La date de vente est obligatoire.")]
     private ?\DateTimeInterface $saleDate = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(name: 'buyer_name', length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le nom de l'acheteur est obligatoire.")]
     private ?string $buyerName = null;
 
@@ -43,8 +43,24 @@ class Vente
     private ?string $status = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    #[Assert\Range(min: 1, max: 5)]
+    #[Assert\Range(min: 1, max: 5, notInRangeMessage: "L'évaluation doit être entre 1 et 5 étoiles.")]
     private ?int $rating = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $deliveryLocation = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $deliveryLatitude = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $deliveryLongitude = null;
+
+    #[ORM\Column(name: 'marketplace_listing', options: ['default' => true])]
+    private bool $isMarketplaceListing = true;
+
+    #[ORM\Column(name: 'available_quantity', nullable: true)]
+    #[Assert\Positive(message: 'La quantite disponible doit etre strictement positive.')]
+    private ?float $availableQuantity = null;
 
     public function getId(): ?int
     {
@@ -125,6 +141,62 @@ class Vente
     public function setRating(?int $rating): static
     {
         $this->rating = $rating;
+        return $this;
+    }
+
+    public function getDeliveryLocation(): ?string
+    {
+        return $this->deliveryLocation;
+    }
+
+    public function setDeliveryLocation(?string $deliveryLocation): static
+    {
+        $this->deliveryLocation = $deliveryLocation;
+        return $this;
+    }
+
+    public function getDeliveryLatitude(): ?string
+    {
+        return $this->deliveryLatitude;
+    }
+
+    public function setDeliveryLatitude(?string $deliveryLatitude): static
+    {
+        $this->deliveryLatitude = $deliveryLatitude;
+        return $this;
+    }
+
+    public function getDeliveryLongitude(): ?string
+    {
+        return $this->deliveryLongitude;
+    }
+
+    public function setDeliveryLongitude(?string $deliveryLongitude): static
+    {
+        $this->deliveryLongitude = $deliveryLongitude;
+        return $this;
+    }
+
+    public function isMarketplaceListing(): bool
+    {
+        return $this->isMarketplaceListing;
+    }
+
+    public function setIsMarketplaceListing(bool $isMarketplaceListing): static
+    {
+        $this->isMarketplaceListing = $isMarketplaceListing;
+
+        return $this;
+    }
+
+    public function getAvailableQuantity(): ?float
+    {
+        return $this->availableQuantity;
+    }
+
+    public function setAvailableQuantity(?float $availableQuantity): static
+    {
+        $this->availableQuantity = $availableQuantity;
 
         return $this;
     }

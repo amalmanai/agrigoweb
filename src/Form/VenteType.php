@@ -71,6 +71,27 @@ class VenteType extends AbstractType
                 ],
                 'attr' => ['class' => $inputClasses],
             ])
+            ->add('deliveryLocation', TextType::class, [
+                'label' => 'Adresse de livraison',
+                'label_attr' => ['class' => $labelClasses],
+                'attr' => ['class' => $inputClasses, 'placeholder' => '123 Rue de la Livraison, Tunis'],
+                'required' => false,
+            ])
+            ->add('availableQuantity', NumberType::class, [
+                'label' => 'Quantite disponible (marketplace)',
+                'required' => false,
+                'label_attr' => ['class' => $labelClasses],
+                'attr' => ['class' => $inputClasses, 'placeholder' => 'Ex: 100'],
+            ])
+            ->add('isMarketplaceListing', ChoiceType::class, [
+                'label' => 'Publier dans le marketplace',
+                'label_attr' => ['class' => $labelClasses],
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false,
+                ],
+                'attr' => ['class' => $inputClasses],
+            ])
         ;
     }
 

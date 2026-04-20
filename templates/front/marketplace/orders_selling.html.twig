@@ -1,0 +1,53 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Ventes Marketplace{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0" style="font-family:'DM Serif Display',serif;">Commandes recues</h2>
+    <a class="btn btn-outline-secondary" href="{{ path('app_marketplace_index') }}">Retour marketplace</a>
+</div>
+
+{% if orders is empty %}
+    <div class="alert alert-info">Aucune commande recue pour l'instant.</div>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Acheteur</th>
+                    <th>Produit</th>
+                    <th>Quantite</th>
+                    <th>Total</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.buyer.prenomUser|default('') }} {{ order.buyer.nomUser|default('') }}</td>
+                        <td>{{ order.vente.recolte.name|default(order.vente.description)|default('Produit') }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.totalPrice }} TND</td>
+                        <td><span class="badge text-bg-secondary">{{ order.status|capitalize }}</span></td>
+                        <td>
+                            <form method="post" action="{{ path('app_marketplace_order_status', {id: order.id}) }}" class="d-flex gap-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('marketplace_order_status_' ~ order.id) }}">
+                                <select name="status" class="form-select form-select-sm">
+                                    {% for s in ['pending','confirmed','shipped','delivered','cancelled'] %}
+                                        <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>{{ s|capitalize }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-sm btn-primary" type="submit">Mettre a jour</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}
