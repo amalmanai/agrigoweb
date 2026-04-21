@@ -13,6 +13,9 @@
     {{ form_label(form.coordonneesGps) }}
     {{ form_widget(form.coordonneesGps) }}
     {{ form_errors(form.coordonneesGps) }}
+    <div class="form-text">Cliquez sur la carte pour definir automatiquement les coordonnees GPS.</div>
+    <div id="parcelle-map" style="height: 360px; border-radius: 14px; border: 1px solid #d8e1ef; overflow: hidden; margin-top: 0.75rem;"></div>
+    <div id="parcelle-map-status" class="form-text mt-2">Aucun point selectionne.</div>
 </div>
 <div class="mb-3">
     {{ form_label(form.typeSol) }}

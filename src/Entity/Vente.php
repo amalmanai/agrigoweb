@@ -34,7 +34,7 @@ class Vente
     #[Assert\NotBlank(message: "La date de vente est obligatoire.")]
     private ?\DateTimeInterface $saleDate = null;
 
-    #[ORM\Column(name: 'buyerName', length: 255, nullable: true)]
+    #[ORM\Column(name: 'buyer_name', length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le nom de l'acheteur est obligatoire.")]
     private ?string $buyerName = null;
 

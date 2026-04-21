@@ -103,7 +103,7 @@ class VenteController extends AbstractController
     {
         $this->denyVenteAccessUnlessOwner($vente);
 
-        if ($this->isCsrfTokenValid('delete'.$vente->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $vente->getId(), $request->request->get('_token'))) {
             $entityManager->remove($vente);
             $entityManager->flush();
         }
@@ -138,7 +138,7 @@ class VenteController extends AbstractController
             200,
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             ]
         );
     }

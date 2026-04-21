@@ -9,6 +9,7 @@ use App\Form\AlerteRisqueFormType;
 use App\Repository\AlerteRisqueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,6 +19,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin/alerte-risque')]
 class AlerteRisqueController extends AbstractController
 {
+    #[Route('/trend-data', name: 'admin_alerte_risque_trend_data', methods: ['GET'])]
+    public function trendData(AlerteRisqueRepository $repository): JsonResponse
+    {
+        $owner = $this->getUser();
+        if (!$owner instanceof \App\Entity\User) {
+            $owner = null;
+        }
+
+        return $this->json([
+            'trend' => $repository->getTrendLastDays(7, $owner),
+            'generatedAt' => (new \DateTimeImmutable('now'))->format(DATE_ATOM),
+        ]);
+    }
+
     #[Route('/', name: 'admin_alerte_risque_index', methods: ['GET'])]
     public function index(Request $request, AlerteRisqueRepository $repository): Response
     {
@@ -25,8 +40,13 @@ class AlerteRisqueController extends AbstractController
         $sort = (string) $request->query->get('sort', 'dateAlerte');
         $direction = (string) $request->query->get('direction', 'DESC');
 
+        $owner = $this->getUser();
+        if (!$owner instanceof \App\Entity\User) {
+            $owner = null;
+        }
+
         return $this->render('back/alerte_risque/index.html.twig', [
-            'alertes' => $repository->findFiltered($search, $sort, $direction),
+            'alertes' => $repository->findFiltered($search, $sort, $direction, $owner),
             'search' => $search,
             'sort' => $sort,
             'direction' => strtoupper($direction) === 'ASC' ? 'ASC' : 'DESC',
@@ -34,6 +54,8 @@ class AlerteRisqueController extends AbstractController
                 'dateAlerte' => 'Date',
                 'typeAlerte' => 'Type',
                 'culture' => 'Culture',
+                'severity' => 'Severite',
+                'isResolved' => 'Resolue',
             ],
         ]);
     }
