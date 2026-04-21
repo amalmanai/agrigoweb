@@ -25,26 +25,22 @@ class Vente
     #[ORM\JoinColumn(name: 'recolte_id', referencedColumnName: 'id_recolte', nullable: true, onDelete: 'SET NULL')]
     private ?Recolte $recolte = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Assert\NotBlank(message: "Le prix est obligatoire.")]
     #[Assert\Positive(message: "Le prix doit être strictement positif.")]
     private ?string $price = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_vente', type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: "La date de vente est obligatoire.")]
     private ?\DateTimeInterface $saleDate = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(name: 'buyer_name', length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le nom de l'acheteur est obligatoire.")]
     private ?string $buyerName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le statut est obligatoire.")]
     private ?string $status = null;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    #[Assert\Range(min: 1, max: 5)]
-    private ?int $rating = null;
 
     public function getId(): ?int
     {
@@ -114,18 +110,6 @@ class Vente
     public function setStatus(?string $status): static
     {
         $this->status = $status;
-        return $this;
-    }
-
-    public function getRating(): ?int
-    {
-        return $this->rating;
-    }
-
-    public function setRating(?int $rating): static
-    {
-        $this->rating = $rating;
-
         return $this;
     }
 }

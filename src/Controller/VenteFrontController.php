@@ -28,15 +28,15 @@ class VenteFrontController extends AbstractController
         $direction = (string) $request->query->get('direction', 'DESC');
 
         $currentUser = $this->getCurrentUserEntity();
-        
+
         // Get ventes linked to user's recoltes
         $ventes = $venteRepository->findForUser($currentUser->getIdUser());
-        
+
         // Filter by search if provided
         if ($search) {
-            $ventes = array_filter($ventes, function(Vente $vente) use ($search) {
-                return stripos($vente->getDescription(), $search) !== false 
-                    || stripos((string)$vente->getBuyerName(), $search) !== false;
+            $ventes = array_filter($ventes, function (Vente $vente) use ($search) {
+                return stripos($vente->getDescription(), $search) !== false
+                    || stripos((string) $vente->getBuyerName(), $search) !== false;
             });
         }
 
@@ -130,7 +130,7 @@ class VenteFrontController extends AbstractController
     {
         $currentUser = $this->getCurrentUserEntity();
         $recolte = $vente->getRecolte();
-        
+
         if ($recolte && $recolte->getUserId() !== $currentUser->getIdUser()) {
             throw $this->createAccessDeniedException('Vous ne pouvez accéder qu\'à vos ventes.');
         }

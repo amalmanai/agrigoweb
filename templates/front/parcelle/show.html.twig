@@ -29,13 +29,53 @@
     </div>
 </div>
 
+{% if weather is not null %}
+    <div class="card mt-3 border-0 shadow-sm">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Meteo de la parcelle (OpenWeatherMap)</h2>
+            <p class="mb-1"><strong>Zone:</strong> {{ weather.city }}</p>
+            <p class="mb-1"><strong>Temperature:</strong> {{ weather.temperature }} C</p>
+            <p class="mb-1"><strong>Ressenti:</strong> {{ weather.feelsLike }} C</p>
+            <p class="mb-1"><strong>Humidite:</strong> {{ weather.humidity }} %</p>
+            <p class="mb-0"><strong>Vent:</strong> {{ weather.windSpeed }} m/s - {{ weather.description }}</p>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info mt-3" role="alert">
+        Donnees meteo indisponibles (coordonnees ou cle API manquante).
+    </div>
+{% endif %}
+
+<div class="card mt-3 border-0 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Terrain Analysis (Soil + Climate + Weather)</h2>
+        <p class="mb-1"><strong>Texture du sol:</strong> {{ soil.texture ?? (parcelle.typeSol ?? 'n/a') }}</p>
+        <p class="mb-1"><strong>pH du sol:</strong> {{ soil.ph is not null ? soil.ph : 'n/a (fallback DB)' }}</p>
+        <p class="mb-1"><strong>Rayonnement solaire moyen (30j):</strong> {{ climate.solarRadiation is not null ? climate.solarRadiation ~ ' ' ~ climate.unit : 'n/a (fallback DB)' }}</p>
+        <p class="mb-1"><strong>Temperature actuelle:</strong> {{ weather is not null ? weather.temperature ~ ' C' : 'n/a' }}</p>
+        <p class="mb-1"><strong>Humidite actuelle:</strong> {{ weather is not null ? weather.humidity ~ ' %' : 'n/a' }}</p>
+        <p class="mb-0 text-muted">Sources: Soil={{ soil.source ?? 'db_fallback' }}, Climate={{ climate.source ?? 'db_fallback' }}, Weather={{ weather is not null ? 'openweathermap' : 'db_fallback' }}</p>
+    </div>
+</div>
+
+<div class="card mt-3 border-0 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Recommendation IA pour cette parcelle</h2>
+        <p class="mb-1"><strong>Culture conseillee:</strong> {{ recommendation.crop }}</p>
+        <p class="mb-1"><strong>Score:</strong> {{ recommendation.score }}%</p>
+        <p class="mb-2 text-muted">{{ recommendation.explanation }}</p>
+        {% if recommendation.alternatives is not empty %}
+            <ul class="mb-0">
+                {% for alt in recommendation.alternatives %}
+                    <li>{{ alt.crop }} ({{ alt.score }}%)</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
 <div class="mt-3 d-flex gap-2">
     <a href="{{ path('app_parcelle_list') }}" class="btn btn-secondary">Retour parcelles</a>
-    <a href="{{ path('app_parcelle_edit', {id: parcelle.id}) }}" class="btn btn-outline-warning">Modifier</a>
-    <form method="post" action="{{ path('app_parcelle_delete', {id: parcelle.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette parcelle ?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete_front_parcelle_' ~ parcelle.id) }}">
-        <button type="submit" class="btn btn-outline-danger">Supprimer</button>
-    </form>
     <a href="{{ path('app_culture_list') }}" class="btn btn-outline-secondary">Retour cultures</a>
 </div>
 {% endblock %}
