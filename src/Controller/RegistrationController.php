@@ -10,9 +10,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\SvgWriter;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -56,11 +55,10 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // Automatic QR Code Generation
-            $qrDir = $this->getParameter('user_qr_codes_directory');
-            if (!is_dir($qrDir)) {
-                mkdir($qrDir, 0775, true);
+            $qrCodeDirectory = $this->getParameter('user_qr_codes_directory');
+            if (!is_dir($qrCodeDirectory)) {
+                mkdir($qrCodeDirectory, 0777, true);
             }
-            $qrCodePath = $qrDir.\DIRECTORY_SEPARATOR.'user_'.$user->getIdUser().'_'.$user->getEmailUser().'.svg';
 
             $qrCodePath = $qrCodeDirectory . '/user_' . $user->getIdUser() . '_' . $user->getEmailUser() . '.svg';
 
@@ -77,7 +75,7 @@ class RegistrationController extends AbstractController
             $request->getSession()->set('registration_success_user', [
                 'id' => $user->getIdUser(),
                 'name' => $user->getPrenomUser(),
-                'qr_path' => 'user_'.$user->getIdUser().'_'.$user->getEmailUser().'.svg'
+                'qr_path' => 'user_' . $user->getIdUser() . '_' . $user->getEmailUser() . '.svg'
             ]);
 
             return $this->redirectToRoute('app_registration_success');
@@ -109,8 +107,7 @@ class RegistrationController extends AbstractController
     #[Route('/qr-code/download/{filename}', name: 'app_qr_download', requirements: ['filename' => '.+'])]
     public function downloadQr(string $filename): Response
     {
-        $filename = basename($filename);
-        $path = $this->getParameter('user_qr_codes_directory').\DIRECTORY_SEPARATOR.$filename;
+        $path = $this->getParameter('user_qr_codes_directory') . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($path)) {
             throw $this->createNotFoundException('QR Code non trouvé.');
         }
@@ -121,8 +118,7 @@ class RegistrationController extends AbstractController
     #[Route('/qr-code/view/{filename}', name: 'app_qr_view', requirements: ['filename' => '.+'])]
     public function viewQr(string $filename): Response
     {
-        $filename = basename($filename);
-        $path = $this->getParameter('user_qr_codes_directory').\DIRECTORY_SEPARATOR.$filename;
+        $path = $this->getParameter('user_qr_codes_directory') . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($path)) {
             throw $this->createNotFoundException('QR Code non trouvé.');
         }

@@ -12,7 +12,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[AsCommand(
@@ -26,7 +25,7 @@ class GenerateUserQrCodesCommand extends Command
         private EntityManagerInterface $entityManager,
         private BuilderInterface $qrCodeBuilder,
         #[Autowire('%user_qr_codes_directory%')]
-        private readonly string $userQrCodesDirectory,
+        private string $qrCodeDirectory,
     ) {
         parent::__construct();
     }
@@ -36,7 +35,7 @@ class GenerateUserQrCodesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $users = $this->userRepository->findAll();
         $filesystem = new Filesystem();
-        $qrCodeDir = rtrim($this->userQrCodesDirectory, '/\\').'/';
+        $qrCodeDir = rtrim($this->qrCodeDirectory, '/\\') . DIRECTORY_SEPARATOR;
         if (!$filesystem->exists($qrCodeDir)) {
             $filesystem->mkdir($qrCodeDir);
         }

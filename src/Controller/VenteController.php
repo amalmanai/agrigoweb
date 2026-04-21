@@ -143,6 +143,35 @@ class VenteController extends AbstractController
         );
     }
 
+    #[Route('/{id}/rate', name: 'app_vente_rate', methods: ['POST'])]
+    public function rate(Request $request, Vente $vente, EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\JsonResponse
+    {
+        try {
+            $this->denyVenteAccessUnlessOwner($vente);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Unauthorized access.'], 403);
+        }
+
+        if ($vente->getStatus() !== 'Completed') {
+            return $this->json(['error' => 'Only completed sales can be rated.'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['rating'])) {
+            return $this->json(['error' => 'Rating value missing.'], 400);
+        }
+
+        $rating = (int) $data['rating'];
+        if ($rating < 1 || $rating > 5) {
+            return $this->json(['error' => 'Rating must be between 1 and 5.'], 400);
+        }
+
+        $vente->setRating($rating);
+        $entityManager->flush();
+
+        return $this->json(['success' => true, 'rating' => $rating]);
+    }
+
     private function requireUser(): User
     {
         $user = $this->getUser();

@@ -41,6 +41,14 @@ class ParcelleRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Parcelle[]
+     */
+    public function findFilteredByOwner(User $owner, ?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC'): array
+    {
+        return $this->findFiltered($search, $sortField, $sortDirection, $owner);
+    }
+
     public function findFilteredQueryBuilder(?string $search = null, string $sortField = 'nomParcelle', string $sortDirection = 'ASC', ?User $owner = null): QueryBuilder
     {
         $qb = $this->createQueryBuilder('p');
