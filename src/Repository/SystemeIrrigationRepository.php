@@ -76,4 +76,21 @@ class SystemeIrrigationRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    /**
+     * @return list<SystemeIrrigation>
+     */
+    public function findActiveByOwner(User $owner): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = s.id_parcelle')
+            ->andWhere('p.owner = :owner')
+            ->andWhere('UPPER(COALESCE(s.statut, :empty)) = :actif')
+            ->setParameter('owner', $owner)
+            ->setParameter('empty', '')
+            ->setParameter('actif', 'ACTIF')
+            ->orderBy('s.nom_systeme', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

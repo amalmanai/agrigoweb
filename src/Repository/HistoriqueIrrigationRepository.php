@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\HistoriqueIrrigation;
 use App\Entity\Parcelle;
+use App\Entity\SystemeIrrigation;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -58,5 +59,32 @@ class HistoriqueIrrigationRepository extends ServiceEntityRepository
         };
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return list<HistoriqueIrrigation>
+     */
+    public function findByOwnerAndPeriod(User $owner, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        return $this->createQueryBuilder('h')
+            ->innerJoin('h.systemeIrrigation', 'sys')->addSelect('sys')
+            ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = sys.id_parcelle')->addSelect('p')
+            ->andWhere('p.owner = :owner')
+            ->andWhere('h.date_irrigation BETWEEN :from AND :to')
+            ->setParameter('owner', $owner)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('h.date_irrigation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findLatestForSysteme(SystemeIrrigation $systeme): ?HistoriqueIrrigation
+    {
+        return $this->findOneBy([
+            'systemeIrrigation' => $systeme,
+        ], [
+            'date_irrigation' => 'DESC',
+        ]);
     }
 }
