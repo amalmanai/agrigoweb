@@ -389,6 +389,17 @@
                         <button class="btn-login" type="submit">
                             SE CONNECTER <i class="fas fa-arrow-right ms-2" style="font-size: 0.9em;"></i>
                         </button>
+
+                        <div style="margin: 1.5rem 0; display: flex; align-items: center; gap: 1rem;">
+                            <div style="flex: 1; height: 1px; background: rgba(0,0,0,0.05);"></div>
+                            <span style="font-size: 0.85rem; color: var(--front-muted); font-weight: 600;">OU</span>
+                            <div style="flex: 1; height: 1px; background: rgba(0,0,0,0.05);"></div>
+                        </div>
+
+                        <a href="{{ path('connect_google') }}" class="btn-login" style="background: white; color: #444; border: 1px solid #ddd; padding: 0.8rem; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-top: 0;">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 18px; height: 18px; margin-right: 12px;">
+                            Continuer avec Google
+                        </a>
                         
                         <div class="login-footer">
                             <a href="{{ path('app_register') }}" class="login-link">

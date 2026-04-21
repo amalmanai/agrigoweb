@@ -80,11 +80,25 @@ class RapportPDFService
         file_put_contents($filePath, $dompdf->output());
 
         $expiresAt = new \DateTimeImmutable('+24 hours');
+        $expires = $expiresAt->getTimestamp();
+        $signature = $this->sign($fileName, $expires);
+        $downloadPath = $this->urlGenerator->generate('front_systeme_irrigation_rapport_download', [
+            'file' => $fileName,
+            'expires' => $expires,
+            'sig' => $signature,
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        $downloadUrl = $this->buildPublicUrl($downloadPath, '/systeme-irrigation/rapport/download/'.$fileName.'/'.$expires.'/'.$signature);
+        $lanFallbackUrl = $this->buildLanFallbackUrl('/systeme-irrigation/rapport/download/'.$fileName.'/'.$expires.'/'.$signature);
 
         $sentMail = false;
         $mailError = null;
         if ($sendMail && null !== $user->getEmailUser() && '' !== trim($user->getEmailUser())) {
             $fromAddress = $this->resolveFromAddress();
+
+            $emailDownloadUrl = $downloadUrl;
+            if ('' === trim($emailDownloadUrl) && null !== $lanFallbackUrl) {
+                $emailDownloadUrl = $lanFallbackUrl;
+            }
 
             $email = (new TemplatedEmail())
                 ->from($fromAddress)
@@ -95,7 +109,7 @@ class RapportPDFService
                     'user' => $user,
                     'period_start' => $periodStart,
                     'period_end' => $periodEnd,
-                    'download_url' => '',
+                    'download_url' => $emailDownloadUrl,
                 ])
                 ->attachFromPath($filePath, $fileName, 'application/pdf');
 
@@ -112,12 +126,12 @@ class RapportPDFService
         $autoSmsCount = 0;
         if ($sendSms) {
             $phone = $this->normalizePhone($user->getNumUser());
-            error_log("Report SMS: User ID {$user->getIdUser()}, Raw phone: {$user->getNumUser()}, Normalized: {$phone}");
+            error_log("Report SMS: User ID {$user->getIdUser()}, Recipient raw phone: {$user->getNumUser()}, Recipient normalized: {$phone}");
             if (null !== $phone) {
                 $autoSmsCount = $this->sendAutomaticIrrigationAlerts($user, $phone);
 
                 // Send PDF report SMS notification
-                $smsBody = '📎 Rapport PDF sent to your email - Check it!';
+                $smsBody = 'Rapport PDF AgriGo disponible. Consultez votre email pour le fichier joint.';
                 $textResult = $this->smsService->sendWithStatus($phone, $smsBody);
                 $sentSms = $textResult['success'];
                 $smsError = $textResult['error'];

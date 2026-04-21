@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
 
+    #[ORM\Column(name: 'bad_word_comment_strikes', type: 'integer', options: ['default' => 0])]
+    private int $badWordCommentStrikes = 0;
+
     #[ORM\Column(name: 'reset_token', length: 20, nullable: true)]
     private ?string $resetToken = null;
 
@@ -64,6 +67,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $faceDescriptor = null;
+
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $googleId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $hostedDomain = null;
+
+    #[ORM\Column(name: 'fcm_token', length: 255, nullable: true)]
+    private ?string $fcmToken = null;
 
     #[ORM\OneToMany(targetEntity: Parcelle::class, mappedBy: 'owner')]
     private Collection $parcelles;
@@ -181,6 +193,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getBadWordCommentStrikes(): int
+    {
+        return $this->badWordCommentStrikes;
+    }
+
+    public function setBadWordCommentStrikes(int $badWordCommentStrikes): static
+    {
+        $this->badWordCommentStrikes = max(0, $badWordCommentStrikes);
+        return $this;
+    }
+
+    public function incrementBadWordCommentStrikes(): static
+    {
+        ++$this->badWordCommentStrikes;
+        return $this;
+    }
+
+    public function resetBadWordCommentStrikes(): static
+    {
+        $this->badWordCommentStrikes = 0;
+        return $this;
+    }
+
     // Symfony Security Interface Methods
     public function getRoles(): array
     {
@@ -277,6 +312,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFaceDescriptor(?string $faceDescriptor): static
     {
         $this->faceDescriptor = $faceDescriptor;
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
+    public function getHostedDomain(): ?string
+    {
+        return $this->hostedDomain;
+    }
+
+    public function setHostedDomain(?string $hostedDomain): static
+    {
+        $this->hostedDomain = $hostedDomain;
+        return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): static
+    {
+        $this->fcmToken = $fcmToken;
         return $this;
     }
 }

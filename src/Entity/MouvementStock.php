@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Produit;
 use App\Repository\MouvementStockRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MouvementStockRepository::class)]
 #[ORM\Table(name: 'mouvement_stock')]
@@ -41,21 +41,24 @@ class MouvementStock
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $date_mouvement = null;
+    #[ORM\Column(type: 'datetime', nullable: false)]
+    #[Assert\NotBlank(message: 'La date du mouvement est obligatoire.')]
+    private ?\DateTimeInterface $date_mouvement = null;
 
-    public function getDate_mouvement(): ?string
+    public function getDate_mouvement(): ?\DateTimeInterface
     {
         return $this->date_mouvement;
     }
 
-    public function setDate_mouvement(string $date_mouvement): static
+    public function setDate_mouvement(\DateTimeInterface $date_mouvement): static
     {
         $this->date_mouvement = $date_mouvement;
         return $this;
     }
 
     #[ORM\Column(type: 'integer', nullable: false)]
+    #[Assert\NotNull(message: 'La quantité est obligatoire.')]
+    #[Assert\Positive(message: 'La quantité doit être positive.')]
     private ?int $quantite = null;
 
     public function getQuantite(): ?int
@@ -70,6 +73,8 @@ class MouvementStock
     }
 
     #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\NotBlank(message: 'Le motif est obligatoire.')]
+    #[Assert\Length(min: 5, max: 255, minMessage: 'Le motif doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le motif ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $motif = null;
 
     public function getMotif(): ?string
@@ -83,17 +88,18 @@ class MouvementStock
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
-    private ?int $id_produit = null;
+    #[ORM\ManyToOne(targetEntity: Produit::class)]
+    #[ORM\JoinColumn(name: 'id_produit', referencedColumnName: 'id_produit', nullable: false)]
+    private ?Produit $produit = null;
 
-    public function getId_produit(): ?int
+    public function getProduit(): ?Produit
     {
-        return $this->id_produit;
+        return $this->produit;
     }
 
-    public function setId_produit(int $id_produit): static
+    public function setProduit(Produit $produit): static
     {
-        $this->id_produit = $id_produit;
+        $this->produit = $produit;
         return $this;
     }
 
@@ -128,12 +134,12 @@ class MouvementStock
         return $this;
     }
 
-    public function getDateMouvement(): ?string
+    public function getDateMouvement(): ?\DateTimeInterface
     {
         return $this->date_mouvement;
     }
 
-    public function setDateMouvement(string $date_mouvement): static
+    public function setDateMouvement(\DateTimeInterface $date_mouvement): static
     {
         $this->date_mouvement = $date_mouvement;
 
@@ -142,14 +148,7 @@ class MouvementStock
 
     public function getIdProduit(): ?int
     {
-        return $this->id_produit;
-    }
-
-    public function setIdProduit(int $id_produit): static
-    {
-        $this->id_produit = $id_produit;
-
-        return $this;
+        return $this->produit?->getIdProduit();
     }
 
     public function getIdUser(): ?int
@@ -161,6 +160,20 @@ class MouvementStock
     {
         $this->id_user = $id_user;
 
+        return $this;
+    }
+
+    /** @var string|null Virtual field (not persisted) for comment moderation */
+    private ?string $commentaire = null;
+
+    public function getCommentaire(): ?string
+    {
+        return $this->commentaire;
+    }
+
+    public function setCommentaire(?string $commentaire): static
+    {
+        $this->commentaire = $commentaire;
         return $this;
     }
 

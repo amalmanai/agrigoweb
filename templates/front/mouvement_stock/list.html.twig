@@ -42,7 +42,7 @@
                 <tbody>
                     {% for mouvement in mouvements %}
                     <tr>
-                        <td>{{ mouvement.dateMouvement }}</td>
+                        <td>{{ mouvement.dateMouvement ? mouvement.dateMouvement|date('d/m/Y') : 'N/A' }}</td>
                         <td>
                             <span class="badge {% if mouvement.typeMouvement == 'Entrée' %}bg-success{% else %}bg-warning{% endif %} glass-badge text-white">
                                 {{ mouvement.typeMouvement }}

@@ -53,20 +53,20 @@ class RecolteType extends AbstractType
                     'Hectolitre (hl)' => 'hl',
                     'Litre (L)' => 'L',
                     'Millilitre (ml)' => 'ml',
-                    
+
                     // Unités pour Parcelles
                     'Hectare (ha)' => 'ha',
                     'Mètre carré (m²)' => 'm²',
                     'Centimètre (cm)' => 'cm',
                     'Mètre (m)' => 'm',
-                    
+
                     // Unités pour Tâches
                     'Heure (h)' => 'h',
                     'Jour (j)' => 'j',
                     'Semaine (sem)' => 'sem',
                     'Mois' => 'mois',
                     'Minute (mn)' => 'mn',
-                    
+
                     // Autres unités communes
                     'Unité (u)' => 'u',
                     'Paquet' => 'paquet',
@@ -80,6 +80,16 @@ class RecolteType extends AbstractType
                 'label' => 'Coût de Production',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses, 'placeholder' => 'Coût en €'],
+            ])
+            ->add('parcelle', \Symfony\Bridge\Doctrine\Form\Type\EntityType::class, [
+                'class' => \App\Entity\Parcelle::class,
+                'choice_label' => 'nomParcelle',
+                'required' => false,
+                'mapped' => false, // Set to false to avoid mapping errors if Recolt->parcelle doesn't exist
+                'label' => 'Parcelle de récolte',
+                'label_attr' => ['class' => $labelClasses],
+                'attr' => ['class' => $inputClasses],
+                'placeholder' => 'Sélectionnez une parcelle',
             ])
         ;
     }

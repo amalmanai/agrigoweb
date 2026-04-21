@@ -1,57 +1,269 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Ventes{% endblock %}
+{% block title %}Gestion des Ventes{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Gestion des Ventes</h1>
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+        border-radius: 50rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .status-completed { background: #e3fbef; color: #1cc88a; border: 1px solid #1cc88a; }
+    .status-pending { background: #fff6e5; color: #f6c23e; border: 1px solid #f6c23e; }
+    .status-other { background: #f8f9fc; color: #858796; border: 1px solid #858796; }
+
+    .action-btn {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: all 0.2s; text-decoration: none; border: none;
+    }
+    .action-btn:hover { transform: translateY(-3px); }
+    
+    .btn-info-soft { background: #e3f2fd; color: #4e73df; }
+    .btn-info-soft:hover { background: #4e73df; color: white; }
+    .btn-pdf-soft { background: #e3fbef; color: #1cc88a; }
+    .btn-pdf-soft:hover { background: #1cc88a; color: white; }
+    .btn-warning-soft { background: #fff6e5; color: #f6c23e; }
+    .btn-warning-soft:hover { background: #f6c23e; color: white; }
+    .btn-danger-soft { background: #fdf3f4; color: #e74a3b; }
+    .btn-danger-soft:hover { background: #e74a3b; color: white; }
+
+    /* Interactive Stars System */
+    .interactive-rating {
+        display: inline-flex;
+        flex-direction: row;
+    }
+    .star-btn {
+        background: none;
+        border: none;
+        padding: 0 2px;
+        font-size: 1.4rem;
+        color: #e3e6f0;
+        cursor: pointer;
+        transition: color 0.2s, transform 0.2s;
+        outline: none;
+    }
+    .star-btn.active, .star-btn.hover-active {
+        color: #f6c23e;
+    }
+    .star-btn:hover {
+        transform: scale(1.15);
+    }
+    /* SVG Support */
+    .star-btn svg { width: 22px; height: 22px; }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="h2 mb-1 text-gray-800 fw-bold" style="letter-spacing: -0.5px;">Gestion des Ventes</h1>
+            <p class="text-muted mb-0">Consultez et évaluez vos ventes avec des étoiles directement depuis la grille.</p>
         </div>
-        <div class="col-md-4 text-end">
-            <a href="{{ path('app_vente_new') }}" class="btn btn-primary">Enregistrer une vente</a>
+        <a href="{{ path('app_vente_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 mb-1" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+            </svg> Nouvelle Vente
+        </a>
+    </div>
+
+    <!-- Toast for Notifications -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <div id="ratingToast" class="toast align-items-center text-white border-0" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 mb-1" viewBox="0 0 16 16">
+                      <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                    </svg>
+                    Évaluation enregistrée avec succès !
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
         </div>
     </div>
 
     {% if ventes is empty %}
-        <div class="alert alert-info">
-            Aucune vente trouvée. <a href="{{ path('app_vente_new') }}">Enregistrer une vente</a>
+        <div class="glass-card text-center p-5 mt-4">
+            <h4 class="text-gray-800 fw-bold">Aucune vente trouvée</h4>
+            <a href="{{ path('app_vente_new') }}" class="btn btn-outline-primary rounded-pill px-4 mt-3 fw-bold">Enregistrer une vente</a>
         </div>
     {% else %}
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Récolte</th>
-                        <th>Acheteur</th>
-                        <th>Prix (TND)</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for vente in ventes %}
-                        <tr>
-                            <td>{{ vente.id }}</td>
-                            <td>{{ vente.recolte.nomRecolte|default('Vente anonyme') }}</td>
-                            <td>{{ vente.nomAcheteur|default('Particulier') }}</td>
-                            <td>{{ vente.prixVente }}</td>
-                            <td>{{ vente.dateVente|date('d/m/Y') }}</td>
-                            <td>
-                                <a href="{{ path('app_vente_pdf', {id: vente.id}) }}" class="btn btn-sm btn-info">Voir</a>
-                                <a href="{{ path('app_vente_edit', {id: vente.id}) }}" class="btn btn-sm btn-warning">Éditer</a>
-                                <form method="post" action="{{ path('app_vente_delete', {id: vente.id}) }}" class="d-inline" onsubmit="return confirm('Etes-vous sûr de vouloir supprimer cet élément ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vente.id) }}">
-                                    <button class="btn btn-sm btn-danger">Supprimer</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="row g-4">
+            {% for vente in ventes %}
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="glass-card h-100 p-4 d-flex flex-column position-relative">
+                        <!-- Top Row: ID & Status -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="text-primary fw-bold fs-5">#{{ vente.id }}</span>
+                            {% if vente.status == 'Completed' %}
+                                <span class="status-badge status-completed">Complétée</span>
+                            {% elseif vente.status == 'Pending' %}
+                                <span class="status-badge status-pending">En cours</span>
+                            {% else %}
+                                <span class="status-badge status-other">{{ vente.status|default('N/A') }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Main Info -->
+                        <h4 class="fw-bold text-gray-800 mb-1">{{ vente.recolte.name|default('Vente anonyme') }}</h4>
+                        <div class="text-muted small mb-3">
+                            Vendu à <span class="fw-bold">{{ vente.buyerName|default('Particulier') }}</span> le {{ vente.saleDate|date('d/m/Y') }}
+                        </div>
+
+                        <!-- Price -->
+                        <div class="mb-4">
+                            <span class="fs-3 fw-bolder text-success">{{ vente.price }}</span>
+                            <span class="text-muted fw-bold">TND</span>
+                        </div>
+
+                        <div class="mt-auto">
+                            <hr class="opacity-25 my-3">
+                            
+                            <!-- Bottom Row: Rating & Actions -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                
+                                <!-- Star Rating Interactive inline -->
+                                <div class="interactive-rating" data-vente-id="{{ vente.id }}" data-status="{{ vente.status|default('') }}">
+                                    {% if vente.status == 'Completed' %}
+                                        {% set r = vente.rating|default(0) %}
+                                        {% for i in 1..5 %}
+                                            <button type="button" class="star-btn {% if i <= r %}active{% endif %}" data-value="{{ i }}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                                </svg>
+                                            </button>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted small fst-italic ms-1">En attente</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex gap-1">
+                                    <a href="{{ path('app_vente_show', {id: vente.id}) }}" class="action-btn btn-info-soft" title="Voir">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>
+                                    </a>
+                                    <a href="{{ path('app_vente_pdf', {id: vente.id}) }}" class="action-btn btn-pdf-soft" title="Télécharger facture PDF">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                                    </a>
+                                    <a href="{{ path('app_vente_edit', {id: vente.id}) }}" class="action-btn btn-warning-soft" title="Modifier">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+                                    </a>
+                                    <form method="post" action="{{ path('app_vente_delete', {id: vente.id}) }}" class="m-0" onsubmit="return confirm('Confirmer la suppression ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vente.id) }}">
+                                        <button class="action-btn btn-danger-soft" title="Supprimer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Interactive Rating System Logic
+    const ratingContainers = document.querySelectorAll('.interactive-rating');
+    const toastEl = document.getElementById('ratingToast');
+    let toast = null;
+    
+    // Initialize Bootstrap toast functionality if present
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+        toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    }
+
+    ratingContainers.forEach(container => {
+        // Only attach logic to completed sales
+        if(container.dataset.status !== 'Completed') return;
+
+        const stars = container.querySelectorAll('.star-btn');
+        const venteId = container.dataset.venteId;
+
+        // Hover effect for stars
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const hoverValue = parseInt(this.dataset.value);
+                stars.forEach(s => {
+                    if (parseInt(s.dataset.value) <= hoverValue) {
+                        s.classList.add('hover-active');
+                    } else {
+                        s.classList.remove('hover-active');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseleave', function() {
+                stars.forEach(s => s.classList.remove('hover-active'));
+            });
+
+            // Click event to submit the rating to the API
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.value);
+                
+                // 1. Optimistic UI Update instantly
+                stars.forEach(s => {
+                    if (parseInt(s.dataset.value) <= rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+
+                // 2. Transmit to backend silently
+                fetch(`/vente/${venteId}/rate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ rating: rating })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success pill
+                        if (toast) {
+                            toast.show();
+                        } else {
+                            // Fallback if no bootstrap JS
+                            toastEl.classList.add('show');
+                            setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
+                        }
+                    } else {
+                        alert(data.message || 'Erreur lors de la notation.');
+                    }
+                })
+                .catch(error => console.error('Error submitting rating:', error));
+            });
+        });
+    });
+});
+</script>
 {% endblock %}
 

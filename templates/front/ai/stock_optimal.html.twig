@@ -1,0 +1,64 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Stock optimal IA - AgriGo{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <p class="section-eyebrow text-start mb-1">Intelligence artificielle</p>
+        <h1 class="h3 m-0">Stock optimal</h1>
+    </div>
+    <a href="{{ path('app_front_home') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+</div>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Délai de livraison (jours)</label>
+        <input type="number" name="delai" min="1" value="{{ delai }}" class="form-control">
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Marge de sécurité (jours)</label>
+        <input type="number" name="marge" min="0" value="{{ marge }}" class="form-control">
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100" type="submit">Recalculer</button>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Stock actuel</th>
+                <th>Stock optimal</th>
+                <th>Écart</th>
+                <th>Risque</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in recommendations %}
+                <tr>
+                    <td>{{ row.produit.nomProduit }}</td>
+                    <td>{{ row.stockActuel }} {{ row.produit.unite }}</td>
+                    <td>{{ row.stockOptimal }} {{ row.produit.unite }}</td>
+                    <td>{{ row.ecart }}</td>
+                    <td>
+                        {% if row.risqueRupture %}
+                            <span class="badge bg-danger">Rupture possible</span>
+                        {% else %}
+                            <span class="badge bg-success">Stable</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">Aucune recommandation disponible.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

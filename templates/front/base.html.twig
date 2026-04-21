@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable Turbo Drive so CDN-loaded scripts (Chart.js, Leaflet) always run -->
+    <meta name="turbo-visit-control" content="reload">
     <title>{% block title %}AgriGo{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -219,10 +221,44 @@
         </div>
     </section>
 
+    {% set currentRoute = app.request.attributes.get('_route') %}
+    {% if currentRoute in ['app_vente_list', 'app_vente_new'] %}
+        {# Vente notification panel intentionally hidden on list/new pages. #}
+    {% elseif currentRoute and currentRoute starts with 'app_vente_' %}
+        {% set venteFlashNotifications = app.flashes('vente_notification') %}
+        {% include 'front/_partials/vente_notifications.html.twig' %}
+        {% if venteFlashNotifications %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const notifications = {{ venteFlashNotifications|json_encode|raw }};
+
+                    notifications.forEach(function (notification) {
+                        const title = notification.title || 'Alerte vente';
+                        const body = notification.body || '';
+                        const tone = notification.tone || 'success';
+
+                        if (window.ventePushShowToast) {
+                            window.ventePushShowToast(title, body, tone);
+                        }
+
+                        if (Notification.permission === 'granted' && !document.hidden) {
+                            new Notification(title, {
+                                body: body,
+                                icon: notification.icon || '{{ asset('images/logo.png') }}'
+                            });
+                        }
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endif %}
+
     {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label == 'danger' ? 'danger' : 'success' }}" role="alert">{{ message }}</div>
-        {% endfor %}
+        {% if label != 'vente_notification' %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'danger' ? 'danger' : 'success' }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
     {% endfor %}
 
     <section class="front-shell">
@@ -231,6 +267,7 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{{ importmap('app') }}
 {% block javascripts %}{% endblock %}
 </body>
 </html>
