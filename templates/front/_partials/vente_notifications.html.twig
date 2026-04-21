@@ -1,0 +1,493 @@
+<style>
+    .vente-push-card {
+        border: 1px solid rgba(47, 91, 64, 0.14);
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(42, 90, 62, 0.08), rgba(135, 169, 95, 0.14));
+        box-shadow: 0 14px 34px rgba(58, 74, 48, 0.08);
+        overflow: hidden;
+        margin-bottom: 1.15rem;
+    }
+
+    .vente-push-card .card-body {
+        padding: 1rem 1.1rem;
+    }
+
+    .vente-push-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        background: rgba(42, 90, 62, 0.12);
+        color: var(--front-forest);
+    }
+
+    .vente-push-status {
+        font-size: 0.92rem;
+        color: var(--front-muted);
+        min-height: 1.25rem;
+    }
+
+    .vente-push-token {
+        display: none;
+        margin-top: 0.75rem;
+        padding: 0.7rem 0.85rem;
+        border-radius: 0.9rem;
+        background: rgba(31, 41, 51, 0.04);
+        border: 1px solid rgba(31, 41, 51, 0.08);
+        font-size: 0.82rem;
+        word-break: break-all;
+    }
+
+    .vente-push-token strong {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #687671;
+        margin-bottom: 0.25rem;
+    }
+
+    .vente-push-toasts {
+        position: fixed;
+        right: 1rem;
+        top: 5.25rem;
+        z-index: 1100;
+        width: min(360px, calc(100vw - 2rem));
+        pointer-events: none;
+    }
+
+    .vente-push-toast {
+        pointer-events: auto;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(42, 90, 62, 0.1);
+        box-shadow: 0 14px 34px rgba(31, 41, 51, 0.14);
+        overflow: hidden;
+        margin-bottom: 0.7rem;
+        transform: translateX(24px);
+        opacity: 0;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .vente-push-toast.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .vente-push-toast-head {
+        padding: 0.85rem 1rem 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .vente-push-toast-title {
+        margin: 0;
+        font-weight: 800;
+        color: #23422f;
+        font-size: 0.98rem;
+    }
+
+    .vente-push-toast-body {
+        padding: 0 1rem 0.9rem;
+        color: #51615a;
+        font-size: 0.92rem;
+        line-height: 1.35;
+    }
+</style>
+
+<div class="vente-push-card">
+    <div class="card-body d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+            <div class="vente-push-badge mb-2">
+                <span>Firebase Cloud Messaging</span>
+            </div>
+            <h2 class="h6 fw-bold mb-1" style="color: var(--front-ink);">Recevez les alertes vente en direct</h2>
+            <p class="mb-0 text-muted">Activez les notifications pour être prévenu quand une vente est créée, passe en complétée, ou change de prix.</p>
+        </div>
+        <div class="text-lg-end">
+            <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" id="enable-vente-notifications">
+                Activer les notifications
+            </button>
+            <div id="vente-notification-status" class="vente-push-status mt-2">En attente d’autorisation du navigateur.</div>
+            <div id="vente-notification-token" class="vente-push-token text-start"></div>
+        </div>
+    </div>
+</div>
+
+<div id="vente-push-toasts" class="vente-push-toasts" aria-live="polite" aria-atomic="true"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const config = {
+            apiKey: 'AIzaSyCgSsEUxbMznBirMAN5sVrBgsVdQES6GCg',
+            authDomain: 'agrigo-a6f05.firebaseapp.com',
+            projectId: 'agrigo-a6f05',
+            storageBucket: 'agrigo-a6f05.firebasestorage.app',
+            messagingSenderId: '819705578051',
+            appId: '1:819705578051:web:32e154a1f9611a0fb4caf6',
+            measurementId: 'G-2GFHJR7W0C'
+        };
+
+        const vapidKey = '{{ firebase_vapid_key|default('')|e('js') }}';
+        const statusEl = document.getElementById('vente-notification-status');
+        const enableButton = document.getElementById('enable-vente-notifications');
+        const toastContainer = document.getElementById('vente-push-toasts');
+        const tokenEl = document.getElementById('vente-notification-token');
+        const registerUrl = '{{ path('app_vente_fcm_register_token') }}';
+        const firebaseTokenDocId = 'user_{{ app.user ? app.user.idUser : 'unknown' }}';
+        const accountHasToken = {{ app.user and app.user.fcmToken ? 'true' : 'false' }};
+        let isEnrolling = false;
+        let firestoreDb = null;
+
+        const setStatus = function (message, tone) {
+            if (!statusEl) {
+                return;
+            }
+
+            statusEl.textContent = message;
+            statusEl.style.color = tone === 'success' ? '#1b7f56' : (tone === 'warning' ? '#a76d00' : 'var(--front-muted)');
+        };
+
+        const withTimeout = function (promise, timeoutMs, timeoutMessage) {
+            let timeoutId = null;
+            const timeoutPromise = new Promise(function (_, reject) {
+                timeoutId = window.setTimeout(function () {
+                    reject(new Error(timeoutMessage));
+                }, timeoutMs);
+            });
+
+            return Promise.race([promise, timeoutPromise]).then(function (value) {
+                if (timeoutId !== null) {
+                    window.clearTimeout(timeoutId);
+                }
+
+                return value;
+            }).catch(function (error) {
+                if (timeoutId !== null) {
+                    window.clearTimeout(timeoutId);
+                }
+
+                throw error;
+            });
+        };
+
+        const showToast = function (title, body, tone) {
+            if (!toastContainer) {
+                return;
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'vente-push-toast';
+            toast.innerHTML = `
+                <div class="vente-push-toast-head">
+                    <div class="vente-push-toast-title">${title}</div>
+                    <button type="button" class="btn-close" aria-label="Fermer"></button>
+                </div>
+                <div class="vente-push-toast-body">${body}</div>
+            `;
+
+            if (tone === 'success') {
+                toast.style.borderColor = 'rgba(42, 90, 62, 0.2)';
+                toast.style.boxShadow = '0 14px 34px rgba(42, 90, 62, 0.14)';
+            }
+
+            toast.querySelector('.btn-close').addEventListener('click', function () {
+                toast.classList.remove('show');
+                window.setTimeout(function () {
+                    toast.remove();
+                }, 260);
+            });
+
+            toastContainer.appendChild(toast);
+            window.requestAnimationFrame(function () {
+                toast.classList.add('show');
+            });
+
+            window.setTimeout(function () {
+                toast.classList.remove('show');
+                window.setTimeout(function () {
+                    toast.remove();
+                }, 260);
+            }, 6000);
+        };
+
+        const showToken = function (token) {
+            if (!tokenEl) {
+                return;
+            }
+
+            tokenEl.style.display = 'block';
+            tokenEl.innerHTML = '<strong>Jeton FCM enregistré</strong><span>' + token + '</span>';
+        };
+
+        const ensureFirebaseAuth = function () {
+            if (!firebase.auth) {
+                return Promise.reject(new Error('Firebase Auth indisponible.'));
+            }
+
+            return firebase.auth().currentUser
+                ? Promise.resolve(firebase.auth().currentUser)
+                : firebase.auth().signInAnonymously().then(function (result) {
+                    return result.user;
+                });
+        };
+
+        const getFirestoreDb = function () {
+            if (firestoreDb) {
+                return firestoreDb;
+            }
+
+            if (!window.firebase || !firebase.firestore) {
+                return null;
+            }
+
+            firestoreDb = firebase.firestore();
+            firestoreDb.settings({
+                experimentalAutoDetectLongPolling: true,
+                useFetchStreams: false
+            });
+
+            return firestoreDb;
+        };
+
+        const storeTokenInFirestoreRest = function (token) {
+            if (!firebase.auth || !firebase.auth().currentUser) {
+                return Promise.reject(new Error('Utilisateur Firebase non authentifié.'));
+            }
+
+            const endpoint = 'https://firestore.googleapis.com/v1/projects/'
+                + encodeURIComponent(config.projectId)
+                + '/databases/(default)/documents/vente_fcm_tokens/'
+                + encodeURIComponent(firebaseTokenDocId)
+                + '?key=' + encodeURIComponent(config.apiKey);
+
+            return firebase.auth().currentUser.getIdToken().then(function (idToken) {
+                return withTimeout(fetch(endpoint, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + idToken,
+                    },
+                    body: JSON.stringify({
+                        fields: {
+                            token: { stringValue: token },
+                            channel: { stringValue: 'vente' },
+                            updatedAtIso: { stringValue: new Date().toISOString() },
+                            userAgent: { stringValue: navigator.userAgent || '' },
+                            page: { stringValue: window.location.pathname || '' },
+                            uid: { stringValue: firebase.auth().currentUser ? firebase.auth().currentUser.uid : '' },
+                            userId: { stringValue: '{{ app.user ? app.user.idUser : '' }}' },
+                            projectId: { stringValue: config.projectId }
+                        }
+                    })
+                }).then(function (response) {
+                    if (!response.ok) {
+                        return response.text().then(function (text) {
+                            throw new Error('Firestore REST ' + response.status + ': ' + text);
+                        });
+                    }
+
+                    return response;
+                }), 10000, 'Timeout pendant l’écriture Firestore (REST).');
+            });
+        };
+
+        const storeTokenInFirestore = function (token) {
+            if (!window.firebase || !firebase.firestore) {
+                return Promise.resolve();
+            }
+
+            return ensureFirebaseAuth().then(function () {
+                const db = getFirestoreDb();
+                if (!db) {
+                    throw new Error('Firestore indisponible.');
+                }
+
+                return withTimeout(db.collection('vente_fcm_tokens').doc(firebaseTokenDocId).set({
+                    token: token,
+                    channel: 'vente',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    userAgent: navigator.userAgent,
+                    page: window.location.pathname,
+                    uid: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null,
+                    userId: '{{ app.user ? app.user.idUser : '' }}',
+                    projectId: config.projectId
+                }, { merge: true }), 8000, 'Timeout Firestore SDK').catch(function () {
+                    return storeTokenInFirestoreRest(token);
+                });
+            });
+        };
+
+        window.ventePushShowToast = showToast;
+
+        if (!('Notification' in window) || !('serviceWorker' in navigator) || !window.firebase) {
+            setStatus('Les notifications du navigateur ne sont pas disponibles dans ce navigateur.', 'warning');
+            if (enableButton) {
+                enableButton.disabled = true;
+            }
+            return;
+        }
+
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(config);
+            }
+        } catch (error) {
+            setStatus('Impossible d’initialiser Firebase pour cette page.', 'warning');
+            if (enableButton) {
+                enableButton.disabled = true;
+            }
+            return;
+        }
+
+        const messaging = firebase.messaging();
+
+        navigator.serviceWorker.register('{{ asset('firebase-messaging-sw.js') }}').then(function (registration) {
+            if (!vapidKey) {
+                setStatus('Ajoutez FIREBASE_VAPID_KEY dans .env.dev pour finaliser l’inscription push.', 'warning');
+                if (enableButton) {
+                    enableButton.disabled = true;
+                }
+                return;
+            }
+
+            if (Notification.permission === 'granted') {
+                if (accountHasToken) {
+                    setStatus('Ce compte est déjà enregistré pour les notifications.', 'success');
+                } else {
+                    setStatus('Autorisation navigateur accordée. Enregistrement du compte en cours...', 'warning');
+                }
+            }
+
+            const enroll = function () {
+                if (isEnrolling) {
+                    return;
+                }
+
+                const finishEnroll = function () {
+                    isEnrolling = false;
+                    if (enableButton) {
+                        enableButton.disabled = false;
+                    }
+                };
+
+                isEnrolling = true;
+                if (enableButton) {
+                    enableButton.disabled = true;
+                }
+
+                setStatus('Enregistrement du navigateur en cours pour ce compte...', 'success');
+
+                const permissionPromise = Notification.permission === 'granted'
+                    ? Promise.resolve('granted')
+                    : Notification.requestPermission();
+
+                permissionPromise.then(function (permission) {
+                    if (permission !== 'granted') {
+                        setStatus('Les notifications ont été refusées par le navigateur.', 'warning');
+                        finishEnroll();
+                        return;
+                    }
+
+                    setStatus('Obtention du jeton Firebase...', 'success');
+
+                    withTimeout(messaging.getToken({
+                        vapidKey: vapidKey,
+                        serviceWorkerRegistration: registration
+                    }), 15000, 'Timeout pendant la génération du jeton Firebase.').then(function (token) {
+                        if (!token) {
+                            setStatus('Aucun jeton Firebase n’a été généré.', 'warning');
+                            finishEnroll();
+                            return;
+                        }
+
+                        setStatus('Enregistrement du jeton dans l’application...', 'success');
+
+                        withTimeout(fetch(registerUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ token: token })
+                        }), 10000, 'Timeout pendant l’enregistrement sur le serveur.').then(function (response) {
+                            return response.json().then(function (payload) {
+                                if (!response.ok) {
+                                    throw new Error(payload.error || 'Impossible d’enregistrer le jeton.');
+                                }
+
+                                setStatus('Synchronisation du jeton vers Firebase...', 'success');
+                                storeTokenInFirestore(payload.token || token).then(function () {
+                                    setStatus('Notifications activées et jeton enregistré dans Firebase.', 'success');
+                                    showToken(payload.token || token);
+                                    showToast('Notifications activées', 'Vous recevrez les alertes vente directement ici.', 'success');
+                                    finishEnroll();
+                                }).catch(function (firestoreError) {
+                                    const firestoreMessage = firestoreError && firestoreError.message ? firestoreError.message : 'erreur Firestore';
+                                    const missingFirestoreDb = firestoreMessage.includes('database (default) does not exist') || firestoreMessage.includes('NOT_FOUND');
+
+                                    if (missingFirestoreDb) {
+                                        setStatus('Notifications activées. Firestore n’est pas encore créé, le jeton est enregistré dans l’application.', 'warning');
+                                        showToken(payload.token || token);
+                                        showToast('Notifications activées', 'Le jeton est bien enregistré côté application. Créez Firestore pour la synchro Firebase.', 'success');
+                                        finishEnroll();
+                                        return;
+                                    }
+
+                                    setStatus('Notifications activées, mais l’enregistrement Firebase a échoué: ' + firestoreMessage, 'warning');
+                                    showToken(payload.token || token);
+                                    showToast('Jeton local enregistré', 'Le jeton a été créé, mais la sauvegarde Firebase a échoué.', 'warning');
+                                    finishEnroll();
+                                });
+                            });
+                        }).catch(function (error) {
+                            setStatus(error.message, 'warning');
+                            finishEnroll();
+                        });
+                    }).catch(function (error) {
+                        setStatus(error.message || 'Erreur lors de la génération du jeton.', 'warning');
+                        finishEnroll();
+                    });
+                }).catch(function (error) {
+                    setStatus(error && error.message ? error.message : 'Erreur pendant la demande d’autorisation.', 'warning');
+                    finishEnroll();
+                });
+            };
+
+            if (enableButton) {
+                enableButton.addEventListener('click', enroll);
+            }
+
+            if (Notification.permission === 'granted' && !accountHasToken) {
+                window.setTimeout(enroll, 250);
+            }
+
+            messaging.onMessage(function (payload) {
+                const notification = payload && payload.notification ? payload.notification : {};
+                const notificationTitle = notification.title || 'Nouvelle alerte vente';
+                const notificationBody = notification.body || 'Une notification AgriGo est arrivée.';
+
+                showToast(notificationTitle, notificationBody, 'success');
+
+                if (Notification.permission === 'granted') {
+                    new Notification(notificationTitle, {
+                        body: notificationBody,
+                        icon: notification.icon || '{{ asset('images/logo.png') }}'
+                    });
+                }
+            });
+        }).catch(function (error) {
+            setStatus((error && error.message) ? error.message : 'Le service worker Firebase n’a pas pu être chargé.', 'warning');
+        });
+    });
+</script>

@@ -87,7 +87,7 @@ class SecurityController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Ce QR Code est invalide ou expiré.'], 404);
         }
 
-        if (!$user->isActive()) {
+           if (!$user->isActive() || $user->getBadWordCommentStrikes() >= 3) {
              return new JsonResponse(['success' => false, 'message' => 'Ce compte est inactif.'], 403);
         }
 
@@ -183,7 +183,7 @@ class SecurityController extends AbstractController
         }
 
         if ($bestMatch) {
-            if (!$bestMatch->isActive()) {
+            if (!$bestMatch->isActive() || $bestMatch->getBadWordCommentStrikes() >= 3) {
                 return new JsonResponse(['success' => false, 'message' => 'Ce compte est inactif.'], 403);
             }
 

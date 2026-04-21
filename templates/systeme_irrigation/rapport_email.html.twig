@@ -2,9 +2,16 @@
 
 <p>Votre rapport AgriGo est prêt pour la période du {{ period_start|date('d/m/Y') }} au {{ period_end|date('d/m/Y') }}.</p>
 
+{% if download_url %}
 <p>
-    Vous pouvez aussi le télécharger via ce lien (valable 24h):
-    <a href="{{ download_url }}">{{ download_url }}</a>
+    Vous pouvez télécharger votre rapport PDF via ce lien valable 24h:
 </p>
+<p>
+    <a href="{{ download_url }}" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:8px;font-weight:600;">Télécharger le rapport PDF</a>
+</p>
+<p style="font-size:12px;color:#6b7280;word-break:break-all;">Lien direct: {{ download_url }}</p>
+{% else %}
+<p>Le lien de téléchargement n'a pas pu être généré automatiquement.</p>
+{% endif %}
 
 <p>Cordialement,<br>AgriGo</p>

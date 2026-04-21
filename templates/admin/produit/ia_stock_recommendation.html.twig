@@ -1,0 +1,66 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Stock optimal IA - Back{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="h3 m-0 text-dark">Stock optimal IA</h1>
+        <p class="text-muted small mb-0">Recommandation de stock idéale.</p>
+    </div>
+    <a href="{{ path('admin_produit_index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Retour aux produits
+    </a>
+</div>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Délai de livraison (jours)</label>
+        <input type="number" name="delai" min="1" value="{{ delaiLivraison|default(7) }}" class="form-control">
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Marge de sécurité (jours)</label>
+        <input type="number" name="marge" min="0" value="{{ margeSecuriteJours|default(3) }}" class="form-control">
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100" type="submit">Recalculer</button>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Stock actuel</th>
+                    <th>Stock optimal</th>
+                    <th>Écart</th>
+                    <th>Risque</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in recommandations %}
+                    <tr>
+                        <td>{{ row.produit.nomProduit|default('N/A') }}</td>
+                        <td>{{ row.stockActuel|default(0) }} {{ row.produit.unite|default('') }}</td>
+                        <td>{{ row.stockOptimal|default(0) }} {{ row.produit.unite|default('') }}</td>
+                        <td>{{ row.ecart|default(0) }}</td>
+                        <td>
+                            {% if row.risqueRupture|default(false) %}
+                                <span class="badge bg-danger">Rupture possible</span>
+                            {% else %}
+                                <span class="badge bg-success">Stable</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">Aucune recommandation disponible.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

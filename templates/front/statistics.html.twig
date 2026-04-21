@@ -1,0 +1,110 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Statistiques - AgriGo{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <p class="section-eyebrow text-start mb-1">Espace agriculteur</p>
+        <h1 class="h3 m-0">Statistiques personnelles</h1>
+    </div>
+    <a href="{{ path('app_front_home') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-semibold">Coût total</div>
+                <div class="display-6 fw-bold text-success">{{ total_cost|number_format(0, ',', ' ') }} TND</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-semibold">Revenu total</div>
+                <div class="display-6 fw-bold text-primary">{{ total_revenue|number_format(0, ',', ' ') }} TND</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase fw-semibold">Marge brute</div>
+                <div class="display-6 fw-bold {{ (total_revenue - total_cost) >= 0 ? 'text-success' : 'text-danger' }}">{{ (total_revenue - total_cost)|number_format(0, ',', ' ') }} TND</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h2 class="h5 m-0">Récoltes récentes</h2>
+            </div>
+            <div class="card-body px-4 pt-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Qté</th>
+                            <th>Coût</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for recolte in recoltes %}
+                            <tr>
+                                <td>{{ recolte.name }}</td>
+                                <td>{{ recolte.quantity }} {{ recolte.unit }}</td>
+                                <td>{{ recolte.productionCost is not null ? recolte.productionCost|number_format(0, ',', ' ') ~ ' TND' : '-' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">Aucune récolte.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h2 class="h5 m-0">Ventes récentes</h2>
+            </div>
+            <div class="card-body px-4 pt-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Acheteur</th>
+                            <th>Statut</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for vente in ventes %}
+                            <tr>
+                                <td>{{ vente.description }}</td>
+                                <td>{{ vente.buyerName ?: '-' }}</td>
+                                <td>{{ vente.status ?: '-' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">Aucune vente.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

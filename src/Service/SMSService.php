@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Twilio\Exceptions\RestException;
 use Twilio\Rest\Client;
 
 class SMSService
@@ -14,6 +15,8 @@ class SMSService
         private readonly ?string $sid,
         #[Autowire('%env(default::TWILIO_TOKEN)%')]
         private readonly ?string $token,
+        #[Autowire('%env(default::TWILIO_AUTH_TOKEN)%')]
+        private readonly ?string $authToken,
         #[Autowire('%env(default::TWILIO_FROM)%')]
         private readonly ?string $from,
     ) {
@@ -30,7 +33,7 @@ class SMSService
     public function sendWithStatus(string $to, string $message, ?string $mediaUrl = null): array
     {
         $sid = trim((string) $this->sid);
-        $token = trim((string) $this->token);
+        $token = trim((string) ($this->authToken ?: $this->token));
         $from = trim((string) $this->from);
 
         if ('' === $sid || '' === $token || '' === $from) {
@@ -57,6 +60,19 @@ class SMSService
             return [
                 'success' => true,
                 'error' => null,
+            ];
+        } catch (RestException $e) {
+            $errorMsg = $e->getMessage();
+
+            if (401 === $e->getCode()) {
+                $errorMsg = 'Twilio auth failed (401). Verify TWILIO_SID + TWILIO_AUTH_TOKEN (or TWILIO_TOKEN) and restart symfony serve.';
+            }
+
+            error_log("SMS Error: {$errorMsg}");
+
+            return [
+                'success' => false,
+                'error' => $errorMsg,
             ];
         } catch (\Throwable $e) {
             $errorMsg = $e->getMessage();

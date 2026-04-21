@@ -3,102 +3,600 @@
 {% block title %}Mes Ventes{% endblock %}
 
 {% block content %}
-<div class="row mb-4 align-items-center">
-    <div class="col-md-6">
-        <h1 class="h3 mb-0 text-gray-800">Mes Ventes</h1>
-    </div>
-    <div class="col-md-6 text-end">
-        <a href="{{ path('app_vente_new') }}" class="btn btn-primary shadow-sm glass-button">
-            <i class="bi bi-plus text-white-50"></i> Nouvelle Vente
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+        border-radius: 50rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .status-completed { background: #e3fbef; color: #1cc88a; border: 1px solid #1cc88a; }
+    .status-pending { background: #fff6e5; color: #f6c23e; border: 1px solid #f6c23e; }
+    .status-other { background: #f8f9fc; color: #858796; border: 1px solid #858796; }
+
+    .action-btn {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: all 0.2s; text-decoration: none; border: none;
+    }
+    .action-btn:hover { transform: translateY(-3px); }
+    
+    .btn-info-soft { background: #e3f2fd; color: #4e73df; }
+    .btn-info-soft:hover { background: #4e73df; color: white; }
+    .btn-pdf-soft { background: #e3fbef; color: #1cc88a; }
+    .btn-pdf-soft:hover { background: #1cc88a; color: white; }
+    .btn-warning-soft { background: #fff6e5; color: #f6c23e; }
+    .btn-warning-soft:hover { background: #f6c23e; color: white; }
+    .btn-danger-soft { background: #fdf3f4; color: #e74a3b; }
+    .btn-danger-soft:hover { background: #e74a3b; color: white; }
+    
+    /* Search and Sort custom styling */
+    .glass-input {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50rem;
+        padding: 0.2rem 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    .glass-input input, .glass-input select {
+        box-shadow: none !important;
+    }
+
+    /* Interactive Stars System */
+    .interactive-rating {
+        display: inline-flex;
+        flex-direction: row;
+    }
+    .star-btn {
+        background: none;
+        border: none;
+        padding: 0 2px;
+        font-size: 1.4rem;
+        color: #e3e6f0;
+        cursor: pointer;
+        transition: color 0.2s, transform 0.2s;
+        outline: none;
+    }
+    .star-btn.active, .star-btn.hover-active {
+        color: #f6c23e;
+    }
+    .star-btn:hover {
+        transform: scale(1.15);
+    }
+    .star-btn svg { width: 22px; height: 22px; }
+
+    /* Vente page chatbot (scoped to this template only) */
+    .vente-ai-wrap {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 1090;
+    }
+
+    .vente-ai-toggle {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        border: none;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 8px 24px rgba(20, 135, 92, 0.35);
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+    }
+
+    .vente-ai-card {
+        display: none;
+        width: min(360px, calc(100vw - 2rem));
+        margin-bottom: 0.75rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid rgba(28, 200, 138, 0.25);
+        background: #fff;
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .vente-ai-card.open {
+        display: block;
+    }
+
+    .vente-ai-head {
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .vente-ai-chat {
+        height: 280px;
+        overflow-y: auto;
+        padding: 0.8rem;
+        background: #f8fffb;
+    }
+
+    .vente-ai-msg {
+        max-width: 90%;
+        font-size: 0.9rem;
+        border-radius: 0.8rem;
+        padding: 0.55rem 0.7rem;
+        margin-bottom: 0.6rem;
+        line-height: 1.4;
+        white-space: pre-line;
+    }
+
+    .vente-ai-msg.bot {
+        background: #e8f9f1;
+        color: #14573f;
+    }
+
+    .vente-ai-msg.user {
+        margin-left: auto;
+        background: #1cc88a;
+        color: #fff;
+    }
+
+    .vente-ai-form {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.7rem;
+        border-top: 1px solid #e7f5ed;
+        background: #fff;
+    }
+
+    .vente-ai-input {
+        border-radius: 999px;
+        border: 1px solid #d6eee2;
+        padding: 0.5rem 0.85rem;
+        font-size: 0.9rem;
+        flex: 1;
+        outline: none;
+    }
+
+    .vente-ai-send {
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 0.95rem;
+        color: #fff;
+        font-weight: 700;
+        background: #13855c;
+    }
+
+    @media (max-width: 576px) {
+        .vente-ai-wrap {
+            right: 0.7rem;
+            bottom: 0.7rem;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h1 class="h2 mb-1 text-gray-800 fw-bold" style="letter-spacing: -0.5px;">Mes Ventes</h1>
+            <p class="text-muted mb-0">Découvrez et gérez vos ventes avec la possibilité de les noter par étoiles.</p>
+        </div>
+        <a href="{{ path('app_vente_new') }}" class="btn text-white rounded-pill px-4 shadow-sm fw-bold" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); border: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 mb-1" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+            </svg> Ajouter une Vente
         </a>
+                <button type="button" class="btn btn-outline-success rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#marketplaceModal">Marketplace (popup)</button>
     </div>
+
+    <!-- Actions Bar: Search and Sort -->
+    <div class="row mb-5">
+        <div class="col-12 col-xl-10">
+            <form method="get" action="{{ path('app_vente_list') }}" class="d-flex flex-column flex-md-row gap-3">
+                <!-- Search -->
+                <div class="input-group glass-input flex-grow-1 border bg-white">
+                    <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control bg-transparent border-0" placeholder="Rechercher une vente..." name="search" value="{{ search }}">
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <!-- Sort Dropdown -->
+                    <div class="d-flex align-items-center">
+                        <select name="sort" class="form-select bg-white rounded-pill px-4 py-2 border shadow-sm text-muted fw-bold">
+                            {% for key, label in sortOptions %}
+                                <option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Direction Dropdown -->
+                    <div class="d-flex align-items-center">
+                        <select name="direction" class="form-select bg-white rounded-pill px-4 py-2 border shadow-sm text-muted">
+                            <option value="ASC" {% if direction == 'ASC' %}selected{% endif %}>Croissant</option>
+                            <option value="DESC" {% if direction == 'DESC' %}selected{% endif %}>Décroissant</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-dark rounded-pill px-4 shadow-sm" type="submit">
+                        Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast for Notifications -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <div id="ratingToast" class="toast align-items-center text-white border-0" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 mb-1" viewBox="0 0 16 16">
+                      <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                    </svg>
+                    Évaluation enregistrée avec succès !
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    {% if ventes is empty and purchase_orders is empty %}
+        <div class="glass-card text-center p-5 mt-4">
+            <h4 class="text-gray-800 fw-bold">Aucune vente trouvée</h4>
+            <p class="text-muted">Commencez dès maintenant en enregistrant la vente de votre première récolte.</p>
+            <a href="{{ path('app_vente_new') }}" class="btn rounded-pill text-white px-4 mt-2 fw-bold" style="background-color: #1cc88a">Ajouter ma première vente</a>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for vente in ventes %}
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="glass-card h-100 p-4 d-flex flex-column position-relative">
+                        <!-- Top Row: ID & Status -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="text-primary fw-bold fs-5">#{{ vente.id }}</span>
+                            {% set vStatus = vente.status|lower %}
+                            {% if vStatus == 'completed' or vStatus == 'terminee' or vStatus == 'terminée' %}
+                                <span class="status-badge status-completed">Complétée</span>
+                            {% elseif vStatus == 'pending' or vStatus == 'en attente' %}
+                                <span class="status-badge status-pending">En attente</span>
+                            {% else %}
+                                <span class="status-badge status-other">{{ vente.status|default('N/A') }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Main Info -->
+                        {% set recolte = vente.recolte %}
+                        <h4 class="fw-bold text-gray-800 mb-1">{{ recolte ? recolte.name : (vente.description ?: 'Vente anonyme') }}</h4>
+                        <div class="text-muted small mb-2">
+                            Acheteur: <span class="fw-bold">{{ vente.buyerName ?: 'Particulier' }}</span>
+                        </div>
+                        <div class="text-muted small mb-3">
+                            Récolte: <span class="fw-bold">{{ recolte ? (recolte.harvestDate ? recolte.harvestDate|date('d/m/Y') : 'Date non renseignée') : 'Aucune récolte liée' }}</span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="mb-4">
+                            <span class="fs-3 fw-bolder text-success">{{ recolte and recolte.productionCost is not null ? recolte.productionCost|number_format(0, ',', ' ') : 'N/A' }}</span>
+                            <span class="text-muted fw-bold">{{ recolte and recolte.productionCost is not null ? 'TND' : '' }}</span>
+                        </div>
+
+                        <div class="mt-auto">
+                            <hr class="opacity-25 my-3">
+                            
+                            <!-- Bottom Row: Rating & Actions -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                
+                                <!-- Star Rating Interactive inline -->
+                                <div class="interactive-rating" data-vente-id="{{ vente.id }}" data-current-rating="{{ vente.rating|default(0) }}" data-status="{{ vente.status ?: 'pending' }}">
+                                    {% for i in 1..5 %}
+                                        <span class="star-btn fs-5"
+                                              data-value="{{ i }}"
+                                              data-vente="{{ vente.id }}"
+                                              title="{{ i }} étoile{{ i > 1 ? 's' : '' }}"
+                                              style="cursor:pointer; color: {{ i <= vente.rating|default(0) ? '#f5a623' : '#ccc' }}; transition: color 0.15s;">★</span>
+                                    {% endfor %}
+                                    <span class="rating-label small text-muted ms-1">{{ vente.rating|default(0) > 0 ? vente.rating|default(0) ~ '/5' : '' }}</span>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex gap-1">
+                                    <a href="{{ path('app_vente_show', {id: vente.id}) }}" class="action-btn btn-info-soft" title="Voir">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>
+                                    </a>
+                                    <a href="{{ path('app_vente_pdf', {id: vente.id}) }}" class="action-btn btn-pdf-soft" title="Télécharger facture PDF">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                                    </a>
+                                    <a href="{{ path('app_vente_edit', {id: vente.id}) }}" class="action-btn btn-warning-soft" title="Modifier">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+                                    </a>
+                                    <form method="post" action="{{ path('app_vente_delete', {id: vente.id}) }}" class="m-0" onsubmit="return confirm('Confirmer la suppression ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete_front_vente_' ~ vente.id) }}">
+                                        <button class="action-btn btn-danger-soft" title="Supprimer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% endif %}
 </div>
 
-<div class="card shadow mb-4 glass-panel border-0">
-    <div class="card-header py-3 bg-transparent border-0 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">Historique des Ventes</h6>
-        <form class="d-none d-sm-inline-block form-inline ml-auto mr-md-3 my-2 my-md-0 mw-100 navbar-search" method="get" action="{{ path('app_vente_list') }}">
-            <div class="input-group glass-input flex-nowrap">
-                <input type="text" class="form-control bg-transparent border-0 small" placeholder="Rechercher..." name="search" value="{{ search }}">
-                <button class="btn btn-primary border-0" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </div>
+<div
+    id="venteAiAssistant"
+    class="vente-ai-wrap"
+    data-catalog="{{ chatbot_catalog|default([])|json_encode|e('html_attr') }}"
+    data-endpoint="{{ path('app_vente_assistant') }}"
+>
+    <div class="vente-ai-card" id="venteAiCard" aria-live="polite">
+        <div class="vente-ai-head">Assistant Vente</div>
+        <div class="vente-ai-chat" id="venteAiChat"></div>
+        <form class="vente-ai-form" id="venteAiForm">
+            <input
+                id="venteAiInput"
+                class="vente-ai-input"
+                type="text"
+                placeholder="Ex: quoi acheter ? ou quoi est disponible ?"
+                autocomplete="off"
+            >
+            <button type="submit" class="vente-ai-send">Envoyer</button>
         </form>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover glass-table" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>
-                            <a href="{{ path('app_vente_list', {'sort': 'description', 'direction': sort == 'description' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
-                                Description {% if sort == 'description' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ path('app_vente_list', {'sort': 'price', 'direction': sort == 'price' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
-                                Prix {% if sort == 'price' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ path('app_vente_list', {'sort': 'saleDate', 'direction': sort == 'saleDate' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
-                                Date {% if sort == 'saleDate' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ path('app_vente_list', {'sort': 'buyerName', 'direction': sort == 'buyerName' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
-                                Acheteur {% if sort == 'buyerName' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
-                            </a>
-                        </th>
-                        <th>
-                            <a href="{{ path('app_vente_list', {'sort': 'status', 'direction': sort == 'status' and direction == 'ASC' ? 'DESC' : 'ASC', 'search': search}) }}" class="text-decoration-none text-dark">
-                                Statut {% if sort == 'status' %}<i class="bi bi-arrow-{{ direction == 'ASC' ? 'up' : 'down' }}"></i>{% endif %}
-                            </a>
-                        </th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for vente in ventes %}
-                    <tr>
-                        <td class="font-weight-bold">{{ vente.description }}</td>
-                        <td class="text-success font-weight-bold">{{ vente.price }} €</td>
-                        <td>{{ vente.saleDate|date('d/m/Y') }}</td>
-                        <td>{{ vente.buyerName }}</td>
-                        <td>
-                            <span class="badge 
-                                {% if vente.status == 'terminee' or vente.status == 'terminée' %}bg-success
-                                {% elseif vente.status == 'en attente' %}bg-warning text-dark
-                                {% else %}bg-secondary{% endif %} glass-badge">
-                                {{ vente.status }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="btn-group gap-2">
-                                <a href="{{ path('app_vente_show', {'id': vente.id}) }}" class="btn btn-sm btn-info text-white rounded shadow-sm" title="Voir">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ path('app_vente_edit', {'id': vente.id}) }}" class="btn btn-sm btn-warning text-white rounded shadow-sm" title="Modifier">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="post" action="{{ path('app_vente_delete', {'id': vente.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette vente ?');" class="d-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_front_vente_' ~ vente.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-danger rounded shadow-sm" title="Supprimer">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">Aucune vente trouvée.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <button id="venteAiToggle" type="button" class="vente-ai-toggle" aria-label="Ouvrir assistant vente">AI</button>
+</div>
+
+<div class="modal fade" id="marketplaceModal" tabindex="-1" aria-labelledby="marketplaceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1rem; overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); color: #fff;">
+                <h5 class="modal-title fw-bold" id="marketplaceModalLabel">Marketplace</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" style="height: min(78vh, 900px);">
+                <iframe
+                    title="Marketplace"
+                    src="{{ path('app_marketplace_index') }}"
+                    style="border:0; width:100%; height:100%; background:#fff;"
+                    loading="lazy"
+                    referrerpolicy="same-origin"
+                ></iframe>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Interactive Rating System Logic
+    const ratingContainers = document.querySelectorAll('.interactive-rating');
+    const toastEl = document.getElementById('ratingToast');
+    let toast = null;
+    
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+        toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    }
+
+    ratingContainers.forEach(container => {
+        if(container.dataset.status !== 'Completed') return;
+
+        const stars = container.querySelectorAll('.star-btn');
+        const venteId = container.dataset.venteId;
+
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const hoverValue = parseInt(this.dataset.value);
+                stars.forEach(s => {
+                    if (parseInt(s.dataset.value) <= hoverValue) {
+                        s.classList.add('hover-active');
+                    } else {
+                        s.classList.remove('hover-active');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseleave', function() {
+                stars.forEach(s => s.classList.remove('hover-active'));
+            });
+
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.value);
+                
+                // Optimistic UI Update instantly
+                stars.forEach(s => {
+                    if (parseInt(s.dataset.value) <= rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+
+                // Send to rate endpoint
+                fetch(`/vente/${venteId}/rate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ rating: rating })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (toast) {
+                            toast.show();
+                        } else {
+                            toastEl.classList.add('show');
+                            setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
+                        }
+                    } else {
+                        alert(data.message || data.error || 'Erreur lors de la notation.');
+                    }
+                })
+                .catch(error => console.error('Error submitting rating:', error));
+            });
+        });
+    });
+
+    const assistantRoot = document.getElementById('venteAiAssistant');
+    if (!assistantRoot) {
+        return;
+    }
+
+    const assistantCard = document.getElementById('venteAiCard');
+    const assistantToggle = document.getElementById('venteAiToggle');
+    const assistantChat = document.getElementById('venteAiChat');
+    const assistantForm = document.getElementById('venteAiForm');
+    const assistantInput = document.getElementById('venteAiInput');
+
+    const endpoint = assistantRoot.dataset.endpoint || '/vente/assistant';
+    const history = [];
+
+    function addMessage(role, text) {
+        const row = document.createElement('div');
+        row.className = `vente-ai-msg ${role}`;
+        row.textContent = text;
+        assistantChat.appendChild(row);
+        assistantChat.scrollTop = assistantChat.scrollHeight;
+    }
+
+    async function askAssistant(message) {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                message,
+                history
+            })
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Le support est indisponible pour le moment.');
+        }
+
+        return (data.reply || '').toString().trim() || 'Je suis la pour aider, tu peux reformuler ta question.';
+    }
+
+    assistantToggle.addEventListener('click', function () {
+        assistantCard.classList.toggle('open');
+        if (assistantCard.classList.contains('open') && assistantChat.children.length === 0) {
+            addMessage('bot', 'Salut, support vente en ligne. Pose ta question librement, je te reponds avec les donnees de cette page.');
+        }
+    });
+
+    assistantForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const message = (assistantInput.value || '').trim();
+        if (!message) {
+            return;
+        }
+
+        addMessage('user', message);
+        assistantInput.value = '';
+        assistantInput.disabled = true;
+
+        const typingMessage = document.createElement('div');
+        typingMessage.className = 'vente-ai-msg bot';
+        typingMessage.textContent = 'En train d ecrire...';
+        assistantChat.appendChild(typingMessage);
+        assistantChat.scrollTop = assistantChat.scrollHeight;
+
+        history.push({ role: 'user', content: message });
+        if (history.length > 16) {
+            history.shift();
+        }
+
+        try {
+            const reply = await askAssistant(message);
+            typingMessage.remove();
+            addMessage('bot', reply);
+
+            history.push({ role: 'assistant', content: reply });
+            if (history.length > 16) {
+                history.shift();
+            }
+        } catch (error) {
+            typingMessage.remove();
+            addMessage('bot', (error && error.message) ? error.message : 'Erreur temporaire. Reessaie dans quelques secondes.');
+        } finally {
+            assistantInput.disabled = false;
+            assistantInput.focus();
+        }
+    });
+});
+</script>
+
+<script>
+// ⭐ Interactive Star Rating
+(function () {
+    function updateStars(container, rating) {
+        container.querySelectorAll('.star-btn').forEach(function (star) {
+            star.style.color = parseInt(star.dataset.value) <= rating ? '#f5a623' : '#ccc';
+        });
+        var label = container.querySelector('.rating-label');
+        if (label) label.textContent = rating > 0 ? rating + '/5' : '';
+    }
+
+    document.querySelectorAll('.interactive-rating').forEach(function (container) {
+        var venteId = container.dataset.venteId;
+        var current = parseInt(container.dataset.currentRating || '0');
+        var stars = container.querySelectorAll('.star-btn');
+
+        // hover highlight
+        stars.forEach(function (star) {
+            star.addEventListener('mouseenter', function () {
+                updateStars(container, parseInt(star.dataset.value));
+            });
+            star.addEventListener('mouseleave', function () {
+                updateStars(container, current);
+            });
+            star.addEventListener('click', function () {
+                var rating = parseInt(star.dataset.value);
+                current = rating;
+                updateStars(container, rating);
+
+                var fd = new FormData();
+                fd.append('rating', rating);
+                fetch('/vente/' + venteId + '/rate', {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'include',
+                }).then(function (r) {
+                    return r.json();
+                }).then(function (data) {
+                    if (data.success) {
+                        var label = container.querySelector('.rating-label');
+                        if (label) label.textContent = rating + '/5';
+                    }
+                }).catch(function () {});
+            });
+        });
+    });
+})();
+</script>
 {% endblock %}

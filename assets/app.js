@@ -1,10 +1,12 @@
 import './stimulus_bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-import './styles/app.css';
+import '@hotwired/turbo';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+/*
+ * Disable Turbo Drive globally — it intercepts page navigation via AJAX,
+ * which prevents CDN-loaded scripts (Chart.js, Leaflet) from re-executing
+ * on each page, causing blank maps and charts.
+ */
+import { Turbo } from '@hotwired/turbo';
+Turbo.session.drive = false;
+
+import './styles/app.css';

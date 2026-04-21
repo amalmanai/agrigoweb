@@ -2,6 +2,101 @@
 
 {% block title %}Nouvelle parcelle{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9T/dtMziYoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        .parcelle-pin-icon {
+            background: transparent;
+            border: 0;
+        }
+
+        .parcelle-pin-icon svg {
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.28));
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.querySelector('[data-parcelle-gps-input]');
+            const mapElement = document.getElementById('parcelle-map');
+            const statusElement = document.getElementById('parcelle-map-status');
+
+            if (!input || !mapElement || !statusElement || typeof L === 'undefined') {
+                return;
+            }
+
+            const tunisiaBounds = L.latLngBounds([
+                [30.2, 7.5],
+                [37.8, 12.6],
+            ]);
+
+            const parseValue = (value) => {
+                const match = value.trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+                return match ? [parseFloat(match[1]), parseFloat(match[2])] : null;
+            };
+
+            const formatValue = (lat, lng) => `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            const initialCoords = parseValue(input.value) || [33.8869, 9.5375];
+
+            const pinIcon = L.divIcon({
+                className: 'parcelle-pin-icon',
+                html: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36" aria-hidden="true"><path d="M14 1c-6.1 0-11 4.9-11 11 0 8.2 11 23 11 23s11-14.8 11-23c0-6.1-4.9-11-11-11Z" fill="#1f7a45"/><path d="M14 6.5a5.5 5.5 0 1 0 0 11a5.5 5.5 0 0 0 0-11Z" fill="#f8fafc" opacity="0.95"/></svg>',
+                iconSize: [28, 36],
+                iconAnchor: [14, 36],
+                popupAnchor: [0, -32],
+            });
+
+            const map = L.map(mapElement, {
+                zoomControl: true,
+                scrollWheelZoom: true,
+                maxBounds: tunisiaBounds.pad(0.35),
+                maxBoundsViscosity: 0.9,
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors',
+            }).addTo(map);
+
+            const marker = L.marker(initialCoords, { draggable: true, icon: pinIcon }).addTo(map);
+            marker.bindPopup('Point sélectionné ici.');
+
+            const updateSelection = (latlng) => {
+                const formatted = formatValue(latlng.lat, latlng.lng);
+                input.value = formatted;
+                statusElement.textContent = `Point sélectionné: ${formatted}`;
+                marker.setLatLng(latlng);
+            };
+
+            map.setView(initialCoords, 7);
+            map.whenReady(() => {
+                setTimeout(() => {
+                    map.invalidateSize();
+                    map.fitBounds(tunisiaBounds);
+                    map.setView(initialCoords, 7);
+                    updateSelection(marker.getLatLng());
+                }, 0);
+            });
+
+            map.on('click', (event) => {
+                updateSelection(event.latlng);
+                marker.openPopup();
+            });
+
+            marker.on('dragend', () => {
+                updateSelection(marker.getLatLng());
+                marker.openPopup();
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
 <h1 class="h3 mb-3">Ajouter une parcelle</h1>
 

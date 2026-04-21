@@ -1,0 +1,470 @@
+<style>
+    .glass-form-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        border-radius: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 5px 15px rgba(0, 0, 0, 0.03);
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Subtle inner gradient decoration */
+    .glass-form-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 5px;
+        background: linear-gradient(90deg, #4e73df, #36b9cc, #1cc88a);
+    }
+
+    .custom-input-group {
+        position: relative;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    .custom-input-group label {
+        font-weight: 700;
+        color: #3a3b45;
+        margin-bottom: 0.6rem;
+        display: block;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    
+    /* Overriding possible Tailwind conflicts with strong specifics */
+    .custom-input-group .custom-input {
+        border-radius: 0.85rem !important;
+        border: 2px solid #eaecf4 !important;
+        padding: 0.85rem 1.25rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        background-color: #f8f9fc !important;
+        width: 100% !important;
+        color: #5a5c69 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        display: block !important;
+        line-height: 1.5 !important;
+    }
+    .custom-input-group .custom-input:focus {
+        border-color: #4e73df !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.15) !important;
+        outline: none !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Overriding symfony form select */
+    .custom-input-group select.custom-input {
+        appearance: none !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23858796' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 1.25rem center !important;
+        background-size: 16px 12px !important;
+        padding-right: 3rem !important;
+    }
+    
+    .form-icon {
+        position: absolute;
+        bottom: 15px;
+        right: 18px;
+        color: #b7b9cc;
+        transition: color 0.3s ease;
+        pointer-events: none;
+        font-size: 1.1rem;
+    }
+    .custom-input:focus + .form-icon {
+        color: #4e73df;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+        border-radius: 50px;
+        padding: 1rem 3rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        box-shadow: 0 10px 25px rgba(78, 115, 223, 0.3);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .submit-btn:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(78, 115, 223, 0.4);
+    }
+    .submit-btn-warning {
+        background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+        box-shadow: 0 10px 25px rgba(246, 194, 62, 0.3);
+    }
+    .submit-btn-warning:hover {
+        box-shadow: 0 15px 35px rgba(246, 194, 62, 0.4);
+    }
+
+    ul.form-error, ul.help-block {
+        list-style: none;
+        padding-left: 0;
+        color: #e74a3b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.75rem;
+        animation: fadeIn 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    ul.form-error li::before, ul.help-block li::before {
+        content: '\F338'; /* bootstrap icon exclamation circle */
+        font-family: bootstrap-icons;
+        margin-right: 5px;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .payment-toggle-card {
+        border: 2px dashed #dbe4ff;
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, rgba(78, 115, 223, 0.07), rgba(54, 185, 204, 0.07));
+    }
+
+    .payment-details-panel {
+        border: 1px solid #dce4ff;
+        border-radius: 1rem;
+        background: #ffffff;
+        padding: 1rem;
+        box-shadow: 0 10px 24px rgba(78, 115, 223, 0.08);
+    }
+
+    .stripe-card-element {
+        border-radius: 0.85rem;
+        border: 2px solid #eaecf4;
+        padding: 0.85rem 1rem;
+        background-color: #f8f9fc;
+        transition: all 0.2s ease;
+    }
+
+    .stripe-card-element.StripeElement--focus {
+        border-color: #4e73df;
+        background-color: #fff;
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.15);
+    }
+
+    .payment-error {
+        color: #e74a3b;
+        font-size: 0.9rem;
+        font-weight: 600;
+        min-height: 1.4rem;
+        margin-top: 0.65rem;
+    }
+</style>
+
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'data-vente-payment-form': 'true'}}) }}
+<div class="glass-form-container">
+    <div class="row">
+        <!-- Error tracking from form.vars.errors mostly handled by form_errors on fields, but let's leave generic top errors -->
+        {{ form_errors(form) }}
+        
+        <div class="col-md-12">
+            <div class="custom-input-group">
+                {{ form_label(form.description, 'Description de la vente') }}
+                <div class="position-relative">
+                    {{ form_widget(form.description, {'attr': {'class': 'custom-input', 'placeholder': 'Ex: Vente lot de tomates...'}}) }}
+                    <i class="bi bi-card-text form-icon"></i>
+                </div>
+                {{ form_errors(form.description) }}
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="custom-input-group">
+                {{ form_label(form.recolte, 'Récolte liée') }}
+                <div class="position-relative">
+                    {{ form_widget(form.recolte, {'attr': {'class': 'custom-input'}}) }}
+                </div>
+                {{ form_errors(form.recolte) }}
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="custom-input-group">
+                {{ form_label(form.saleDate, 'Date de Vente :') }}
+                <div class="position-relative">
+                    {{ form_widget(form.saleDate, {'attr': {'class': 'custom-input'}}) }}
+                </div>
+                {{ form_errors(form.saleDate) }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="custom-input-group">
+                {{ form_label(form.price, 'Prix (TND)') }}
+                <div class="position-relative">
+                    {{ form_widget(form.price, {'attr': {'class': 'custom-input', 'placeholder': '0.00'}}) }}
+                    <i class="bi bi-tag form-icon"></i>
+                </div>
+                {{ form_errors(form.price) }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="custom-input-group">
+                {{ form_label(form.buyerName, 'Nom de l’acheteur') }}
+                <div class="position-relative">
+                    {{ form_widget(form.buyerName, {'attr': {'class': 'custom-input', 'placeholder': 'Jean Dupont'}}) }}
+                    <i class="bi bi-person form-icon"></i>
+                </div>
+                {{ form_errors(form.buyerName) }}
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="custom-input-group mb-0">
+                {{ form_label(form.status, 'Statut de la transaction') }}
+                <div class="position-relative">
+                    {{ form_widget(form.status, {'attr': {'class': 'custom-input'}}) }}
+                </div>
+                {{ form_errors(form.status) }}
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="custom-input-group mb-0">
+                {{ form_label(form.deliveryLocation, 'Adresse de livraison') }}
+                <div class="position-relative">
+                    {{ form_widget(form.deliveryLocation, {'attr': {'class': 'custom-input', 'placeholder': '123 Rue de la Livraison, Tunis'}}) }}
+                    <i class="bi bi-geo-alt form-icon"></i>
+                </div>
+                {{ form_errors(form.deliveryLocation) }}
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="custom-input-group mb-0">
+                {{ form_label(form.availableQuantity, 'Quantite disponible (marketplace)') }}
+                <div class="position-relative">
+                    {{ form_widget(form.availableQuantity, {'attr': {'class': 'custom-input', 'placeholder': 'Ex: 100'}}) }}
+                    <i class="bi bi-box-seam form-icon"></i>
+                </div>
+                {{ form_errors(form.availableQuantity) }}
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-3">
+            <div class="custom-input-group mb-0">
+                {{ form_label(form.isMarketplaceListing, 'Publier dans le marketplace') }}
+                <div class="position-relative">
+                    {{ form_widget(form.isMarketplaceListing, {'attr': {'class': 'custom-input'}}) }}
+                </div>
+                {{ form_errors(form.isMarketplaceListing) }}
+            </div>
+        </div>
+
+        {% if show_payment_section|default(false) %}
+            <div class="col-md-12 mt-4">
+                <div class="payment-toggle-card">
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="payment-enabled-checkbox">
+                        <label class="form-check-label fw-bold text-dark" for="payment-enabled-checkbox">
+                            Payer maintenant avec Stripe (optionnel)
+                        </label>
+                    </div>
+                    <div class="text-muted small mt-2">
+                        Vous pouvez finaliser la vente sans paiement en ligne. Activez cette option uniquement si vous voulez encaisser maintenant.
+                    </div>
+                </div>
+
+                <div id="stripe-payment-panel" class="payment-details-panel mt-3" style="display: none;">
+                    <div class="fw-bold text-primary mb-2">Coordonnees de paiement</div>
+                    <div class="text-muted small mb-2">Mode demo Stripe: aucun vrai debit. Entrez une carte de test.</div>
+                    <div class="text-muted small mb-3">Exemple: 4242 4242 4242 4242, date future, CVC 123, code postal au choix.</div>
+
+                    <div id="stripe-card-element" class="stripe-card-element"></div>
+                    <div id="stripe-card-errors" class="payment-error"></div>
+
+                    <input type="hidden" name="payment_enabled" id="payment-enabled-input" value="0">
+                    <input type="hidden" name="payment_status" id="payment-status-input" value="">
+                    <input type="hidden" name="payment_intent_id" id="payment-intent-id-input" value="">
+                    <input type="hidden" name="payment_token" id="payment-token-input" value="{{ csrf_token('stripe_payment') }}">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <hr class="my-5" style="border-color: #eaecf4; border-width: 2px;">
+    
+    <div class="text-center">
+        <button type="submit" class="btn text-white submit-btn {% if is_edit|default(false) %}submit-btn-warning{% else %}btn-primary{% endif %} w-100 w-md-auto">
+            <i class="bi {% if is_edit|default(false) %}bi-pencil-square{% else %}bi-check2-circle{% endif %} me-2"></i>
+            {{ button_label|default('Enregistrer la Vente') }}
+        </button>
+    </div>
+</div>
+{{ form_end(form) }}
+
+{% if show_payment_section|default(false) %}
+<script>
+(() => {
+    const form = document.querySelector('[data-vente-payment-form="true"]');
+    if (!form) {
+        return;
+    }
+
+    const stripeKey = '{{ stripe_publishable_key|default('')|e('js') }}';
+    const paymentCheckbox = document.getElementById('payment-enabled-checkbox');
+    const paymentPanel = document.getElementById('stripe-payment-panel');
+    const paymentEnabledInput = document.getElementById('payment-enabled-input');
+    const paymentStatusInput = document.getElementById('payment-status-input');
+    const paymentIntentIdInput = document.getElementById('payment-intent-id-input');
+    const paymentTokenInput = document.getElementById('payment-token-input');
+    const cardErrors = document.getElementById('stripe-card-errors');
+    const priceInput = form.querySelector('input[id$="_price"]');
+    const buyerNameInput = form.querySelector('input[id$="_buyerName"]');
+    const descriptionInput = form.querySelector('input[id$="_description"]');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    let stripe = null;
+    let cardElement = null;
+
+    const showPaymentError = (message) => {
+        cardErrors.textContent = message || '';
+    };
+
+    const setSubmitting = (isSubmitting) => {
+        if (!submitBtn) {
+            return;
+        }
+
+        submitBtn.disabled = isSubmitting;
+        if (isSubmitting) {
+            submitBtn.dataset.originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Traitement du paiement...';
+        } else if (submitBtn.dataset.originalText) {
+            submitBtn.innerHTML = submitBtn.dataset.originalText;
+        }
+    };
+
+    const setupStripe = () => {
+        if (!paymentCheckbox.checked) {
+            paymentPanel.style.display = 'none';
+            paymentEnabledInput.value = '0';
+            paymentStatusInput.value = '';
+            paymentIntentIdInput.value = '';
+            showPaymentError('');
+
+            if (cardElement) {
+                cardElement.clear();
+            }
+
+            return;
+        }
+
+        paymentPanel.style.display = 'block';
+        paymentEnabledInput.value = '1';
+
+        if (stripe !== null && cardElement !== null) {
+            return;
+        }
+
+        if (!stripeKey) {
+            showPaymentError('Clé Stripe publishable manquante. Ajoutez STRIPE_PUBLISHABLE_KEY.');
+            return;
+        }
+
+        if (typeof window.Stripe !== 'function') {
+            showPaymentError('Stripe.js est indisponible. Verifiez votre connexion internet puis reessayez.');
+            return;
+        }
+
+        stripe = window.Stripe(stripeKey);
+        const elements = stripe.elements();
+        cardElement = elements.create('card', {
+            hidePostalCode: true,
+        });
+        cardElement.mount('#stripe-card-element');
+
+        cardElement.on('change', (event) => {
+            showPaymentError(event.error ? event.error.message : '');
+        });
+    };
+
+    paymentCheckbox.addEventListener('change', setupStripe);
+    setupStripe();
+
+    form.addEventListener('submit', async (event) => {
+        if (!paymentCheckbox.checked) {
+            paymentEnabledInput.value = '0';
+            paymentStatusInput.value = '';
+            paymentIntentIdInput.value = '';
+            setSubmitting(false);
+            return;
+        }
+
+        if (paymentStatusInput.value === 'succeeded') {
+            return;
+        }
+
+        event.preventDefault();
+        showPaymentError('');
+        setSubmitting(true);
+
+        try {
+            if (!stripe || !cardElement) {
+                throw new Error('Stripe n\'est pas initialise.');
+            }
+
+            const amount = parseFloat((priceInput?.value || '').toString().replace(',', '.'));
+            if (!Number.isFinite(amount) || amount <= 0) {
+                throw new Error('Le prix de vente doit etre renseigne avant le paiement.');
+            }
+
+            const paymentIntentResponse = await fetch('{{ path('app_vente_payment_intent') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                },
+                body: new URLSearchParams({
+                    amount: amount.toString(),
+                    description: descriptionInput?.value || 'Paiement vente AgriGo',
+                    _token: paymentTokenInput.value,
+                }),
+            });
+
+            const paymentIntentPayload = await paymentIntentResponse.json();
+            if (!paymentIntentResponse.ok || !paymentIntentPayload.clientSecret) {
+                throw new Error(paymentIntentPayload.error || 'Echec de creation du paiement Stripe.');
+            }
+
+            const confirmation = await stripe.confirmCardPayment(paymentIntentPayload.clientSecret, {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: buyerNameInput?.value || 'Client',
+                    },
+                },
+            });
+
+            if (confirmation.error) {
+                throw new Error(confirmation.error.message || 'Paiement refuse.');
+            }
+
+            const intent = confirmation.paymentIntent;
+            if (!intent || intent.status !== 'succeeded') {
+                throw new Error('Paiement non confirme.');
+            }
+
+            paymentStatusInput.value = intent.status;
+            paymentIntentIdInput.value = intent.id || '';
+            form.submit();
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Erreur de paiement inattendue.';
+            showPaymentError(message);
+            setSubmitting(false);
+        }
+    });
+})();
+</script>
+{% endif %}

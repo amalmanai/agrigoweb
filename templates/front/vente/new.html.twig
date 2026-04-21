@@ -2,23 +2,35 @@
 
 {% block title %}Nouvelle Vente{% endblock %}
 
-{% block content %}
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Ajouter une Vente</h1>
-    <a href="{{ path('app_vente_list') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm glass-button">
-        <i class="bi bi-arrow-left text-white-50"></i> Retour
-    </a>
-</div>
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
 
-<div class="row justify-content-center">
-    <div class="col-xl-8 col-lg-9">
-        <div class="card shadow mb-4 glass-panel border-0">
-            <div class="card-body p-4 p-md-5">
-                {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
-                    {{ form_widget(form) }}
-                    <hr class="my-4">
-                    <button type="submit" class="btn btn-primary glass-button w-100">Enregistrer la vente</button>
-                {{ form_end(form) }}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-5">
+        <div>
+            <h1 class="h2 mb-1 text-gray-800 fw-bold" style="letter-spacing: -0.5px;">Ajouter une Vente</h1>
+            <p class="text-muted mb-0">Remplissez les détails de la vente de votre récolte pour la sauvegarder.</p>
+        </div>
+        <a href="{{ path('app_vente_list') }}" class="btn btn-light shadow-sm rounded-pill px-4 text-primary fw-bold transition-all" style="background-color: white;">
+            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <div class="position-relative">
+                <!-- Background decorative elements for the WOW factor -->
+                <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-primary opacity-25" style="width: 300px; height: 300px; filter: blur(50px); z-index: -1;"></div>
+                <div class="position-absolute bottom-0 end-0 rounded-circle opacity-25" style="width: 250px; height: 250px; background-color: #36b9cc; filter: blur(45px); z-index: -1;"></div>
+                
+                {{ include('front/vente/_form.html.twig', {
+                    'button_label': 'Confirmer la Vente',
+                    'show_payment_section': true,
+                    'stripe_publishable_key': stripe_publishable_key|default('')
+                }) }}
             </div>
         </div>
     </div>
