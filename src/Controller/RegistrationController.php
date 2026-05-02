@@ -26,22 +26,7 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $photoFile */
-            $photoFile = $form->get('photoPath')->getData();
-
-            if ($photoFile) {
-                $newFilename = uniqid() . '.' . $photoFile->guessExtension();
-
-                try {
-                    $photoFile->move(
-                        $this->getParameter('profile_photos_directory'),
-                        $newFilename
-                    );
-                    $user->setPhotoPath($newFilename);
-                } catch (FileException $e) {
-                    // silent fail or log
-                }
-            }
+            // VichUploaderBundle will automatically handle the file upload
 
             // Store password in plain text
             $user->setPassword($form->get('password')->getData());

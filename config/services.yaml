@@ -11,6 +11,8 @@ parameters:
     user_qr_codes_directory: '%kernel.project_dir%/public/user-qrs'
     stripe_publishable_key: '%env(STRIPE_PUBLISHABLE_KEY)%'
     stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
+    openai_api_key: '%env(OPENAI_API_KEY)%'
+    groq_api_key: '%env(GROQ_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -24,4 +26,7 @@ services:
         resource: '../src/'
 
     # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Service\AiChatService:
+        arguments:
+            $openaiApiKey: '%openai_api_key%'
+            $groqApiKey: '%groq_api_key%'

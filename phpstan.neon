@@ -1,0 +1,14 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    ignoreErrors:
+        - '#Call to an undefined method#'
+        - '#expects string\|null, bool\|float\|int\|string\|null given#'
+        - '#expects string\|null, string\|false given#'
+        - '#expects string, array<string>\|string given#'
+        - '#expects string\|Symfony\\Component\\Mime\\Address, string\|null given#'
+        - '#does not specify its types: TKey, T#'
+        - '#no value type specified in iterable type array#'
+        - '#expects string, array\|bool\|float\|int\|string\|UnitEnum\|null given#'
+        - '#Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and .* results in an error#'

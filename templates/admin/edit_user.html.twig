@@ -63,7 +63,7 @@
                         </div>
 
                         <div class="mb-3">
-                            {{ form_row(form.photoPath, {
+                            {{ form_row(form.photoFile, {
                                 'attr': {'class': 'form-control'}
                             }) }}
                         </div>
@@ -91,7 +91,7 @@
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
                             {% if user.photoPath %}
-                                <img src="{{ user.photoPath }}" alt="Current Photo" class="rounded-circle shadow-sm" style="width: 64px; height: 64px; object-fit: cover;">
+                                <img src="{{ vich_uploader_asset(user, 'photoFile') }}" alt="Current Photo" class="rounded-circle shadow-sm" style="width: 64px; height: 64px; object-fit: cover;">
                             {% else %}
                                 <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width: 64px; height: 64px;">
                                     <i class="fas fa-user-slash text-muted"></i>

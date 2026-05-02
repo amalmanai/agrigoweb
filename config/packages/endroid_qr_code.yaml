@@ -1,7 +1,6 @@
 endroid_qr_code:
     default:
-        # SVG avoids requiring the PHP GD extension (PngWriter needs GD).
-        writer: Endroid\QrCode\Writer\SvgWriter
+        writer: Endroid\QrCode\Writer\PngWriter
         size: 300
         margin: 10
         encoding: 'UTF-8'

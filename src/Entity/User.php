@@ -9,9 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
+#[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -33,6 +37,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $emailUser = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
+    #[Ignore]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -49,6 +55,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photoPath = null;
+    #[Ignore]
+    #[Vich\UploadableField(mapping: 'user_photos', fileNameProperty: 'photoPath')]
+    private ?File $photoFile = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
@@ -74,9 +86,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $hostedDomain = null;
 
-    #[ORM\Column(name: 'fcm_token', length: 255, nullable: true)]
-    private ?string $fcmToken = null;
-
     #[ORM\OneToMany(targetEntity: Parcelle::class, mappedBy: 'owner')]
     private Collection $parcelles;
 
@@ -87,6 +96,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->parcelles = new ArrayCollection();
         $this->cultures = new ArrayCollection();
+    }
+    public function __serialize(): array
+    {
+        return [
+            'idUser' => $this->idUser,
+            'emailUser' => $this->emailUser,
+            'password' => $this->password,
+            'roleUser' => $this->roleUser,
+            'isActive' => $this->isActive,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->idUser = $data['idUser'];
+        $this->emailUser = $data['emailUser'];
+        $this->password = $data['password'];
+        $this->roleUser = $data['roleUser'];
+        $this->isActive = $data['isActive'];
     }
 
     public function getIdUser(): ?int
@@ -179,6 +207,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhotoPath(?string $photoPath): static
     {
         $this->photoPath = $photoPath;
+        return $this;
+    }
+
+    /**
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $photoFile
+     */
+    public function setPhotoFile(?File $photoFile = null): void
+    {
+        $this->photoFile = $photoFile;
+
+        if (null !== $photoFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getPhotoFile(): ?File
+    {
+        return $this->photoFile;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 
@@ -334,17 +392,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setHostedDomain(?string $hostedDomain): static
     {
         $this->hostedDomain = $hostedDomain;
-        return $this;
-    }
-
-    public function getFcmToken(): ?string
-    {
-        return $this->fcmToken;
-    }
-
-    public function setFcmToken(?string $fcmToken): static
-    {
-        $this->fcmToken = $fcmToken;
         return $this;
     }
 }

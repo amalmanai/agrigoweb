@@ -21,7 +21,11 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findByAdvancedFilters(?string $query, ?string $role, ?string $status, ?string $sortBy = 'idUser', ?string $sortOrder = 'DESC'): array
     {
-        $qb = $this->createQueryBuilder('u');
+        $qb = $this->createQueryBuilder('u')
+            ->leftJoin('u.parcelles', 'p')
+            ->addSelect('p')
+            ->leftJoin('u.cultures', 'c')
+            ->addSelect('c');
 
         if ($query) {
             $qb->andWhere(
