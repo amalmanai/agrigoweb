@@ -27,7 +27,7 @@ class StockMailerService
     {
         /** @var User|null $user */
         $user = $this->security->getUser();
-        
+
         return $user ? $user->getEmailUser() : null;
     }
 
@@ -141,6 +141,32 @@ class StockMailerService
             'quantite' => $quantite,
             'produit_id' => $produit->getIdProduit(),
         ]);
+        $this->mailer->send($emailMessage);
+    }
+
+    public function sendAnimalKeywordWarning(User $user): void
+    {
+        $email = $user->getEmailUser();
+        if (!$email) {
+            return;
+        }
+
+        $emailMessage = (new Email())
+            ->from('amalmanai658@gmail.com')
+            ->to($email)
+            ->subject('⚠️ Avertissement : commentaire inapproprié détecté')
+            ->html(sprintf(
+                '<html><body>
+                    <h2>Avertissement de modération</h2>
+                    <p>Bonjour %s,</p>
+                    <p>Votre commentaire a été supprimé car il contenait un terme non autorisé (nom d\'animal).</p>
+                    <p><strong>Attention :</strong> Un prochain écart entraînera la désactivation de votre compte.</p>
+                    <p>Merci de respecter les règles de la communauté AgriGo.</p>
+                </body></html>',
+                htmlspecialchars($user->getFullName(), ENT_QUOTES, 'UTF-8')
+            ));
+
+        $this->logger->warning('Animal keyword warning sent', ['to' => $email, 'user_id' => $user->getIdUser()]);
         $this->mailer->send($emailMessage);
     }
 }

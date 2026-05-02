@@ -2,15 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\Parcelle;
 use App\Entity\Recolte;
-use App\Entity\User;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,7 +16,6 @@ class RecolteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $owner = $options['parcelle_owner'];
         $inputClasses = 'py-2.5 px-4 transition duration-200 ease-in-out shadow-sm';
         $labelClasses = 'block text-sm font-semibold leading-6 text-gray-900 mb-1';
 
@@ -57,20 +53,20 @@ class RecolteType extends AbstractType
                     'Hectolitre (hl)' => 'hl',
                     'Litre (L)' => 'L',
                     'Millilitre (ml)' => 'ml',
-                    
+
                     // Unités pour Parcelles
                     'Hectare (ha)' => 'ha',
                     'Mètre carré (m²)' => 'm²',
                     'Centimètre (cm)' => 'cm',
                     'Mètre (m)' => 'm',
-                    
+
                     // Unités pour Tâches
                     'Heure (h)' => 'h',
                     'Jour (j)' => 'j',
                     'Semaine (sem)' => 'sem',
                     'Mois' => 'mois',
                     'Minute (mn)' => 'mn',
-                    
+
                     // Autres unités communes
                     'Unité (u)' => 'u',
                     'Paquet' => 'paquet',
@@ -85,24 +81,15 @@ class RecolteType extends AbstractType
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses, 'placeholder' => 'Coût en €'],
             ])
-            ->add('parcelle', EntityType::class, [
-                'class' => Parcelle::class,
+            ->add('parcelle', \Symfony\Bridge\Doctrine\Form\Type\EntityType::class, [
+                'class' => \App\Entity\Parcelle::class,
                 'choice_label' => 'nomParcelle',
                 'required' => false,
-                'label' => 'Parcelle',
-                'placeholder' => 'Sélectionnez une parcelle...',
+                'mapped' => false, // Set to false to avoid mapping errors if Recolt->parcelle doesn't exist
+                'label' => 'Parcelle de récolte',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses],
-                'query_builder' => function (EntityRepository $repository) use ($owner) {
-                    $qb = $repository->createQueryBuilder('p')
-                        ->orderBy('p.nomParcelle', 'ASC');
-
-                    if ($owner instanceof User) {
-                        $qb->andWhere('p.owner = :owner')->setParameter('owner', $owner);
-                    }
-
-                    return $qb;
-                },
+                'placeholder' => 'Sélectionnez une parcelle',
             ])
         ;
     }
@@ -111,9 +98,6 @@ class RecolteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Recolte::class,
-            'parcelle_owner' => null,
         ]);
-
-        $resolver->setAllowedTypes('parcelle_owner', ['null', User::class]);
     }
 }

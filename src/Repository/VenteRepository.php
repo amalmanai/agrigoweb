@@ -17,12 +17,8 @@ class VenteRepository extends ServiceEntityRepository
     }
     public function getTotalRevenue(): float
     {
-        $qb = $this->createQueryBuilder('v')
-            ->select('SUM(v.price) as total');
-
-        $result = $qb->getQuery()->getSingleScalarResult();
-
-        return $result ? (float) $result : 0.0;
+        // Since price column is removed, return 0 or implement differently
+        return 0.0;
     }
 
     /**
@@ -43,15 +39,8 @@ class VenteRepository extends ServiceEntityRepository
 
     public function getTotalRevenueForUser(int $userId): float
     {
-        $qb = $this->createQueryBuilder('v')
-            ->select('SUM(v.price) as total')
-            ->innerJoin('v.recolte', 'r')
-            ->andWhere('r.userId = :uid')
-            ->setParameter('uid', $userId);
-
-        $result = $qb->getQuery()->getSingleScalarResult();
-
-        return $result ? (float) $result : 0.0;
+        // Since price column is removed, return 0
+        return 0.0;
     }
 
     public function adminSearch(?string $search, string $sort = 'id', string $direction = 'ASC'): array
@@ -60,7 +49,7 @@ class VenteRepository extends ServiceEntityRepository
 
         if ($search) {
             $qb->andWhere('v.description LIKE :search OR v.buyerName LIKE :search OR v.status LIKE :search')
-               ->setParameter('search', '%' . $search . '%');
+                ->setParameter('search', '%' . $search . '%');
         }
 
         $allowedSorts = ['id', 'description', 'price', 'saleDate', 'buyerName', 'status'];
@@ -72,69 +61,47 @@ class VenteRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @return Vente[]
-     */
-    public function findMarketplaceListingsForBuyer(int $buyerId, ?string $search = null, int $limit = 24): array
+    public function findMarketplaceListingsForBuyer(int $buyerId, ?string $search = '', int $limit = 30): array
     {
         $qb = $this->createQueryBuilder('v')
-            ->innerJoin('v.recolte', 'r')
-            ->addSelect('r')
-            ->andWhere('v.isMarketplaceListing = :listing')
-            ->andWhere('(v.availableQuantity > 0 OR v.availableQuantity IS NULL)')
-            ->andWhere('r.userId <> :buyerId')
-            ->setParameter('listing', true)
+            ->leftJoin('v.recolte', 'r')
+            ->andWhere('r.userId IS NULL OR r.userId != :buyerId')
             ->setParameter('buyerId', $buyerId)
-            ->orderBy('v.saleDate', 'DESC')
-            ->addOrderBy('v.id', 'DESC')
+            ->andWhere('v.status != :status')
+            ->setParameter('status', 'Completed')
             ->setMaxResults($limit);
 
-        if ($search !== null && trim($search) !== '') {
-            $qb->andWhere('LOWER(v.description) LIKE :search OR LOWER(r.name) LIKE :search')
-                ->setParameter('search', '%' . mb_strtolower(trim($search)) . '%');
+        if ($search) {
+            $qb->andWhere('v.description LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
         }
 
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @param string[] $keywords
-     * @param int[] $excludeVenteIds
-     *
-     * @return Vente[]
-     */
-    public function findRecommendedForBuyer(int $buyerId, array $keywords, array $excludeVenteIds = [], int $limit = 6): array
+    public function findRecommendedForBuyer(int $buyerId, array $keywords, array $excludeVenteIds, int $limit = 6): array
     {
         $qb = $this->createQueryBuilder('v')
-            ->innerJoin('v.recolte', 'r')
-            ->addSelect('r')
-            ->andWhere('v.isMarketplaceListing = :listing')
-            ->andWhere('(v.availableQuantity > 0 OR v.availableQuantity IS NULL)')
-            ->andWhere('r.userId <> :buyerId')
-            ->setParameter('listing', true)
+            ->leftJoin('v.recolte', 'r')
+            ->andWhere('r.userId IS NULL OR r.userId != :buyerId')
             ->setParameter('buyerId', $buyerId)
-            ->orderBy('v.rating', 'DESC')
-            ->addOrderBy('v.saleDate', 'DESC')
-            ->addOrderBy('v.id', 'DESC')
+            ->andWhere('v.status != :status')
+            ->setParameter('status', 'Completed')
             ->setMaxResults($limit);
 
-        if ($excludeVenteIds !== []) {
-            $qb->andWhere($qb->expr()->notIn('v.id', ':excludeIds'))
+        if (!empty($excludeVenteIds)) {
+            $qb->andWhere('v.id NOT IN (:excludeIds)')
                 ->setParameter('excludeIds', $excludeVenteIds);
         }
 
-        $keywords = array_values(array_filter(array_map(static fn (string $k): string => trim($k), $keywords)));
-        if ($keywords !== []) {
+        if (!empty($keywords)) {
             $orX = $qb->expr()->orX();
-            foreach (array_slice($keywords, 0, 5) as $index => $keyword) {
-                $paramName = 'kw' . $index;
-                $orX->add('LOWER(r.name) LIKE :' . $paramName);
-                $qb->setParameter($paramName, '%' . mb_strtolower($keyword) . '%');
+            foreach ($keywords as $i => $keyword) {
+                $orX->add($qb->expr()->like('v.description', ':kw' . $i));
+                $orX->add($qb->expr()->like('r.name', ':kw' . $i));
+                $qb->setParameter('kw' . $i, '%' . $keyword . '%');
             }
-
-            if ($orX->count() > 0) {
-                $qb->andWhere($orX);
-            }
+            $qb->andWhere($orX);
         }
 
         return $qb->getQuery()->getResult();

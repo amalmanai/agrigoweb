@@ -277,15 +277,19 @@
                         </div>
 
                         <!-- Main Info -->
-                        <h4 class="fw-bold text-gray-800 mb-1">{{ vente.recolte.name|default(vente.description)|default('Vente anonyme') }}</h4>
+                        {% set recolte = vente.recolte %}
+                        <h4 class="fw-bold text-gray-800 mb-1">{{ recolte ? recolte.name : (vente.description ?: 'Vente anonyme') }}</h4>
+                        <div class="text-muted small mb-2">
+                            Acheteur: <span class="fw-bold">{{ vente.buyerName ?: 'Particulier' }}</span>
+                        </div>
                         <div class="text-muted small mb-3">
-                            Vendu à <span class="fw-bold">{{ vente.buyerName|default('Particulier') }}</span> le {{ vente.saleDate|date('d/m/Y') }}
+                            Récolte: <span class="fw-bold">{{ recolte ? (recolte.harvestDate ? recolte.harvestDate|date('d/m/Y') : 'Date non renseignée') : 'Aucune récolte liée' }}</span>
                         </div>
 
                         <!-- Price -->
                         <div class="mb-4">
-                            <span class="fs-3 fw-bolder text-success">{{ vente.price }}</span>
-                            <span class="text-muted fw-bold">TND</span>
+                            <span class="fs-3 fw-bolder text-success">{{ recolte and recolte.productionCost is not null ? recolte.productionCost|number_format(0, ',', ' ') : 'N/A' }}</span>
+                            <span class="text-muted fw-bold">{{ recolte and recolte.productionCost is not null ? 'TND' : '' }}</span>
                         </div>
 
                         <div class="mt-auto">
@@ -295,19 +299,15 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 
                                 <!-- Star Rating Interactive inline -->
-                                <div class="interactive-rating" data-vente-id="{{ vente.id }}" data-status="{% if vStatus == 'completed' or vStatus == 'terminee' or vStatus == 'terminée' %}Completed{% else %}{{ vente.status }}{% endif %}">
-                                    {% if vStatus == 'completed' or vStatus == 'terminee' or vStatus == 'terminée' %}
-                                        {% set r = vente.rating|default(0) %}
-                                        {% for i in 1..5 %}
-                                            <button type="button" class="star-btn {% if i <= r %}active{% endif %}" data-value="{{ i }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-                                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
-                                                </svg>
-                                            </button>
-                                        {% endfor %}
-                                    {% else %}
-                                        <span class="text-muted small fst-italic ms-1">En attente</span>
-                                    {% endif %}
+                                <div class="interactive-rating" data-vente-id="{{ vente.id }}" data-current-rating="{{ vente.rating|default(0) }}" data-status="{{ vente.status ?: 'pending' }}">
+                                    {% for i in 1..5 %}
+                                        <span class="star-btn fs-5"
+                                              data-value="{{ i }}"
+                                              data-vente="{{ vente.id }}"
+                                              title="{{ i }} étoile{{ i > 1 ? 's' : '' }}"
+                                              style="cursor:pointer; color: {{ i <= vente.rating|default(0) ? '#f5a623' : '#ccc' }}; transition: color 0.15s;">★</span>
+                                    {% endfor %}
+                                    <span class="rating-label small text-muted ms-1">{{ vente.rating|default(0) > 0 ? vente.rating|default(0) ~ '/5' : '' }}</span>
                                 </div>
 
                                 <!-- Actions -->
@@ -335,47 +335,6 @@
             {% endfor %}
         </div>
 
-        {% if purchase_orders is not empty %}
-            <div class="d-flex align-items-center justify-content-between mt-5 mb-3">
-                <h3 class="h4 mb-0 fw-bold text-gray-800">Mes commandes marketplace</h3>
-                <span class="badge rounded-pill text-bg-success">{{ purchase_orders|length }} commande(s)</span>
-            </div>
-
-            <div class="row g-4">
-                {% for order in purchase_orders %}
-                    {% set orderedVente = order.vente %}
-                    {% set orderedRecolte = orderedVente ? orderedVente.recolte : null %}
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="glass-card h-100 p-4 d-flex flex-column position-relative" style="border: 1px solid #d6f0df;">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span class="text-success fw-bold fs-6">Commande #{{ order.id }}</span>
-                                <span class="status-badge status-pending">{{ order.status|default('pending')|capitalize }}</span>
-                            </div>
-
-                            <h4 class="fw-bold text-gray-800 mb-1">{{ orderedRecolte ? orderedRecolte.name : (orderedVente ? orderedVente.description : 'Produit') }}</h4>
-                            <div class="text-muted small mb-3">
-                                Commandee le {{ order.orderedAt ? order.orderedAt|date('d/m/Y H:i') : 'N/A' }}
-                            </div>
-
-                            <div class="mb-2"><strong>Quantite:</strong> {{ order.quantity }}</div>
-                            <div class="mb-2"><strong>Prix unitaire:</strong> {{ order.unitPrice }} TND</div>
-                            <div class="mb-2"><strong>Total:</strong> <span class="fw-bold text-success">{{ order.totalPrice }} TND</span></div>
-                            <div class="mb-2"><strong>Livraison:</strong> {{ order.deliveryAddress|default('Non renseignee') }}</div>
-                            {% if order.note %}
-                                <div class="mb-2"><strong>Note:</strong> {{ order.note }}</div>
-                            {% endif %}
-
-                            <div class="mt-auto pt-3 d-flex gap-2">
-                                {% if orderedVente %}
-                                    <a href="{{ path('app_vente_show', {id: orderedVente.id}) }}" class="btn btn-sm btn-outline-secondary">Voir vente</a>
-                                {% endif %}
-                                <a href="{{ path('app_marketplace_orders_buying') }}" class="btn btn-sm btn-success">Mes commandes</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
     {% endif %}
 </div>
 
@@ -590,5 +549,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+</script>
+
+<script>
+// ⭐ Interactive Star Rating
+(function () {
+    function updateStars(container, rating) {
+        container.querySelectorAll('.star-btn').forEach(function (star) {
+            star.style.color = parseInt(star.dataset.value) <= rating ? '#f5a623' : '#ccc';
+        });
+        var label = container.querySelector('.rating-label');
+        if (label) label.textContent = rating > 0 ? rating + '/5' : '';
+    }
+
+    document.querySelectorAll('.interactive-rating').forEach(function (container) {
+        var venteId = container.dataset.venteId;
+        var current = parseInt(container.dataset.currentRating || '0');
+        var stars = container.querySelectorAll('.star-btn');
+
+        // hover highlight
+        stars.forEach(function (star) {
+            star.addEventListener('mouseenter', function () {
+                updateStars(container, parseInt(star.dataset.value));
+            });
+            star.addEventListener('mouseleave', function () {
+                updateStars(container, current);
+            });
+            star.addEventListener('click', function () {
+                var rating = parseInt(star.dataset.value);
+                current = rating;
+                updateStars(container, rating);
+
+                var fd = new FormData();
+                fd.append('rating', rating);
+                fetch('/vente/' + venteId + '/rate', {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'include',
+                }).then(function (r) {
+                    return r.json();
+                }).then(function (data) {
+                    if (data.success) {
+                        var label = container.querySelector('.rating-label');
+                        if (label) label.textContent = rating + '/5';
+                    }
+                }).catch(function () {});
+            });
+        });
+    });
+})();
 </script>
 {% endblock %}

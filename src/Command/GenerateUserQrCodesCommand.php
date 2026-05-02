@@ -5,6 +5,8 @@ namespace App\Command;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\BuilderInterface;
+use Endroid\QrCode\Writer\SvgWriter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +23,9 @@ class GenerateUserQrCodesCommand extends Command
     public function __construct(
         private UserRepository $userRepository,
         private EntityManagerInterface $entityManager,
-        private BuilderInterface $qrCodeBuilder
+        private BuilderInterface $qrCodeBuilder,
+        #[Autowire('%user_qr_codes_directory%')]
+        private string $qrCodeDirectory,
     ) {
         parent::__construct();
     }
@@ -31,7 +35,7 @@ class GenerateUserQrCodesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $users = $this->userRepository->findAll();
         $filesystem = new Filesystem();
-        $qrCodeDir = 'C:/Users/Amal/AgriGo/user-qrs/';
+        $qrCodeDir = rtrim($this->qrCodeDirectory, '/\\') . DIRECTORY_SEPARATOR;
         if (!$filesystem->exists($qrCodeDir)) {
             $filesystem->mkdir($qrCodeDir);
         }
@@ -40,7 +44,7 @@ class GenerateUserQrCodesCommand extends Command
         foreach ($users as $user) {
             $id = $user->getIdUser();
             $email = $user->getEmailUser();
-            $fileName = sprintf('user_%d_%s.png', $id, $email);
+            $fileName = sprintf('user_%d_%s.svg', $id, $email);
             $filePath = $qrCodeDir . $fileName;
 
             // Skip if QR code already exists
@@ -57,6 +61,7 @@ class GenerateUserQrCodesCommand extends Command
             // Generate QR code with the premium format: AGRIGO-USER:{id}:{email}
             $qrData = sprintf('AGRIGO-USER:%d:%s', $id, $email);
             $result = $this->qrCodeBuilder->build(
+                writer: new SvgWriter(),
                 data: $qrData
             );
 

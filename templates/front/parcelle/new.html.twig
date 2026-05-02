@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9T/dtMziYoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <style>
         .parcelle-pin-icon {
             background: transparent;
@@ -15,12 +15,26 @@
             display: block;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.28));
         }
+        
+        /* Fix Leaflet tile rendering issues */
+        .leaflet-container img {
+            max-width: none !important;
+            max-height: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #parcelle-map {
+            z-index: 1;
+            background: #e8f0e8;
+            min-height: 360px;
+        }
     </style>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const input = document.querySelector('[data-parcelle-gps-input]');
@@ -81,8 +95,11 @@
                     map.fitBounds(tunisiaBounds);
                     map.setView(initialCoords, 7);
                     updateSelection(marker.getLatLng());
-                }, 0);
+                }, 600);
             });
+
+            // Fallback: re-invalidate on window load in case the card was hidden
+            window.addEventListener('load', () => setTimeout(() => map.invalidateSize(), 300));
 
             map.on('click', (event) => {
                 updateSelection(event.latlng);

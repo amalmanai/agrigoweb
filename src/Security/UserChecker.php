@@ -17,8 +17,8 @@ final class UserChecker implements UserCheckerInterface
             return;
         }
 
-        if (!$user->isActive()) {
-            throw new CustomUserMessageAccountStatusException('Votre compte est bloqué. Contactez l\'administration.');
+        if (!$user->isActive() || $user->getBadWordCommentStrikes() >= 3) {
+            throw new CustomUserMessageAccountStatusException('Ce compte est bloqué après 3 tentatives non autorisées.');
         }
     }
 

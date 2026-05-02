@@ -23,7 +23,7 @@ final class CommentWarningMailerService
 
     public function sendSecondCommentWarning(User $user, Produit $produit): void
     {
-        $to = trim((string) $user->getEmailPersonnel());
+        $to = trim((string) $user->getEmailUser());
         if ($to === '') {
             return;
         }
@@ -66,7 +66,7 @@ final class CommentWarningMailerService
      */
     public function sendBadWordViolationWarning(User $user): void
     {
-        $to = trim((string) $user->getEmailPersonnel());
+        $to = trim((string) $user->getEmailUser());
         if ($to === '') {
             return;
         }
@@ -80,7 +80,9 @@ final class CommentWarningMailerService
                 <h1>Avertissement</h1>
                 <p>Bonjour %s,</p>
                 <p>Vous avez à nouveau tenté de publier un commentaire contenant des <strong>termes non autorisés</strong> sur la plateforme AgriGo.</p>
-                <p>Ce message est envoyé à votre <strong>e-mail personnel</strong> après une récidive. Merci de respecter le règlement des commentaires.</p>
+                <p>Cette tentative correspond à un niveau <strong>2/3</strong>.</p>
+                <p><strong>Attention :</strong> à la prochaine tentative (3/3), votre compte sera automatiquement bloqué.</p>
+                <p>Ce message est envoyé à votre <strong>e-mail personnel</strong> après récidive. Merci de respecter le règlement des commentaires.</p>
                 <p>Cordialement,<br>L\'équipe AgriGo</p>
             </body></html>',
             htmlspecialchars($prenom, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
@@ -107,7 +109,7 @@ final class CommentWarningMailerService
      */
     public function sendAccountBlockedDueToBadWords(User $user): void
     {
-        $to = trim((string) $user->getEmailPersonnel());
+        $to = trim((string) $user->getEmailUser());
         if ($to === '') {
             return;
         }

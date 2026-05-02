@@ -35,12 +35,15 @@ export default class extends Controller {
     async initializeMap() {
         try {
             const mapUrl = this.getMapUrl();
+            console.log('🗺️ Map initialization starting');
+            console.log('Map URL:', mapUrl);
+            
             if (!mapUrl) {
                 throw new Error('Map API URL is missing on this page');
             }
 
             // Load Leaflet first
-            console.log('Loading Leaflet...');
+            console.log('Loading Leaflet CSS and JS...');
             this.loadLeafletCSS();
             await this.loadLeafletJS();
 
@@ -50,39 +53,78 @@ export default class extends Controller {
 
             console.log('✅ Leaflet loaded, fetching location data...');
 
-            // Fetch location data from API
-            const response = await fetch(mapUrl, {
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                },
-            });
-            console.log('API response status:', response.status);
+            // Fetch location data from API with timeout
+            let data = null;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    console.warn('⏱️ API request timeout triggered after 5 seconds');
+                    controller.abort();
+                }, 5000);
+                
+                console.log('Sending API request to:', mapUrl);
+                const response = await fetch(mapUrl, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    signal: controller.signal,
+                });
+                clearTimeout(timeoutId);
+                console.log('✅ API response received with status:', response.status);
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`API error ${response.status}: ${errorText}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`API error ${response.status}:`, errorText);
+                    throw new Error(`API error ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    console.error('Wrong content type:', contentType);
+                    throw new Error(`Expected JSON but got: ${contentType}`);
+                }
+
+                data = await response.json();
+                console.log('✅ Location data parsed:', data);
+
+                if (!data.seller?.coordinates) {
+                    throw new Error('No seller coordinates in API response');
+                }
+
+            } catch (fetchError) {
+                console.error('❌ API fetch failed:', fetchError.message);
+                // Try to use fallback data from page
+                data = this.createFallbackData();
             }
 
-            const contentType = response.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-                const bodyPreview = (await response.text()).slice(0, 120);
-                throw new Error(`Expected JSON but got: ${contentType || 'unknown'} (${bodyPreview})`);
+            if (data) {
+                console.log('Rendering map with data:', data);
+                this.renderMap(data);
+                console.log('✅ Map rendering complete');
             }
-
-            const data = await response.json();
-            console.log('✅ Location data received:', data);
-
-            if (!data.seller?.coordinates) {
-                throw new Error('No seller location data in response');
-            }
-
-            this.renderMap(data);
 
         } catch (error) {
-            console.error('❌ Error initializing map:', error.message);
-            this.displayError(`${error.message}`);
+            console.error('❌ Critical error initializing map:', error.message);
+            console.error('Stack trace:', error.stack);
+            this.displayError(error.message);
         }
+    }
+
+    createFallbackData() {
+        // Try to extract basic info from page
+        console.log('📍 Creating fallback map data...');
+        
+        // Default to Tunisia center
+        return {
+            seller: {
+                name: 'Pickup Location',
+                address: 'Unknown location',
+                coordinates: { lat: 35.8, lng: 10.6 }
+            },
+            delivery: null,
+            sale: { id: 'N/A', buyer: 'N/A', price: 'N/A', date: 'N/A' }
+        };
     }
 
     loadLeafletCSS() {
@@ -132,16 +174,34 @@ export default class extends Controller {
                 throw new Error('Map container not found');
             }
 
+            console.log('🗺️ Container element:', container);
+            console.log('Container dimensions:', {
+                width: container.offsetWidth,
+                height: container.offsetHeight,
+                clientWidth: container.clientWidth,
+                clientHeight: container.clientHeight
+            });
+
+            // Ensure container has dimensions
+            if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+                console.warn('⚠️ Container has no dimensions, setting fallback styles');
+                container.style.width = '100%';
+                container.style.height = '400px';
+            }
+
+            // Clear container but preserve styles
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
             console.log('Creating Leaflet map...');
             
-            // Clear container
-            container.innerHTML = '';
-
-            // Create map
+            // Create map with explicit sizing
             const map = L.map(container, {
                 center: [data.seller.coordinates.lat, data.seller.coordinates.lng],
                 zoom: 13,
                 scrollWheelZoom: true,
+                attributionControl: true,
             });
 
             console.log('✅ Map created');
@@ -255,7 +315,7 @@ export default class extends Controller {
     displayError(message) {
         const container = this.getContainerElement();
         container.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; padding: 20px;">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #fff3cd; padding: 20px;">
                 <div style="text-align: center;">
                     <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
                     <p style="color: #dc3545; font-weight: bold; margin: 0; font-size: 14px;">${message}</p>
@@ -266,3 +326,8 @@ export default class extends Controller {
         `;
     }
 }
+
+// Add global error handler to catch any unhandled promise rejections
+window.addEventListener('unhandledrejection', event => {
+    console.error('Unhandled promise rejection:', event.reason);
+});

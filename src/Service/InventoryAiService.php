@@ -5,12 +5,14 @@ namespace App\Service;
 use App\Entity\Produit;
 use App\Repository\MouvementStockRepository;
 use App\Repository\ProduitRepository;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class InventoryAiService
 {
     public function __construct(
         private readonly ProduitRepository $produitRepository,
         private readonly MouvementStockRepository $mouvementStockRepository,
+        private readonly HttpClientInterface $httpClient,
     ) {
     }
 
@@ -23,11 +25,9 @@ class InventoryAiService
     public function analyzeWasteDetection(): array
     {
         $produits = $this->produitRepository->findAll();
-        // Important: éviter findAll() sur mouvement_stock (peut être énorme => MySQL "server has gone away").
         $monthlyOutbound = $this->mouvementStockRepository->monthlyOutboundByProduct(12);
-        $analyses = [];
-        $anomaliesCount = 0;
 
+        $payload = [];
         foreach ($produits as $produit) {
             $produitId = $produit->getIdProduit();
             if ($produitId === null) {
@@ -36,64 +36,23 @@ class InventoryAiService
 
             $series = $monthlyOutbound[$produitId] ?? [];
             ksort($series);
-            $values = array_values($series);
-            $count = count($values);
 
-            if ($count === 0) {
-                $analyses[] = [
-                    'produit' => $produit,
-                    'moyenne' => 0.0,
-                    'ecartType' => 0.0,
-                    'seuil' => 0.0,
-                    'consommationDernierMois' => 0.0,
-                    'anomalie' => false,
-                    'confiance' => 'Faible',
-                    'zScore' => 0.0,
-                    'explication' => 'Historique insuffisant.',
-                ];
-                continue;
-            }
-
-            $lastValue = (float) $values[$count - 1];
-            $historyWithoutLast = $count > 1 ? array_slice($values, 0, -1) : $values;
-            $weightedBaseline = $this->weightedMean($historyWithoutLast);
-            $stdDev = $this->stdDev($historyWithoutLast);
-            $dynamicThreshold = $weightedBaseline + (1.8 * $stdDev);
-            $zScore = $this->robustZScore($lastValue, $historyWithoutLast);
-
-            $anomaly = $count >= 4
-                && $lastValue > $dynamicThreshold
-                && $zScore >= 2.5;
-
-            if ($anomaly) {
-                $anomaliesCount++;
-            }
-
-            $confidence = $count >= 12 ? 'Élevée' : ($count >= 6 ? 'Moyenne' : 'Faible');
-            $analyses[] = [
-                'produit' => $produit,
-                'moyenne' => round($weightedBaseline, 2),
-                'ecartType' => round($stdDev, 2),
-                'seuil' => round($dynamicThreshold, 2),
-                'consommationDernierMois' => round($lastValue, 2),
-                'anomalie' => $anomaly,
-                'confiance' => $confidence,
-                'zScore' => round($zScore, 2),
-                'explication' => $anomaly
-                    ? 'Pic de consommation anormal vs tendance récente.'
-                    : 'Consommation cohérente avec la tendance.',
+            $payload[] = [
+                'id' => $produitId,
+                'nom' => $produit->getNomProduit(),
+                'categorie' => $produit->getCategorie(),
+                'unite' => $produit->getUnite(),
+                'stock_actuel' => (int) ($produit->getQuantiteDisponible() ?? 0),
+                'historique_mensuel' => $series,
             ];
         }
 
-        usort(
-            $analyses,
-            static fn (array $a, array $b): int => (int) $b['consommationDernierMois'] <=> (int) $a['consommationDernierMois']
-        );
+        $apiResult = $this->callOpenAiWasteDetection($payload);
+        if ($apiResult !== null) {
+            return $apiResult;
+        }
 
-        return [
-            'analyses' => $analyses,
-            'anomaliesCount' => $anomaliesCount,
-        ];
+        return $this->analyzeWasteDetectionFallback($produits, $monthlyOutbound);
     }
 
     /**
@@ -136,16 +95,11 @@ class InventoryAiService
             $mean = $this->mean($historyWithoutLast);
             $stdDev = $this->stdDev($historyWithoutLast);
             $threshold = $mean + (2.0 * $stdDev);
-            $robustZ = $this->robustZScore($lastValue, $historyWithoutLast);
 
-            // IA (détection d’anomalies) : décision + score
-            $anomaly = $count >= 4 && $lastValue > $threshold && $robustZ >= 2.5;
+            $anomaly = $count >= 2 && $lastValue > $threshold;
             if ($anomaly) {
                 $anomaliesCount++;
             }
-
-            $confidence = $count >= 12 ? 'Élevée' : ($count >= 6 ? 'Moyenne' : 'Faible');
-            $score = $this->anomalyScore($lastValue, $threshold, $robustZ, $count);
 
             $analyses[] = [
                 'produit' => [
@@ -160,13 +114,7 @@ class InventoryAiService
                 'ecartType' => round($stdDev, 2),
                 'seuil' => round($threshold, 2),
                 'anomalie' => $anomaly,
-                'anomalyScore' => $score,
-                'confiance' => $confidence,
-                'robustZ' => round($robustZ, 2),
                 'historiqueMois' => $count,
-                'explication' => $anomaly
-                    ? 'Consommation > µ + 2σ et z-score robuste élevé (MAD) → anomalie probable.'
-                    : 'Consommation compatible avec la distribution historique.',
             ];
         }
 
@@ -224,10 +172,10 @@ class InventoryAiService
     public function recommendOptimalStock(int $delaiLivraison, int $margeSecuriteJours): array
     {
         $produits = $this->produitRepository->findAll();
-        // Agrégation DB pour éviter de charger tous les mouvements
-        $monthlyOutbound = $this->mouvementStockRepository->monthlyOutboundByProduct(24);
+        $mouvements = $this->mouvementStockRepository->findAll();
+        $monthlyOutbound = $this->buildMonthlyOutboundByProduct($mouvements);
 
-        $recommandations = [];
+        $payload = [];
         foreach ($produits as $produit) {
             $produitId = $produit->getIdProduit();
             if ($produitId === null) {
@@ -236,47 +184,23 @@ class InventoryAiService
 
             $series = $monthlyOutbound[$produitId] ?? [];
             ksort($series);
-            $values = array_values($series);
-            $count = count($values);
 
-            // IA (prévision) : lissage exponentiel de Holt (niveau + tendance)
-            $forecast = $this->holtLinearForecast($values, 0.45, 0.20);
-            $adjustedMonthlyForecast = max(0.0, $forecast['forecastNext'] ?? 0.0);
-            $dailyForecast = $adjustedMonthlyForecast / 30.0;
-            $variability = $this->stdDev($values);
-
-            // Niveau de service ~95% => z = 1.65
-            $safetyStock = 1.65 * ($variability / 30.0) * sqrt(max(1, $delaiLivraison + $margeSecuriteJours));
-            $cycleStock = $dailyForecast * $delaiLivraison;
-            $stockOptimal = (int) ceil(max(0.0, $cycleStock + $safetyStock));
-            $stockActuel = (int) ($produit->getQuantiteDisponible() ?? 0);
-            $gap = $stockActuel - $stockOptimal;
-
-            $recommandations[] = [
-                'produit' => $produit,
-                'consommationJour' => round($dailyForecast, 2),
-                'delaiLivraison' => $delaiLivraison,
-                'margeSecurite' => round($safetyStock, 2),
-                'stockOptimal' => $stockOptimal,
-                'stockActuel' => $stockActuel,
-                'risqueRupture' => $stockActuel < $stockOptimal,
-                'tendanceMensuelle' => round((float) ($forecast['trend'] ?? 0.0), 2),
-                'historiqueMois' => $count,
-                'ecart' => $gap,
-                'ia' => [
-                    'method' => 'HoltLinear',
-                    'forecastMonthlyNext' => round($adjustedMonthlyForecast, 2),
-                    'level' => round((float) ($forecast['level'] ?? 0.0), 2),
-                ],
+            $payload[] = [
+                'id' => $produitId,
+                'nom' => $produit->getNomProduit(),
+                'categorie' => $produit->getCategorie(),
+                'unite' => $produit->getUnite(),
+                'stock_actuel' => (int) ($produit->getQuantiteDisponible() ?? 0),
+                'historique_mensuel' => $series,
             ];
         }
 
-        usort(
-            $recommandations,
-            static fn (array $a, array $b): int => ($a['ecart']) <=> ($b['ecart'])
-        );
+        $apiResult = $this->callGroqStockRecommendation($payload, $delaiLivraison, $margeSecuriteJours);
+        if ($apiResult !== null) {
+            return $apiResult;
+        }
 
-        return $recommandations;
+        return $this->recommendOptimalStockFallback($produits, $monthlyOutbound, $delaiLivraison, $margeSecuriteJours);
     }
 
     private function buildMonthlyOutboundByProduct(array $mouvements): array
@@ -417,59 +341,291 @@ class InventoryAiService
         return ((float) $values[$middle - 1] + (float) $values[$middle]) / 2.0;
     }
 
-    /**
-     * Score d'anomalie (0..100) basé sur dépassement de seuil + z-score robuste + taille d'historique.
-     */
-    private function anomalyScore(float $value, float $threshold, float $robustZ, int $historyCount): int
+    private function analyzeWasteDetectionFallback(array $produits, array $monthlyOutbound): array
     {
-        if ($historyCount <= 1) {
-            return 0;
+        $analyses = [];
+        $anomaliesCount = 0;
+
+        foreach ($produits as $produit) {
+            $produitId = $produit->getIdProduit();
+            if ($produitId === null) {
+                continue;
+            }
+
+            $series = $monthlyOutbound[$produitId] ?? [];
+            ksort($series);
+            $values = array_values($series);
+            $count = count($values);
+
+            if ($count === 0) {
+                $analyses[] = [
+                    'produit' => $produit,
+                    'moyenne' => 0.0,
+                    'ecartType' => 0.0,
+                    'seuil' => 0.0,
+                    'consommationDernierMois' => 0.0,
+                    'anomalie' => false,
+                    'confiance' => 'Faible',
+                    'zScore' => 0.0,
+                    'explication' => 'Historique insuffisant.',
+                ];
+                continue;
+            }
+
+            $lastValue = (float) $values[$count - 1];
+            $historyWithoutLast = $count > 1 ? array_slice($values, 0, -1) : $values;
+            $weightedBaseline = $this->weightedMean($historyWithoutLast);
+            $stdDev = $this->stdDev($historyWithoutLast);
+            $dynamicThreshold = $weightedBaseline + (1.8 * $stdDev);
+            $zScore = $this->robustZScore($lastValue, $historyWithoutLast);
+
+            $anomaly = $count >= 4
+                && $lastValue > $dynamicThreshold
+                && $zScore >= 2.5;
+
+            if ($anomaly) {
+                $anomaliesCount++;
+            }
+
+            $confidence = $count >= 12 ? 'Élevée' : ($count >= 6 ? 'Moyenne' : 'Faible');
+            $analyses[] = [
+                'produit' => $produit,
+                'moyenne' => round($weightedBaseline, 2),
+                'ecartType' => round($stdDev, 2),
+                'seuil' => round($dynamicThreshold, 2),
+                'consommationDernierMois' => round($lastValue, 2),
+                'anomalie' => $anomaly,
+                'confiance' => $confidence,
+                'zScore' => round($zScore, 2),
+                'explication' => $anomaly
+                    ? 'Pic de consommation anormal vs tendance récente.'
+                    : 'Consommation cohérente avec la tendance.',
+            ];
         }
 
-        $excess = $threshold > 0.0 ? max(0.0, ($value - $threshold) / $threshold) : max(0.0, $value - $threshold);
-        $zComponent = max(0.0, ($robustZ - 2.0) / 3.0); // ~0 à partir de z≈2
-        $historyFactor = min(1.0, $historyCount / 12.0);
-
-        $raw = (0.65 * $excess) + (0.35 * $zComponent);
-        $scaled = 100.0 * (1.0 - exp(-3.0 * $raw)) * $historyFactor;
-
-        return (int) max(0, min(100, round($scaled)));
-    }
-
-    /**
-     * Lissage exponentiel double (Holt) pour séries mensuelles non saisonnières.
-     *
-     * @return array{forecastNext:float, level:float, trend:float}
-     */
-    private function holtLinearForecast(array $values, float $alpha, float $beta): array
-    {
-        $n = count($values);
-        if ($n === 0) {
-            return ['forecastNext' => 0.0, 'level' => 0.0, 'trend' => 0.0];
-        }
-        if ($n === 1) {
-            $v = (float) $values[0];
-            return ['forecastNext' => $v, 'level' => $v, 'trend' => 0.0];
-        }
-
-        $alpha = max(0.01, min(0.99, $alpha));
-        $beta = max(0.01, min(0.99, $beta));
-
-        $level = (float) $values[0];
-        $trend = (float) $values[1] - (float) $values[0];
-
-        for ($i = 1; $i < $n; $i++) {
-            $value = (float) $values[$i];
-            $prevLevel = $level;
-            $level = $alpha * $value + (1.0 - $alpha) * ($level + $trend);
-            $trend = $beta * ($level - $prevLevel) + (1.0 - $beta) * $trend;
-        }
+        usort($analyses, static fn (array $a, array $b): int => (int) $b['consommationDernierMois'] <=> (int) $a['consommationDernierMois']);
 
         return [
-            'forecastNext' => max(0.0, $level + $trend),
-            'level' => $level,
-            'trend' => $trend,
+            'analyses' => $analyses,
+            'anomaliesCount' => $anomaliesCount,
         ];
+    }
+
+    private function recommendOptimalStockFallback(array $produits, array $monthlyOutbound, int $delaiLivraison, int $margeSecuriteJours): array
+    {
+        $recommandations = [];
+        foreach ($produits as $produit) {
+            $produitId = $produit->getIdProduit();
+            if ($produitId === null) {
+                continue;
+            }
+
+            $series = $monthlyOutbound[$produitId] ?? [];
+            ksort($series);
+            $values = array_values($series);
+            $count = count($values);
+
+            $monthlyForecast = $count > 0 ? $this->weightedMean($values) : 0.0;
+            $trend = $this->trendPerMonth($values);
+            $adjustedMonthlyForecast = max(0.0, $monthlyForecast + $trend);
+            $dailyForecast = $adjustedMonthlyForecast / 30.0;
+            $variability = $this->stdDev($values);
+
+            $safetyStock = 1.65 * ($variability / 30.0) * sqrt(max(1, $delaiLivraison + $margeSecuriteJours));
+            $cycleStock = $dailyForecast * $delaiLivraison;
+            $stockOptimal = (int) ceil(max(0.0, $cycleStock + $safetyStock));
+            $stockActuel = (int) ($produit->getQuantiteDisponible() ?? 0);
+            $gap = $stockActuel - $stockOptimal;
+
+            $recommandations[] = [
+                'produit' => $produit,
+                'consommationJour' => round($dailyForecast, 2),
+                'delaiLivraison' => $delaiLivraison,
+                'margeSecurite' => round($safetyStock, 2),
+                'stockOptimal' => $stockOptimal,
+                'stockActuel' => $stockActuel,
+                'risqueRupture' => $stockActuel < $stockOptimal,
+                'tendanceMensuelle' => round($trend, 2),
+                'historiqueMois' => $count,
+                'ecart' => $gap,
+            ];
+        }
+
+        usort($recommandations, static fn (array $a, array $b): int => ($a['ecart']) <=> ($b['ecart']));
+
+        return $recommandations;
+    }
+
+    private function callOpenAiWasteDetection(array $productsPayload): ?array
+    {
+        $apiKey = trim((string) ($_ENV['OPENAI_API_KEY'] ?? $_SERVER['OPENAI_API_KEY'] ?? ''));
+        if ($apiKey === '') {
+            return null;
+        }
+
+        try {
+            $response = $this->httpClient->request('POST', 'https://api.openai.com/v1/chat/completions', [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => 'gpt-4o-mini',
+                    'temperature' => 0.2,
+                    'response_format' => ['type' => 'json_object'],
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'Tu es un analyste de stock. Réponds uniquement en JSON valide avec les clés: anomaliesCount et analyses. Chaque element analyses doit contenir produit_id, produit_nom, moyenne, ecartType, seuil, consommationDernierMois, anomalie, confiance, zScore, explication.',
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => json_encode([
+                                'task' => 'detect_waste',
+                                'products' => $productsPayload,
+                            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                        ],
+                    ],
+                ],
+            ]);
+
+            $data = $response->toArray(false);
+            $content = $data['choices'][0]['message']['content'] ?? null;
+            if (!is_string($content) || $content === '') {
+                return null;
+            }
+
+            $decoded = json_decode($content, true);
+            if (!is_array($decoded) || !isset($decoded['analyses']) || !is_array($decoded['analyses'])) {
+                return null;
+            }
+
+            $produitById = [];
+            foreach ($this->produitRepository->findAll() as $produit) {
+                if ($produit->getIdProduit() !== null) {
+                    $produitById[(string) $produit->getIdProduit()] = $produit;
+                }
+            }
+
+            $analyses = [];
+            foreach ($decoded['analyses'] as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+
+                $produitId = (string) ($row['produit_id'] ?? '');
+                if ($produitId === '' || !isset($produitById[$produitId])) {
+                    continue;
+                }
+
+                $analyses[] = [
+                    'produit' => $produitById[$produitId],
+                    'moyenne' => (float) ($row['moyenne'] ?? 0),
+                    'ecartType' => (float) ($row['ecartType'] ?? 0),
+                    'seuil' => (float) ($row['seuil'] ?? 0),
+                    'consommationDernierMois' => (float) ($row['consommationDernierMois'] ?? 0),
+                    'anomalie' => (bool) ($row['anomalie'] ?? false),
+                    'confiance' => (string) ($row['confiance'] ?? 'Faible'),
+                    'zScore' => (float) ($row['zScore'] ?? 0),
+                    'explication' => (string) ($row['explication'] ?? ''),
+                ];
+            }
+
+            usort($analyses, static fn (array $a, array $b): int => (int) $b['consommationDernierMois'] <=> (int) $a['consommationDernierMois']);
+
+            return [
+                'analyses' => $analyses,
+                'anomaliesCount' => (int) ($decoded['anomaliesCount'] ?? 0),
+            ];
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function callGroqStockRecommendation(array $productsPayload, int $delaiLivraison, int $margeSecuriteJours): ?array
+    {
+        $apiKey = trim((string) ($_ENV['GROQ_API_KEY'] ?? $_SERVER['GROQ_API_KEY'] ?? ''));
+        if ($apiKey === '') {
+            return null;
+        }
+
+        try {
+            $response = $this->httpClient->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => 'llama-3.1-70b-versatile',
+                    'temperature' => 0.2,
+                    'response_format' => ['type' => 'json_object'],
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'Tu es un expert en optimisation de stock. Réponds uniquement en JSON valide avec les clés: recommandations. Chaque element recommandations doit contenir produit_id, produit_nom, consommationJour, delaiLivraison, margeSecurite, stockOptimal, stockActuel, risqueRupture, tendanceMensuelle, historiqueMois, ecart.',
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => json_encode([
+                                'task' => 'optimal_stock',
+                                'delaiLivraison' => $delaiLivraison,
+                                'margeSecuriteJours' => $margeSecuriteJours,
+                                'products' => $productsPayload,
+                            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                        ],
+                    ],
+                ],
+            ]);
+
+            $data = $response->toArray(false);
+            $content = $data['choices'][0]['message']['content'] ?? null;
+            if (!is_string($content) || $content === '') {
+                return null;
+            }
+
+            $decoded = json_decode($content, true);
+            if (!is_array($decoded) || !isset($decoded['recommandations']) || !is_array($decoded['recommandations'])) {
+                return null;
+            }
+
+            $produitById = [];
+            foreach ($this->produitRepository->findAll() as $produit) {
+                if ($produit->getIdProduit() !== null) {
+                    $produitById[(string) $produit->getIdProduit()] = $produit;
+                }
+            }
+
+            $recommandations = [];
+            foreach ($decoded['recommandations'] as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+
+                $produitId = (string) ($row['produit_id'] ?? '');
+                if ($produitId === '' || !isset($produitById[$produitId])) {
+                    continue;
+                }
+
+                $recommandations[] = [
+                    'produit' => $produitById[$produitId],
+                    'consommationJour' => (float) ($row['consommationJour'] ?? 0),
+                    'delaiLivraison' => (int) ($row['delaiLivraison'] ?? $delaiLivraison),
+                    'margeSecurite' => (float) ($row['margeSecurite'] ?? 0),
+                    'stockOptimal' => (int) ($row['stockOptimal'] ?? 0),
+                    'stockActuel' => (int) ($row['stockActuel'] ?? 0),
+                    'risqueRupture' => (bool) ($row['risqueRupture'] ?? false),
+                    'tendanceMensuelle' => (float) ($row['tendanceMensuelle'] ?? 0),
+                    'historiqueMois' => (int) ($row['historiqueMois'] ?? 0),
+                    'ecart' => (int) ($row['ecart'] ?? 0),
+                ];
+            }
+
+            usort($recommandations, static fn (array $a, array $b): int => ($a['ecart']) <=> ($b['ecart']));
+
+            return $recommandations;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
 

@@ -50,11 +50,13 @@ class VenteType extends AbstractType
                 'label' => 'Date de Vente',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses],
+                'mapped' => false,
             ])
             ->add('price', NumberType::class, [
                 'label' => 'Prix',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses, 'placeholder' => '0.00'],
+                'mapped' => false,
             ])
             ->add('buyerName', TextType::class, [
                 'label' => 'Nom de l’acheteur',
@@ -72,25 +74,16 @@ class VenteType extends AbstractType
                 'attr' => ['class' => $inputClasses],
             ])
             ->add('deliveryLocation', TextType::class, [
-                'label' => 'Adresse de livraison',
-                'label_attr' => ['class' => $labelClasses],
-                'attr' => ['class' => $inputClasses, 'placeholder' => '123 Rue de la Livraison, Tunis'],
+                'mapped' => false,
                 'required' => false,
             ])
             ->add('availableQuantity', NumberType::class, [
-                'label' => 'Quantite disponible (marketplace)',
+                'mapped' => false,
                 'required' => false,
-                'label_attr' => ['class' => $labelClasses],
-                'attr' => ['class' => $inputClasses, 'placeholder' => 'Ex: 100'],
             ])
-            ->add('isMarketplaceListing', ChoiceType::class, [
-                'label' => 'Publier dans le marketplace',
-                'label_attr' => ['class' => $labelClasses],
-                'choices' => [
-                    'Oui' => true,
-                    'Non' => false,
-                ],
-                'attr' => ['class' => $inputClasses],
+            ->add('isMarketplaceListing', \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class, [
+                'mapped' => false,
+                'required' => false,
             ])
         ;
     }

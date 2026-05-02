@@ -132,7 +132,7 @@ class VenteMapApiController extends AbstractController
 
     /**
      * Geocode an address using OpenStreetMap Nominatim API
-     * Returns latitude and longitude
+     * Returns latitude and longitude with a short timeout to prevent blocking
      */
     private function geocodeAddress(?string $address): ?array
     {
@@ -153,33 +153,32 @@ class VenteMapApiController extends AbstractController
             }
 
             $url = 'https://nominatim.openstreetmap.org/search?q=' . urlencode($query) 
-                   . '&format=json&limit=1&timeout=10';
+                   . '&format=json&limit=1&timeout=3';
             
-            // Create a stream context with timeout
+            // Create a stream context with a SHORT timeout to prevent blocking
+            // 2.5 seconds is enough for Nominatim under good conditions
             $opts = [
                 'http' => [
                     'method' => 'GET',
                     'header' => 'User-Agent: AgriGoWeb/1.0 (+https://agrigoweb.local)',
-                    'timeout' => 10,
+                    'timeout' => 2.5,
                 ]
             ];
             
             $context = stream_context_create($opts);
             
-            // Set to use the context
+            // Suppress warnings and set to use the context
             $response = @file_get_contents($url, false, $context);
             
             if ($response === false) {
-                throw new \Exception('Failed to reach geocoding service');
+                error_log("Geocoding service timeout for '$address'");
+                return null;
             }
 
             $data = json_decode($response, true);
             
             if (!is_array($data) || count($data) === 0) {
-                // Try without Tunisia suffix as fallback
-                if (stripos($query, 'tunisia') !== false) {
-                    return $this->geocodeAddress(str_ireplace(', Tunisia', '', $address));
-                }
+                error_log("No geocoding results for '$address'");
                 return null;
             }
 

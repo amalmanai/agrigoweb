@@ -105,6 +105,7 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         '98aea6e41b9cb79b379b10f37ba1f0b7' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/RuleSet/RuleContainer.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '6a47392539ca2329373e0d33e1dba053' => __DIR__ . '/..' . '/symfony/polyfill-intl-icu/bootstrap.php',
+        '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
     );
@@ -124,6 +125,7 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         ),
         'T' => 
         array (
+            'Twilio\\' => 7,
             'Twig\\Extra\\TwigExtraBundle\\' => 27,
             'Twig\\' => 5,
         ),
@@ -212,6 +214,7 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
             'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
+            'PhpMyAdmin\\SqlParser\\' => 21,
             'PHPStan\\PhpDocParser\\' => 21,
         ),
         'M' => 
@@ -278,6 +281,7 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         array (
             'App\\Tests\\' => 10,
             'App\\' => 4,
+            'AhmedBhs\\DoctrineDoctor\\' => 24,
         ),
     );
 
@@ -295,6 +299,10 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         'Vich\\UploaderBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/vich/uploader-bundle/src',
+        ),
+        'Twilio\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
         ),
         'Twig\\Extra\\TwigExtraBundle\\' => 
         array (
@@ -625,6 +633,10 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
+        'PhpMyAdmin\\SqlParser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmyadmin/sql-parser/src',
+        ),
         'PHPStan\\PhpDocParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
@@ -700,7 +712,7 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         ),
         'Doctrine\\Persistence\\' => 
         array (
-            0 => __DIR__ . '/..' . '/doctrine/persistence/src/Persistence',
+            0 => __DIR__ . '/..' . '/doctrine/persistence/src',
         ),
         'Doctrine\\ORM\\' => 
         array (
@@ -769,6 +781,10 @@ class ComposerStaticInitbe7d384e0db8d5f04eb2ca5e3181dbc8
         'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
+        ),
+        'AhmedBhs\\DoctrineDoctor\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ahmed-bhs/doctrine-doctor/src',
         ),
     );
 

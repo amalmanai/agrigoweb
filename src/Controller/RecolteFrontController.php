@@ -51,14 +51,11 @@ class RecolteFrontController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $recolte = new Recolte();
-        $form = $this->createForm(RecolteType::class, $recolte, [
-            'parcelle_owner' => $this->getCurrentUserEntity(),
-        ]);
+        $form = $this->createForm(RecolteType::class, $recolte);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $recolte->setUserId($this->getCurrentUserEntity()->getIdUser());
-            $this->syncRecolteAddressFromParcelle($recolte);
             $entityManager->persist($recolte);
             $entityManager->flush();
 
@@ -87,13 +84,10 @@ class RecolteFrontController extends AbstractController
     {
         $this->denyRecolteAccessIfNeeded($recolte);
 
-        $form = $this->createForm(RecolteType::class, $recolte, [
-            'parcelle_owner' => $this->getCurrentUserEntity(),
-        ]);
+        $form = $this->createForm(RecolteType::class, $recolte);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->syncRecolteAddressFromParcelle($recolte);
             $entityManager->flush();
             $this->addFlash('success', 'Récolte mise à jour avec succès.');
 
@@ -127,21 +121,6 @@ class RecolteFrontController extends AbstractController
         if ($recolte->getUserId() !== $this->getCurrentUserEntity()->getIdUser()) {
             throw $this->createAccessDeniedException('Vous ne pouvez accéder qu\'à vos récoltes.');
         }
-    }
-
-    private function syncRecolteAddressFromParcelle(Recolte $recolte): void
-    {
-        $parcelle = $recolte->getParcelle();
-        if ($parcelle === null) {
-            return;
-        }
-
-        $locationParts = array_filter([
-            $parcelle->getNomParcelle(),
-            $parcelle->getCoordonneesGps() ? 'GPS: ' . $parcelle->getCoordonneesGps() : null,
-        ]);
-
-        $recolte->setAdresse(implode(' - ', $locationParts));
     }
 
     private function getCurrentUserEntity(): User

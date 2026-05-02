@@ -25,7 +25,7 @@ class ProfileCompletionSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $route = $request->attributes->get('_route');
+        $route = (string) $request->attributes->get('_route', '');
 
         // Routes to ignore
         $ignoredRoutes = [
@@ -35,7 +35,7 @@ class ProfileCompletionSubscriber implements EventSubscriberInterface
             '_profiler',
         ];
 
-        if (in_array($route, $ignoredRoutes) || str_starts_with($route, 'connect_')) {
+        if (in_array($route, $ignoredRoutes, true) || str_starts_with($route, 'connect_')) {
             return;
         }
 

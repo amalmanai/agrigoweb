@@ -12,10 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Endroid\QrCode\Builder\BuilderInterface;
+use Endroid\QrCode\Writer\SvgWriter;
 
 class GoogleAuthenticator extends OAuth2Authenticator
 {
@@ -24,7 +27,8 @@ class GoogleAuthenticator extends OAuth2Authenticator
     public function __construct(
         private ClientRegistry $clientRegistry,
         private EntityManagerInterface $entityManager,
-        private RouterInterface $router
+        private RouterInterface $router,
+        private BuilderInterface $qrCodeBuilder
     ) {
     }
 
@@ -50,6 +54,10 @@ class GoogleAuthenticator extends OAuth2Authenticator
                 $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['googleId' => $googleUser->getId()]);
 
                 if ($existingUser) {
+                    if (!$existingUser->isActive() || $existingUser->getBadWordCommentStrikes() >= 3) {
+                        throw new CustomUserMessageAuthenticationException('Ce compte est bloqué après 3 tentatives non autorisées.');
+                    }
+
                     return $existingUser;
                 }
 
@@ -73,7 +81,24 @@ class GoogleAuthenticator extends OAuth2Authenticator
 
                     $this->entityManager->persist($user);
                     $this->entityManager->flush();
+
+                    // Generate QR Code
+                    $qrCodeDirectory = 'C:\Users\Amal\AgriGo\user-qrs';
+                    if (!is_dir($qrCodeDirectory)) {
+                        mkdir($qrCodeDirectory, 0777, true);
+                    }
+                    $qrCodePath = $qrCodeDirectory . '\user_' . $user->getIdUser() . '_' . $user->getEmailUser() . '.svg';
+
+                    $result = $this->qrCodeBuilder->build(
+                        data: 'user:' . $user->getIdUser(),
+                        writer: new SvgWriter()
+                    );
+                    $result->saveToFile($qrCodePath);
                 } else {
+                    if (!$user->isActive() || $user->getBadWordCommentStrikes() >= 3) {
+                        throw new CustomUserMessageAuthenticationException('Ce compte est bloqué après 3 tentatives non autorisées.');
+                    }
+
                     // Update existing user with googleId if they match by email
                     $user->setGoogleId($googleUser->getId());
                     $this->entityManager->flush();
