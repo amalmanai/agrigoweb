@@ -80,7 +80,7 @@ class Parcelle
         return $this->nomParcelle;
     }
 
-    public function setNomParcelle(?string $nomParcelle): self
+    public function setNomParcelle(string $nomParcelle): self
     {
         $this->nomParcelle = $nomParcelle;
 
@@ -92,7 +92,7 @@ class Parcelle
         return $this->surface;
     }
 
-    public function setSurface(?float $surface): self
+    public function setSurface(float $surface): self
     {
         $this->surface = $surface;
 
@@ -119,6 +119,18 @@ class Parcelle
     public function setTypeSol(?string $typeSol): self
     {
         $this->typeSol = $typeSol;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }
@@ -184,17 +196,5 @@ class Parcelle
     public function __toString(): string
     {
         return $this->nomParcelle ?? (string) $this->id;
-    }
-
-    public function getOwner(): ?User
-    {
-        return $this->owner;
-    }
-
-    public function setOwner(?User $owner): self
-    {
-        $this->owner = $owner;
-
-        return $this;
     }
 }

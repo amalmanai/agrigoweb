@@ -12,6 +12,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'alertes_risques')]
 class AlerteRisque
 {
+    public const SEVERITY_GREEN = 'Green';
+    public const SEVERITY_YELLOW = 'Yellow';
+    public const SEVERITY_RED = 'Red';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_alerte', type: 'integer')]
@@ -31,6 +35,19 @@ class AlerteRisque
     #[Assert\NotNull(message: 'La date de l\'alerte est obligatoire.')]
     #[Assert\LessThanOrEqual('now', message: 'La date de l\'alerte ne peut pas etre dans le futur.')]
     private ?\DateTimeImmutable $dateAlerte = null;
+
+    #[ORM\Column(name: 'severity', type: 'string', length: 10, options: ['default' => self::SEVERITY_YELLOW])]
+    #[Assert\Choice(
+        choices: [self::SEVERITY_GREEN, self::SEVERITY_YELLOW, self::SEVERITY_RED],
+        message: 'La severite selectionnee est invalide.'
+    )]
+    private string $severity = self::SEVERITY_YELLOW;
+
+    #[ORM\Column(name: 'is_resolved', type: 'boolean', options: ['default' => false])]
+    private bool $isResolved = false;
+
+    #[ORM\Column(name: 'resolved_at', type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $resolvedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Culture::class, inversedBy: 'alertesRisques')]
     #[ORM\JoinColumn(name: 'id_culture', referencedColumnName: 'id_culture', nullable: true)]
@@ -91,6 +108,50 @@ class AlerteRisque
     public function setCulture(?Culture $culture): self
     {
         $this->culture = $culture;
+
+        return $this;
+    }
+
+    public function getSeverity(): string
+    {
+        return $this->severity;
+    }
+
+    public function setSeverity(string $severity): self
+    {
+        $this->severity = $severity;
+
+        return $this;
+    }
+
+    public function isResolved(): bool
+    {
+        return $this->isResolved;
+    }
+
+    public function setIsResolved(bool $isResolved): self
+    {
+        $this->isResolved = $isResolved;
+
+        if ($isResolved && $this->resolvedAt === null) {
+            $this->resolvedAt = new \DateTimeImmutable('now');
+        }
+
+        if (!$isResolved) {
+            $this->resolvedAt = null;
+        }
+
+        return $this;
+    }
+
+    public function getResolvedAt(): ?\DateTimeImmutable
+    {
+        return $this->resolvedAt;
+    }
+
+    public function setResolvedAt(?\DateTimeImmutable $resolvedAt): self
+    {
+        $this->resolvedAt = $resolvedAt;
 
         return $this;
     }

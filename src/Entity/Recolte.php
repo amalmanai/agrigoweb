@@ -14,6 +14,7 @@ class Recolte
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_recolte')]
+    /** @phpstan-ignore property.unusedType */
     private ?int $id = null;
 
     #[ORM\Column(name: 'nom_produit', length: 100, nullable: true)]

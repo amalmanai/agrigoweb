@@ -101,5 +101,63 @@
             {% endif %}
         </div>
     </div>
+
+    {# Map Section #}
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <i class="ph ph-map-pin text-2xl text-agri-green"></i>
+                Localisation et Traçabilité
+            </h3>
+            
+            <div 
+                data-controller="map"
+                data-map-map-url-value="{{ path('api_vente_map_locations', {'id': vente.id}) }}"
+                data-map-vente-id-value="{{ vente.id }}"
+                data-map-target="container"
+                style="height: 500px; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                <div class="flex items-center justify-center h-full bg-gray-50">
+                    <div class="text-center">
+                        <i class="ph ph-spinning text-3xl text-agri-green mb-2 inline-block animate-spin"></i>
+                        <p class="text-gray-600">Chargement de la carte...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-8 w-8 rounded-md bg-green-100">
+                            <i class="ph ph-map-pin text-green-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Lieu de vente</p>
+                        <p class="text-sm text-gray-600 mt-1">
+                            {% if vente.recolte and vente.recolte.adresse %}
+                                {{ vente.recolte.adresse }}
+                            {% else %}
+                                Adresse non disponible
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                {% if vente.deliveryLocation %}
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center justify-center h-8 w-8 rounded-md bg-red-100">
+                            <i class="ph ph-map-pin text-red-600"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Lieu de livraison</p>
+                        <p class="text-sm text-gray-600 mt-1">{{ vente.deliveryLocation }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

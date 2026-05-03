@@ -10,11 +10,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Service\AiChatService;
 
 class UserController extends AbstractController
 {
@@ -43,23 +45,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $photoFile */
-            $photoFile = $form->get('photoPath')->getData();
-
-            if ($photoFile) {
-                $newFilename = uniqid().'.'.$photoFile->guessExtension();
-
-                try {
-                    $photoFile->move($this->getParameter('profile_photos_directory'), $newFilename);
-                    
-                    if ($user->getPhotoPath()) {
-                        $oldPath = $this->getParameter('profile_photos_directory').'/'.$user->getPhotoPath();
-                        if (file_exists($oldPath)) @unlink($oldPath);
-                    }
-
-                    $user->setPhotoPath($newFilename);
-                } catch (FileException $e) {}
-            }
+            // VichUploaderBundle will automatically handle the file upload
             $entityManager->flush();
 
             $this->addFlash('success', 'Profil mis à jour avec succès.');
@@ -87,6 +73,9 @@ class UserController extends AbstractController
         $activeUsers = $userRepository->count(['isActive' => true]);
         $inactiveUsers = $totalUsers - $activeUsers;
 
+        $adminUsers = $userRepository->count(['roleUser' => 'ROLE_ADMIN']);
+        $regularUsers = $totalUsers - $adminUsers;
+
         return $this->render('admin/users.html.twig', [
             'users' => $users,
             'query' => $query,
@@ -97,6 +86,8 @@ class UserController extends AbstractController
             'totalUsers' => $totalUsers,
             'activeUsers' => $activeUsers,
             'inactiveUsers' => $inactiveUsers,
+            'adminUsers' => $adminUsers,
+            'regularUsers' => $regularUsers,
         ]);
     }
 
@@ -150,20 +141,7 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                /** @var UploadedFile $photoFile */
-                $photoFile = $form->get('photoPath')->getData();
-
-                if ($photoFile) {
-                    $newFilename = uniqid().'.'.$photoFile->guessExtension();
-                    try {
-                        $photoFile->move($this->getParameter('profile_photos_directory'), $newFilename);
-                        if ($user->getPhotoPath()) {
-                            $oldPath = $this->getParameter('profile_photos_directory').'/'.$user->getPhotoPath();
-                            if (file_exists($oldPath)) @unlink($oldPath);
-                        }
-                        $user->setPhotoPath($newFilename);
-                    } catch (FileException $e) {}
-                }
+                // VichUploaderBundle will automatically handle the file upload
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Utilisateur modifié avec succès.');
@@ -222,5 +200,23 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['success' => true, 'message' => 'Signature faciale enregistrée avec succès !']);
+    }
+
+    #[Route('/admin/user/{id}/ai-insight', name: 'api_admin_user_insight', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function getAiInsight(User $user, AiChatService $aiChatService): JsonResponse
+    {
+        try {
+            $insight = $aiChatService->getUserInsight($user);
+            return new JsonResponse([
+                'success' => true,
+                'insight' => $insight
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Erreur lors de la génération de l\'analyse : ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

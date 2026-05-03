@@ -16,6 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\File;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class UserType extends AbstractType
 {
@@ -73,10 +74,14 @@ class UserType extends AbstractType
             ]);
         }
 
-        $builder->add('photoPath', FileType::class, [
+        $builder->add('photoFile', VichImageType::class, [
                 'label' => 'Photo de profil',
-                'mapped' => false,
                 'required' => false,
+                'allow_delete' => true,
+                'delete_label' => 'Supprimer la photo actuelle',
+                'download_uri' => false,
+                'image_uri' => true,
+                'asset_helper' => true,
                 'constraints' => [
                     new File([
                         'maxSize' => '2M',

@@ -4,30 +4,20 @@ namespace App\Form;
 
 use App\Entity\MouvementStock;
 use App\Entity\Produit;
-use App\Repository\ProduitRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MouvementStockType extends AbstractType
 {
-    private ProduitRepository $produitRepository;
-
-    public function __construct(ProduitRepository $produitRepository)
-    {
-        $this->produitRepository = $produitRepository;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $produits = $this->produitRepository->findAll();
-        $produitChoices = [];
-        foreach ($produits as $p) {
-            $produitChoices[$p->getNomProduit() . ' (ID: ' . $p->getIdProduit() . ')'] = $p->getIdProduit();
-        }
 
         $builder
             ->add('type_mouvement', ChoiceType::class, [
@@ -38,12 +28,10 @@ class MouvementStockType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-control']
             ])
-            ->add('date_mouvement', TextType::class, [
+            ->add('date_mouvement', DateType::class, [
                 'label' => 'Date du mouvement',
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Ex: 2025-12-31'
-                ]
+                'widget' => 'single_text',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('quantite', IntegerType::class, [
                 'label' => 'Quantité',
@@ -53,14 +41,21 @@ class MouvementStockType extends AbstractType
                 'label' => 'Motif',
                 'attr' => ['class' => 'form-control']
             ])
-            ->add('id_produit', ChoiceType::class, [
+            ->add('produit', EntityType::class, [
+                'class' => Produit::class,
+                'choice_label' => fn(Produit $produit) => sprintf('%s (ID: %d)', $produit->getNomProduit(), $produit->getIdProduit()),
                 'label' => 'Produit',
-                'choices' => $produitChoices,
                 'placeholder' => 'Sélectionnez un produit',
                 'attr' => ['class' => 'form-select']
             ])
+            ->add('commentaire', TextareaType::class, [
+                'label' => 'Commentaire',
+                'required' => false,
+                'mapped' => false,
+                'attr' => ['class' => 'form-control', 'rows' => 3, 'placeholder' => 'Ajoutez un commentaire sur ce mouvement...'],
+            ])
         ;
-        
+
         // We will manually set id_user in the controller if needed or it's hidden, so we won't add it to the user-facing form.
     }
 

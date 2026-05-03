@@ -80,6 +80,22 @@ class RapportPDFService
         file_put_contents($filePath, $dompdf->output());
 
         $expiresAt = new \DateTimeImmutable('+24 hours');
+        $expiresTs = $expiresAt->getTimestamp();
+        $signature = $this->sign($fileName, $expiresTs);
+
+        $path = $this->urlGenerator->generate('front_systeme_irrigation_rapport_download', [
+            'file' => $fileName,
+            'expires' => $expiresTs,
+            'sig' => $signature,
+        ]);
+        
+        $absoluteUrl = $this->urlGenerator->generate('front_systeme_irrigation_rapport_download', [
+            'file' => $fileName,
+            'expires' => $expiresTs,
+            'sig' => $signature,
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $downloadUrl = $this->buildPublicUrl($absoluteUrl, $path);
 
         $sentMail = false;
         $mailError = null;
@@ -95,7 +111,7 @@ class RapportPDFService
                     'user' => $user,
                     'period_start' => $periodStart,
                     'period_end' => $periodEnd,
-                    'download_url' => '',
+                    'download_url' => $downloadUrl,
                 ])
                 ->attachFromPath($filePath, $fileName, 'application/pdf');
 

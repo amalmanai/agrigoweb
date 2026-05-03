@@ -8,10 +8,13 @@ use App\Repository\CultureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[ORM\Entity(repositoryClass: CultureRepository::class)]
 #[ORM\Table(name: 'cultures')]
+#[Vich\Uploadable]
 class Culture
 {
     #[ORM\Id]
@@ -56,17 +59,37 @@ class Culture
     )]
     private ?float $rendementPrevu = null;
 
+    #[ORM\Column(name: 'date_recolte_estimee', type: 'date_immutable', nullable: true)]
+    private ?\DateTimeImmutable $dateRecolteEstimee = null;
+
+    #[ORM\Column(name: 'rendement_estime', type: 'float', nullable: true)]
+    #[Assert\Range(
+        min: 0,
+        max: 1000000,
+        notInRangeMessage: 'Le rendement estime doit etre compris entre {{ min }} et {{ max }}.'
+    )]
+    private ?float $rendementEstime = null;
+
+    #[Vich\UploadableField(mapping: 'culture_images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(name: 'image_name', type: 'string', length: 255, nullable: true)]
+    private ?string $imageName = null;
+
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     #[ORM\ManyToOne(targetEntity: Parcelle::class, inversedBy: 'cultures')]
     #[ORM\JoinColumn(name: 'id_parcelle', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'CASCADE')]
     #[Assert\NotNull(message: 'La parcelle est obligatoire.')]
     private ?Parcelle $parcelle = null;
 
-    #[ORM\OneToMany(targetEntity: AlerteRisque::class, mappedBy: 'culture')]
-    private Collection $alertesRisques;
-
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'cultures')]
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id_user', nullable: true, onDelete: 'SET NULL')]
     private ?User $owner = null;
+
+    #[ORM\OneToMany(targetEntity: AlerteRisque::class, mappedBy: 'culture')]
+    private Collection $alertesRisques;
 
     public function __construct()
     {
@@ -83,7 +106,7 @@ class Culture
         return $this->nomCulture;
     }
 
-    public function setNomCulture(?string $nomCulture): self
+    public function setNomCulture(string $nomCulture): self
     {
         $this->nomCulture = $nomCulture;
 
@@ -95,7 +118,7 @@ class Culture
         return $this->dateSemis;
     }
 
-    public function setDateSemis(?\DateTimeInterface $dateSemis): self
+    public function setDateSemis(\DateTimeInterface $dateSemis): self
     {
         $this->dateSemis = $dateSemis;
 
@@ -126,6 +149,70 @@ class Culture
         return $this;
     }
 
+    public function getDateRecolteEstimee(): ?\DateTimeImmutable
+    {
+        return $this->dateRecolteEstimee;
+    }
+
+    public function setDateRecolteEstimee(?\DateTimeImmutable $dateRecolteEstimee): self
+    {
+        $this->dateRecolteEstimee = $dateRecolteEstimee;
+
+        return $this;
+    }
+
+    public function getRendementEstime(): ?float
+    {
+        return $this->rendementEstime;
+    }
+
+    public function setRendementEstime(?float $rendementEstime): self
+    {
+        $this->rendementEstime = $rendementEstime;
+
+        return $this;
+    }
+
+    public function setImageFile(?File $imageFile = null): self
+    {
+        $this->imageFile = $imageFile;
+
+        if ($imageFile !== null) {
+            $this->updatedAt = new \DateTimeImmutable('now');
+        }
+
+        return $this;
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageName(?string $imageName): self
+    {
+        $this->imageName = $imageName;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
     public function getParcelle(): ?Parcelle
     {
         return $this->parcelle;
@@ -134,6 +221,18 @@ class Culture
     public function setParcelle(?Parcelle $parcelle): self
     {
         $this->parcelle = $parcelle;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }
@@ -170,17 +269,5 @@ class Culture
     public function __toString(): string
     {
         return $this->nomCulture ?? (string) $this->id;
-    }
-
-    public function getOwner(): ?User
-    {
-        return $this->owner;
-    }
-
-    public function setOwner(?User $owner): self
-    {
-        $this->owner = $owner;
-
-        return $this;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Produit;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -35,25 +36,38 @@ class ProduitType extends AbstractType
                 'label' => 'Seuil d\'alerte',
                 'attr' => ['class' => 'form-control']
             ])
-            ->add('date_expiration', TextType::class, [
+            ->add('date_expiration', DateType::class, [
                 'label' => 'Date d\'expiration',
                 'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Ex: 2025-12-31'
-                ]
+                'widget' => 'single_text',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('prix_unitaire', IntegerType::class, [
                 'label' => 'Prix Unitaire',
                 'attr' => ['class' => 'form-control']
             ])
         ;
+
+        if ($options['include_commentaire']) {
+            $builder->add('commentaire', TextareaType::class, [
+                'label' => 'Commentaire',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 3,
+                    'placeholder' => 'Ajoutez un commentaire si nécessaire...'
+                ]
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Produit::class,
+            'include_commentaire' => true,
         ]);
+
+        $resolver->setAllowedTypes('include_commentaire', 'bool');
     }
 }

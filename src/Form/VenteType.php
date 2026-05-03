@@ -50,11 +50,13 @@ class VenteType extends AbstractType
                 'label' => 'Date de Vente',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses],
+                'mapped' => false,
             ])
             ->add('price', NumberType::class, [
                 'label' => 'Prix',
                 'label_attr' => ['class' => $labelClasses],
                 'attr' => ['class' => $inputClasses, 'placeholder' => '0.00'],
+                'mapped' => false,
             ])
             ->add('buyerName', TextType::class, [
                 'label' => 'Nom de l’acheteur',
@@ -70,6 +72,18 @@ class VenteType extends AbstractType
                     'Cancelled' => 'Cancelled',
                 ],
                 'attr' => ['class' => $inputClasses],
+            ])
+            ->add('deliveryLocation', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+            ])
+            ->add('availableQuantity', NumberType::class, [
+                'mapped' => false,
+                'required' => false,
+            ])
+            ->add('isMarketplaceListing', \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class, [
+                'mapped' => false,
+                'required' => false,
             ])
         ;
     }

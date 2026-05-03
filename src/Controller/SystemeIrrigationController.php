@@ -93,14 +93,19 @@ class SystemeIrrigationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $parcelle = $form->get('parcelle')->getData();
-            if ($parcelle) {
+            if (!$parcelle) {
+                // parcelle is unmapped so required:true alone won't catch null server-side
+                $form->get('parcelle')->addError(
+                    new \Symfony\Component\Form\FormError('Veuillez sélectionner une parcelle.')
+                );
+            } else {
                 $systeme->setIdParcelle($parcelle->getId());
-            }
-            $em->persist($systeme);
-            $em->flush();
-            $this->addFlash('success', 'Système d\'irrigation enregistré.');
+                $em->persist($systeme);
+                $em->flush();
+                $this->addFlash('success', 'Système d\'irrigation enregistré.');
 
-            return $this->redirectToRoute($this->crudRoute($request, 'index'));
+                return $this->redirectToRoute($this->crudRoute($request, 'index'));
+            }
         }
 
         return $this->render('systeme_irrigation/new.html.twig', [
@@ -145,15 +150,19 @@ class SystemeIrrigationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $parcelle = $form->get('parcelle')->getData();
-            if ($parcelle) {
+            if (!$parcelle) {
+                $form->get('parcelle')->addError(
+                    new \Symfony\Component\Form\FormError('Veuillez sélectionner une parcelle.')
+                );
+            } else {
                 $systeme->setIdParcelle($parcelle->getId());
-            }
-            $em->flush();
-            $this->addFlash('success', 'Système mis à jour.');
+                $em->flush();
+                $this->addFlash('success', 'Système mis à jour.');
 
-            return $this->redirectToRoute($this->crudRoute($request, 'show'), [
-                'idSysteme' => $systeme->getIdSysteme(),
-            ]);
+                return $this->redirectToRoute($this->crudRoute($request, 'show'), [
+                    'idSysteme' => $systeme->getIdSysteme(),
+                ]);
+            }
         }
 
         return $this->render('systeme_irrigation/edit.html.twig', [
