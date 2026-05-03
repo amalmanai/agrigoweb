@@ -128,4 +128,45 @@ class AiChatService
         }
         return $summary;
     }
+
+    public function getUserInsight(User $user): string
+    {
+        $contextSummary = $this->buildUserContext($user);
+        $userMessage = "Veuillez analyser le profil de l'agriculteur " . $user->getFullName() . " et me faire un résumé court avec 1 ou 2 recommandations pertinentes concernant ses parcelles et cultures. " . $contextSummary;
+
+        if ($this->isKeyValid($this->groqApiKey)) {
+            return $this->callAiProviderWithoutHistory('https://api.groq.com/openai/v1/chat/completions', $this->groqApiKey, self::GROQ_MODEL, $userMessage);
+        }
+
+        if ($this->isKeyValid($this->openaiApiKey)) {
+            return $this->callAiProviderWithoutHistory('https://api.openai.com/v1/chat/completions', $this->openaiApiKey, self::OPENAI_MODEL, $userMessage);
+        }
+
+        return "Analyse automatique (Mode hors-ligne) : L'utilisateur " . $user->getFullName() . " a actuellement plusieurs parcelles et cultures enregistrées. En surveillant régulièrement l'humidité et en optimisant l'irrigation sur les phases critiques, le rendement pourra être amélioré de 15%.";
+    }
+
+    private function callAiProviderWithoutHistory(string $url, string $key, string $model, string $userMessage): string
+    {
+        $systemPrompt = "Tu es un expert agronome et un conseiller AgriGo. Tu parles directement à l'administrateur de l'application AgriGo. Fais un résumé pertinent en 3-4 phrases max.";
+        
+        $messages = [
+            ['role' => 'system', 'content' => $systemPrompt],
+            ['role' => 'user', 'content' => $userMessage],
+        ];
+
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $key,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => ['model' => $model, 'messages' => $messages, 'temperature' => 0.5],
+            ]);
+
+            $data = $response->toArray();
+            return $data['choices'][0]['message']['content'] ?? "Impossible de générer l'analyse.";
+        } catch (\Exception $e) {
+            return "Une erreur est survenue lors de l'appel au service IA : " . $e->getMessage();
+        }
+    }
 }

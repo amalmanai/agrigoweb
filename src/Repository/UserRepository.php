@@ -50,7 +50,7 @@ class UserRepository extends ServiceEntityRepository
 
         $validSortFields = ['idUser', 'nomUser', 'prenomUser', 'emailUser', 'roleUser', 'isActive'];
         if (in_array($sortBy, $validSortFields)) {
-            $qb->orderBy('u.' . $sortBy, strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC');
+            $qb->orderBy('u.' . $sortBy, strtoupper((string)$sortOrder) === 'ASC' ? 'ASC' : 'DESC');
         } else {
             $qb->orderBy('u.idUser', 'DESC');
         }

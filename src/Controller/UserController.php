@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Service\AiChatService;
 
 class UserController extends AbstractController
 {
@@ -199,5 +200,23 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['success' => true, 'message' => 'Signature faciale enregistrée avec succès !']);
+    }
+
+    #[Route('/admin/user/{id}/ai-insight', name: 'api_admin_user_insight', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function getAiInsight(User $user, AiChatService $aiChatService): JsonResponse
+    {
+        try {
+            $insight = $aiChatService->getUserInsight($user);
+            return new JsonResponse([
+                'success' => true,
+                'insight' => $insight
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Erreur lors de la génération de l\'analyse : ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
