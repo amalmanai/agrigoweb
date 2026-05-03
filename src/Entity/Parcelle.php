@@ -17,7 +17,7 @@ class Parcelle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_parcelle', type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(name: 'nom_parcelle', type: 'string', length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la parcelle est obligatoire.')]
@@ -27,12 +27,12 @@ class Parcelle
         minMessage: 'Le nom de la parcelle doit contenir au moins {{ limit }} caracteres.',
         maxMessage: 'Le nom de la parcelle ne doit pas depasser {{ limit }} caracteres.'
     )]
-    private ?string $nomParcelle = null;
+    private string $nomParcelle = '';
 
     #[ORM\Column(type: 'float')]
     #[Assert\NotNull(message: 'La surface est obligatoire.')]
     #[Assert\Positive(message: 'La surface doit etre strictement positive.')]
-    private ?float $surface = null;
+    private float $surface = 0.0;
 
     #[ORM\Column(name: 'coordonnees_gps', type: 'string', length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Les coordonnees GPS sont obligatoires.')]
@@ -54,7 +54,7 @@ class Parcelle
     )]
     private ?string $typeSol = null;
 
-    #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'parcelle')]
+    #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'parcelle', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $cultures;
 
     #[ORM\OneToMany(targetEntity: HistoriqueCulture::class, mappedBy: 'parcelle')]
@@ -72,7 +72,14 @@ class Parcelle
 
     public function getId(): ?int
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getNomParcelle(): ?string
@@ -155,11 +162,7 @@ class Parcelle
 
     public function removeCulture(Culture $culture): self
     {
-        if ($this->cultures->removeElement($culture)) {
-            if ($culture->getParcelle() === $this) {
-                $culture->setParcelle(null);
-            }
-        }
+        $this->cultures->removeElement($culture);
 
         return $this;
     }
@@ -195,6 +198,6 @@ class Parcelle
 
     public function __toString(): string
     {
-        return $this->nomParcelle ?? (string) $this->id;
+        return $this->nomParcelle;
     }
 }

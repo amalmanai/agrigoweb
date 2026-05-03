@@ -14,7 +14,7 @@ class Recolte
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_recolte')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(name: 'nom_produit', length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Le nom du produit est obligatoire.")]
@@ -34,17 +34,25 @@ class Recolte
     #[Assert\NotBlank(message: "La date de récolte est obligatoire.")]
     private ?\DateTimeInterface $harvestDate = null;
 
-    #[ORM\Column(name: 'cout_production', nullable: true)]
+    #[ORM\Column(name: 'cout_production', type: 'decimal', precision: 12, scale: 2, nullable: true)]
     #[Assert\NotBlank(message: "Le coût de production est obligatoire.")]
     #[Assert\PositiveOrZero(message: "Le coût doit être positif ou nul.")]
-    private ?float $productionCost = null;
+    private ?string $productionCost = null;
 
-    #[ORM\Column(name: 'id_user', nullable: true)]
-    private ?int $userId = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
 
     public function getId(): ?int
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -91,25 +99,46 @@ class Recolte
         return $this;
     }
 
-    public function getProductionCost(): ?float
+    public function getProductionCost(): ?string
     {
         return $this->productionCost;
     }
 
-    public function setProductionCost(?float $productionCost): static
+    public function setProductionCost(float|int|string|null $productionCost): static
     {
-        $this->productionCost = $productionCost;
+        if ($productionCost === null || $productionCost === '') {
+            $this->productionCost = null;
+
+            return $this;
+        }
+
+        $this->productionCost = number_format((float) $productionCost, 2, '.', '');
         return $this;
     }
 
     public function getUserId(): ?int
     {
-        return $this->userId;
+        return $this->user?->getIdUser();
     }
 
     public function setUserId(?int $userId): static
     {
-        $this->userId = $userId;
+        if ($userId === null) {
+            $this->user = null;
+        }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
         return $this;
     }
 

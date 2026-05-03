@@ -19,7 +19,7 @@ class AlerteRisque
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_alerte', type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(name: 'type_alerte', type: 'string', length: 50, nullable: true)]
     #[Assert\NotBlank(message: 'Le type d\'alerte est obligatoire.')]
@@ -50,7 +50,7 @@ class AlerteRisque
     private ?\DateTimeImmutable $resolvedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Culture::class, inversedBy: 'alertesRisques')]
-    #[ORM\JoinColumn(name: 'id_culture', referencedColumnName: 'id_culture', nullable: true)]
+    #[ORM\JoinColumn(name: 'culture_id', referencedColumnName: 'id_culture', nullable: true)]
     #[Assert\NotNull(message: 'La culture associee est obligatoire.')]
     private ?Culture $culture = null;
 
@@ -61,7 +61,14 @@ class AlerteRisque
 
     public function getId(): ?int
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getTypeAlerte(): ?string

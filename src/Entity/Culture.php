@@ -20,7 +20,7 @@ class Culture
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_culture', type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(name: 'nom_culture', type: 'string', length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la culture est obligatoire.')]
@@ -34,12 +34,12 @@ class Culture
         pattern: "/^[\\p{L}][\\p{L}\\s'\\-]{1,79}$/u",
         message: 'Le nom doit commencer par une lettre et contenir uniquement des lettres, espaces, apostrophes ou tirets.'
     )]
-    private ?string $nomCulture = null;
+    private string $nomCulture = '';
 
     #[ORM\Column(name: 'date_semis', type: 'date')]
     #[Assert\NotNull(message: 'La date de semis est obligatoire.')]
     #[Assert\Type(type: \DateTimeInterface::class, message: 'La date de semis est invalide.')]
-    private ?\DateTimeInterface $dateSemis = null;
+    private \DateTimeInterface $dateSemis;
 
     #[ORM\Column(name: 'etat_croissance', type: 'string', length: 50, nullable: true)]
     #[Assert\NotBlank(message: 'L\'etat de croissance est obligatoire.')]
@@ -80,7 +80,7 @@ class Culture
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Parcelle::class, inversedBy: 'cultures')]
-    #[ORM\JoinColumn(name: 'id_parcelle', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'parcelle_id', referencedColumnName: 'id_parcelle', nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull(message: 'La parcelle est obligatoire.')]
     private ?Parcelle $parcelle = null;
 
@@ -94,11 +94,19 @@ class Culture
     public function __construct()
     {
         $this->alertesRisques = new ArrayCollection();
+        $this->dateSemis = new \DateTimeImmutable('today');
     }
 
     public function getId(): ?int
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getNomCulture(): ?string
@@ -218,7 +226,7 @@ class Culture
         return $this->parcelle;
     }
 
-    public function setParcelle(?Parcelle $parcelle): self
+    public function setParcelle(Parcelle $parcelle): self
     {
         $this->parcelle = $parcelle;
 
@@ -268,6 +276,6 @@ class Culture
 
     public function __toString(): string
     {
-        return $this->nomCulture ?? (string) $this->id;
+        return $this->nomCulture;
     }
 }

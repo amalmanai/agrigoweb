@@ -39,7 +39,7 @@ class VenteType extends AbstractType
                 'query_builder' => function (EntityRepository $r) use ($owner) {
                     $qb = $r->createQueryBuilder('rec')->orderBy('rec.name', 'ASC');
                     if ($owner instanceof User) {
-                        $qb->andWhere('rec.userId = :uid')->setParameter('uid', $owner->getIdUser());
+                        $qb->andWhere('rec.user = :uid')->setParameter('uid', $owner->getIdUser());
                     }
 
                     return $qb;

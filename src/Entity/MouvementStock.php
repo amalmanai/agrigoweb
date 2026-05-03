@@ -89,7 +89,7 @@ class MouvementStock
     }
 
     #[ORM\ManyToOne(targetEntity: Produit::class)]
-    #[ORM\JoinColumn(name: 'id_produit', referencedColumnName: 'id_produit', nullable: false)]
+    #[ORM\JoinColumn(name: 'produit_id', referencedColumnName: 'id_produit', nullable: false)]
     private ?Produit $produit = null;
 
     public function getProduit(): ?Produit

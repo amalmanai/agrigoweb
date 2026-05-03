@@ -15,10 +15,10 @@ class HistoriqueCulture
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_historique', type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\ManyToOne(targetEntity: Parcelle::class, inversedBy: 'historiqueCultures')]
-    #[ORM\JoinColumn(name: 'id_parcelle', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'parcelle_id', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'SET NULL')]
     #[Assert\NotNull(message: 'La parcelle est obligatoire.')]
     private ?Parcelle $parcelle = null;
 
@@ -41,7 +41,14 @@ class HistoriqueCulture
 
     public function getId(): ?int
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getParcelle(): ?Parcelle

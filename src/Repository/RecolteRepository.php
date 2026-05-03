@@ -51,7 +51,7 @@ class RecolteRepository extends ServiceEntityRepository
     public function searchAndSortForUser(int $userId, ?string $query, string $sortOrder = 'ASC'): array
     {
         $qb = $this->createQueryBuilder('r')
-            ->andWhere('r.userId = :uid')
+            ->andWhere('r.user = :uid')
             ->setParameter('uid', $userId);
 
         if ($query) {
@@ -69,7 +69,7 @@ class RecolteRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('r')
             ->select('SUM(r.productionCost) as total')
-            ->andWhere('r.userId = :uid')
+            ->andWhere('r.user = :uid')
             ->setParameter('uid', $userId);
 
         $result = $qb->getQuery()->getSingleScalarResult();

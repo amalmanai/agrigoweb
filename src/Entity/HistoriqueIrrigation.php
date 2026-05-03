@@ -29,7 +29,7 @@ class HistoriqueIrrigation
     }
 
     #[ORM\ManyToOne(targetEntity: SystemeIrrigation::class, inversedBy: 'historiqueIrrigations')]
-    #[ORM\JoinColumn(name: 'id_systeme', referencedColumnName: 'id_systeme')]
+    #[ORM\JoinColumn(name: 'systeme_id', referencedColumnName: 'id_systeme')]
     private ?SystemeIrrigation $systemeIrrigation = null;
 
     public function getSystemeIrrigation(): ?SystemeIrrigation
@@ -113,7 +113,7 @@ class HistoriqueIrrigation
         return $this;
     }
 
-    public function getDateIrrigation(): ?\DateTime
+    public function getDateIrrigation(): ?\DateTimeInterface
     {
         return $this->date_irrigation;
     }

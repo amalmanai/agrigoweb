@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\ParcelleSummaryDto;
 use App\Entity\Parcelle;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -115,29 +116,34 @@ class ParcelleRepository extends ServiceEntityRepository
     public function findParcelleSummariesWithCultureCount(?User $owner = null): array
     {
         $qb = $this->createQueryBuilder('p')
-            ->select('p.id AS id, p.nomParcelle AS nomParcelle, p.surface AS surface, p.coordonneesGps AS coordonneesGps, p.typeSol AS typeSol, COUNT(c.id) AS cultureCount')
-            ->leftJoin('p.cultures', 'c');
+            ->select('NEW App\Dto\ParcelleSummaryDto(p.id, p.nomParcelle, p.surface, p.coordonneesGps, p.typeSol, COUNT(c.id))');
 
         if ($owner !== null) {
             $qb->andWhere('p.owner = :owner')
-                ->setParameter('owner', $owner)
-                ->andWhere('c.owner = :owner');
+                ->setParameter('owner', $owner);
+
+            $qb->leftJoin('p.cultures', 'c', 'WITH', 'c.owner = :owner');
+        } else {
+            $qb->leftJoin('p.cultures', 'c');
         }
+
+        $cacheKey = 'parcelle_summaries_with_culture_count_' . ($owner?->getIdUser() ?? 'all');
 
         $rows = $qb
             ->groupBy('p.id, p.nomParcelle, p.surface, p.coordonneesGps, p.typeSol')
             ->orderBy('p.nomParcelle', 'ASC')
             ->getQuery()
-            ->getArrayResult();
+            ->enableResultCache(120, $cacheKey)
+            ->getResult();
 
         return array_map(
-            static fn(array $row): array => [
-                'id' => (int) $row['id'],
-                'nomParcelle' => (string) $row['nomParcelle'],
-                'surface' => (float) $row['surface'],
-                'coordonneesGps' => isset($row['coordonneesGps']) ? (string) $row['coordonneesGps'] : null,
-                'typeSol' => isset($row['typeSol']) ? (string) $row['typeSol'] : null,
-                'cultureCount' => (int) $row['cultureCount'],
+            static fn(ParcelleSummaryDto $row): array => [
+                'id' => $row->id,
+                'nomParcelle' => $row->nomParcelle,
+                'surface' => $row->surface,
+                'coordonneesGps' => $row->coordonneesGps,
+                'typeSol' => $row->typeSol,
+                'cultureCount' => $row->cultureCount,
             ],
             $rows
         );

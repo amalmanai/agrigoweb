@@ -30,7 +30,7 @@ class VenteRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('v')
             ->innerJoin('v.recolte', 'r')
-            ->andWhere('r.userId = :uid')
+            ->andWhere('r.user = :uid')
             ->setParameter('uid', $userId)
             ->orderBy('v.id', 'DESC')
             ->getQuery()
@@ -65,7 +65,7 @@ class VenteRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('v')
             ->leftJoin('v.recolte', 'r')
-            ->andWhere('r.userId IS NULL OR r.userId != :buyerId')
+            ->andWhere('r.user IS NULL OR r.user != :buyerId')
             ->setParameter('buyerId', $buyerId)
             ->andWhere('v.status != :status')
             ->setParameter('status', 'Completed')
@@ -83,7 +83,7 @@ class VenteRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('v')
             ->leftJoin('v.recolte', 'r')
-            ->andWhere('r.userId IS NULL OR r.userId != :buyerId')
+            ->andWhere('r.user IS NULL OR r.user != :buyerId')
             ->setParameter('buyerId', $buyerId)
             ->andWhere('v.status != :status')
             ->setParameter('status', 'Completed')

@@ -27,8 +27,13 @@ class RecolteFrontController extends AbstractController
         $direction = (string) $request->query->get('direction', 'ASC');
 
         $currentUser = $this->getCurrentUserEntity();
+        $currentUserId = $currentUser->getIdUser();
+        if ($currentUserId === null) {
+            throw $this->createAccessDeniedException('Utilisateur invalide.');
+        }
+
         $recoltes = $recolteRepository->searchAndSortForUser(
-            $currentUser->getIdUser(),
+            $currentUserId,
             $search,
             strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC'
         );
@@ -55,7 +60,7 @@ class RecolteFrontController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $recolte->setUserId($this->getCurrentUserEntity()->getIdUser());
+            $recolte->setUser($this->getCurrentUserEntity());
             $entityManager->persist($recolte);
             $entityManager->flush();
 
@@ -118,7 +123,7 @@ class RecolteFrontController extends AbstractController
 
     private function denyRecolteAccessIfNeeded(Recolte $recolte): void
     {
-        if ($recolte->getUserId() !== $this->getCurrentUserEntity()->getIdUser()) {
+        if ($recolte->getUser()?->getIdUser() !== $this->getCurrentUserEntity()->getIdUser()) {
             throw $this->createAccessDeniedException('Vous ne pouvez accéder qu\'à vos récoltes.');
         }
     }

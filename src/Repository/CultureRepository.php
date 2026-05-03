@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\CultureEtatCountDto;
 use App\Entity\Culture;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -155,7 +156,7 @@ class CultureRepository extends ServiceEntityRepository
     public function countByEtatCroissance(?User $owner = null): array
     {
         $qb = $this->createQueryBuilder('c')
-            ->select('COALESCE(c.etatCroissance, :inconnu) AS etat, COUNT(c.id) AS total')
+            ->select('NEW App\Dto\CultureEtatCountDto(COALESCE(c.etatCroissance, :inconnu), COUNT(c.id))')
             ->setParameter('inconnu', 'Non defini')
             ->groupBy('c.etatCroissance');
 
@@ -164,15 +165,18 @@ class CultureRepository extends ServiceEntityRepository
                 ->setParameter('owner', $owner);
         }
 
+        $cacheKey = 'culture_count_by_etat_' . ($owner?->getIdUser() ?? 'all');
+
         $rows = $qb
-            ->orderBy('total', 'DESC')
+            ->orderBy('COUNT(c.id)', 'DESC')
             ->getQuery()
-            ->getArrayResult();
+            ->enableResultCache(120, $cacheKey)
+            ->getResult();
 
         return array_map(
-            static fn(array $row): array => [
-                'etat' => (string) $row['etat'],
-                'total' => (int) $row['total'],
+            static fn(CultureEtatCountDto $row): array => [
+                'etat' => $row->etat,
+                'total' => $row->total,
             ],
             $rows
         );

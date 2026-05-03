@@ -15,7 +15,7 @@ class ProduitComment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id_commentaire', type: 'integer')]
-    private ?int $id_commentaire = null;
+    private int $id_commentaire;
 
     #[ORM\Column(type: 'text')]
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide.')]
@@ -25,11 +25,11 @@ class ProduitComment
     private ?\DateTimeImmutable $date_commentaire = null;
 
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'comments')]
-    #[ORM\JoinColumn(name: 'id_produit', referencedColumnName: 'id_produit', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'produit_id', referencedColumnName: 'id_produit', nullable: false, onDelete: 'CASCADE')]
     private ?Produit $produit = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produitCommentaires')]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     public function __construct()
@@ -39,7 +39,14 @@ class ProduitComment
 
     public function getIdCommentaire(): ?int
     {
-        return $this->id_commentaire;
+        return isset($this->id_commentaire) ? $this->id_commentaire : null;
+    }
+
+    public function setIdCommentaire(int $id_commentaire): static
+    {
+        $this->id_commentaire = $id_commentaire;
+
+        return $this;
     }
 
     public function getContenu(): ?string
