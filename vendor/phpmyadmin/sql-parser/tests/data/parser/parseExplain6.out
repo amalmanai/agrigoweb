@@ -1,0 +1,145 @@
+{
+    "query": "DESCRIBE Shop 'N%';\n",
+    "lexer": {
+        "@type": "PhpMyAdmin\\SqlParser\\Lexer",
+        "strict": false,
+        "errors": [],
+        "str": "DESCRIBE Shop 'N%';\n",
+        "len": 20,
+        "last": 20,
+        "list": {
+            "@type": "PhpMyAdmin\\SqlParser\\TokensList",
+            "count": 8,
+            "idx": 8,
+            "tokens": [
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "DESCRIBE",
+                    "value": "DESCRIBE",
+                    "keyword": "DESCRIBE",
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Keyword",
+                        "value": 1
+                    },
+                    "flags": 3,
+                    "position": 0
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Whitespace",
+                        "value": 3
+                    },
+                    "flags": 0,
+                    "position": 8
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "Shop",
+                    "value": "Shop",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "None",
+                        "value": 0
+                    },
+                    "flags": 0,
+                    "position": 9
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 13
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "'N%'",
+                    "value": "N%",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "String",
+                        "value": 7
+                    },
+                    "flags": 1,
+                    "position": 14
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": ";",
+                    "value": ";",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Delimiter",
+                        "value": 9
+                    },
+                    "flags": 0,
+                    "position": 18
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "\n",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 19
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "",
+                    "value": "",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@12"
+                    },
+                    "flags": 0,
+                    "position": null
+                }
+            ]
+        },
+        "delimiter": ";",
+        "delimiterLen": 1
+    },
+    "parser": {
+        "@type": "PhpMyAdmin\\SqlParser\\Parser",
+        "strict": false,
+        "errors": [],
+        "list": {
+            "@type": "@1"
+        },
+        "statements": [
+            {
+                "@type": "PhpMyAdmin\\SqlParser\\Statements\\ExplainStatement",
+                "bodyParser": null,
+                "statementAlias": "DESCRIBE",
+                "connectionId": null,
+                "explainedDatabase": null,
+                "explainedTable": "Shop",
+                "explainedColumn": "N%",
+                "options": null,
+                "first": 0,
+                "last": 4
+            }
+        ],
+        "brackets": 0
+    },
+    "errors": {
+        "lexer": [],
+        "parser": []
+    }
+}

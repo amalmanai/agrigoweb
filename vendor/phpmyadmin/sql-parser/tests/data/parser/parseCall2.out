@@ -1,0 +1,189 @@
+{
+    "query": "CALL foo(@bar, @baz);",
+    "lexer": {
+        "@type": "PhpMyAdmin\\SqlParser\\Lexer",
+        "strict": false,
+        "errors": [],
+        "str": "CALL foo(@bar, @baz);",
+        "len": 21,
+        "last": 21,
+        "list": {
+            "@type": "PhpMyAdmin\\SqlParser\\TokensList",
+            "count": 11,
+            "idx": 11,
+            "tokens": [
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "CALL",
+                    "value": "CALL",
+                    "keyword": "CALL",
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Keyword",
+                        "value": 1
+                    },
+                    "flags": 3,
+                    "position": 0
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Whitespace",
+                        "value": 3
+                    },
+                    "flags": 0,
+                    "position": 4
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "foo",
+                    "value": "foo",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "None",
+                        "value": 0
+                    },
+                    "flags": 0,
+                    "position": 5
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "(",
+                    "value": "(",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Operator",
+                        "value": 2
+                    },
+                    "flags": 16,
+                    "position": 8
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "@bar",
+                    "value": "bar",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Symbol",
+                        "value": 8
+                    },
+                    "flags": 1,
+                    "position": 9
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": ",",
+                    "value": ",",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@9"
+                    },
+                    "flags": 16,
+                    "position": 13
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 14
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "@baz",
+                    "value": "baz",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@11"
+                    },
+                    "flags": 1,
+                    "position": 15
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": ")",
+                    "value": ")",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@9"
+                    },
+                    "flags": 16,
+                    "position": 19
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": ";",
+                    "value": ";",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Delimiter",
+                        "value": 9
+                    },
+                    "flags": 0,
+                    "position": 20
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "",
+                    "value": "",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@17"
+                    },
+                    "flags": 0,
+                    "position": null
+                }
+            ]
+        },
+        "delimiter": ";",
+        "delimiterLen": 1
+    },
+    "parser": {
+        "@type": "PhpMyAdmin\\SqlParser\\Parser",
+        "strict": false,
+        "errors": [],
+        "list": {
+            "@type": "@1"
+        },
+        "statements": [
+            {
+                "@type": "PhpMyAdmin\\SqlParser\\Statements\\CallStatement",
+                "call": {
+                    "@type": "PhpMyAdmin\\SqlParser\\Components\\FunctionCall",
+                    "name": "foo",
+                    "parameters": {
+                        "@type": "PhpMyAdmin\\SqlParser\\Components\\ArrayObj",
+                        "raw": [
+                            "@bar",
+                            "@baz"
+                        ],
+                        "values": [
+                            "bar",
+                            "baz"
+                        ]
+                    }
+                },
+                "options": null,
+                "first": 0,
+                "last": 8
+            }
+        ],
+        "brackets": 0
+    },
+    "errors": {
+        "lexer": [],
+        "parser": []
+    }
+}

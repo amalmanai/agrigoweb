@@ -14,6 +14,9 @@
         "doctrine/orm": "*",
         "dompdf/dompdf": "^3.1",
         "endroid/qr-code-bundle": "^6.0",
+        "knplabs/knp-paginator-bundle": "*",
+        "knpuniversity/oauth2-client-bundle": "^2.20",
+        "league/oauth2-google": "^5.0",
         "phpdocumentor/reflection-docblock": "^5.6.7",
         "phpstan/phpdoc-parser": "^2.3",
         "symfony/asset": "6.4.*",
@@ -46,7 +49,10 @@
         "symfony/web-link": "6.4.*",
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "twig/twig": "^2.12|^3.0",
+        "twilio/sdk": "^8.11",
+        "vich/uploader-bundle": "*",
+        "webmozart/assert": "1.11"
     },
     "config": {
         "allow-plugins": {
@@ -82,6 +88,7 @@
         "symfony/polyfill-php84": "*"
     },
     "scripts": {
+        "test": "php bin/phpunit",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
@@ -104,6 +111,8 @@
         }
     },
     "require-dev": {
+        "ahmed-bhs/doctrine-doctor": "^1.1",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.0",
         "symfony/browser-kit": "6.4.*",
         "symfony/css-selector": "6.4.*",

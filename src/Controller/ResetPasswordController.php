@@ -146,4 +146,58 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('security/reset_password.html.twig');
     }
+
+    #[Route('/resend-code', name: 'app_resend_code')]
+    public function resendCode(Request $request, UserRepository $userRepository, MailerInterface $mailer, EntityManagerInterface $entityManager): Response
+    {
+        $email = $request->getSession()->get('reset_password_email');
+        if (!$email) {
+            return $this->redirectToRoute('app_forgot_password');
+        }
+
+        $user = $userRepository->findOneBy(['emailUser' => $email]);
+        if ($user) {
+            // Generate a 6-digit OTP code (same logic as forgotPassword)
+            $otp = sprintf('%06d', mt_rand(100000, 999999));
+            $user->setResetToken($otp);
+            $user->setResetExpiresAt(new \DateTimeImmutable('+15 minutes'));
+            
+            $entityManager->flush();
+
+            // Send the email (same logic as forgotPassword)
+            $mailerDsn = (string) (getenv('MAILER_DSN') ?: ($_ENV['MAILER_DSN'] ?? ($_SERVER['MAILER_DSN'] ?? 'null://null')));
+            $isMailerConfigured = $mailerDsn !== '' && !str_starts_with($mailerDsn, 'null://');
+
+            try {
+                if ($isMailerConfigured) {
+                    $emailMessage = (new Email())
+                        ->from('amalmanai658@gmail.com')
+                        ->to($email)
+                        ->subject('Votre nouveau code de vérification Agrigo')
+                        ->html("
+                            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+                                <h1 style='color: #28a745;'>🌿 Agrigo</h1>
+                                <h2>Nouveau code de vérification</h2>
+                                <p>Bonjour,</p>
+                                <p>Suite à votre demande, voici votre nouveau code de vérification :</p>
+                                <div style='background: #f8f9fa; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; border-radius: 5px; border: 1px dashed #28a745; color: #28a745; margin: 20px 0;'>
+                                    $otp
+                                </div>
+                                <p>Ce code expirera dans 15 minutes.</p>
+                                <p>Cordialement,<br>L'équipe Agrigo</p>
+                            </div>
+                        ");
+
+                    $mailer->send($emailMessage);
+                    $this->addFlash('success', 'Un nouveau code de vérification a été envoyé.');
+                } else {
+                    throw new \Exception("Mailer not configured");
+                }
+            } catch (\Exception $e) {
+                $this->addFlash('warning', "Mode test: e-mail non configure. Nouveau code OTP: $otp");
+            }
+        }
+
+        return $this->redirectToRoute('app_verify_code');
+    }
 }

@@ -1,0 +1,145 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Marketplace{% endblock %}
+
+{% block content %}
+<style>
+    .mk-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .mk-card {
+        border: 1px solid #d8e4cf;
+        border-radius: 16px;
+        background: linear-gradient(170deg, #ffffff, #f6fbf1);
+        box-shadow: 0 12px 24px rgba(46, 78, 58, 0.08);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .mk-pill {
+        display: inline-flex;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        background: #eaf5de;
+        color: #2f5d41;
+        width: fit-content;
+    }
+
+    .mk-price {
+        font-weight: 800;
+        color: #1f7a49;
+        font-size: 1.45rem;
+    }
+
+    .mk-meta {
+        color: #5b6b62;
+        font-size: 0.9rem;
+    }
+
+    /* Quality indicator circles */
+    .mk-quality {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-left: 0.5rem;
+        border: 2px solid;
+        position: relative;
+        top: -2px;
+    }
+
+    .mk-quality.good {
+        background: #1cc88a;
+        border-color: #13855c;
+        box-shadow: 0 0 6px rgba(28, 200, 138, 0.4);
+    }
+
+    .mk-quality.bad {
+        background: #e74a3b;
+        border-color: #c82333;
+        box-shadow: 0 0 6px rgba(231, 74, 59, 0.4);
+    }
+
+    .mk-quality.neutral {
+        background: #f0ad4e;
+        border-color: #d89a3c;
+    }
+</style>
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h2 class="mb-1" style="font-family:'DM Serif Display',serif;">Marketplace</h2>
+        <p class="text-muted mb-0">Achetez des recoltes de producteurs verifies avec suivi de commandes.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{{ path('app_marketplace_orders_buying') }}">Mes achats</a>
+        <a class="btn btn-outline-secondary" href="{{ path('app_marketplace_orders_selling') }}">Mes ventes marketplace</a>
+    </div>
+</div>
+
+<form method="get" action="{{ path('app_marketplace_index') }}" class="row g-2 mb-4">
+    <div class="col-md-9">
+        <input class="form-control" type="text" name="search" value="{{ search }}" placeholder="Rechercher produit, mot-cle, description...">
+    </div>
+    <div class="col-md-3 d-grid">
+        <button class="btn btn-primary" type="submit">Rechercher</button>
+    </div>
+</form>
+
+{% if recommended is not empty %}
+    <h5 class="mb-3">Recommandations pour vous</h5>
+    <div class="mk-grid mb-4">
+        {% for vente in recommended %}
+            <article class="mk-card">
+                <span class="mk-pill">Recommande</span>
+                {% set quality = deal_qualities[vente.id]|default({quality: 'neutral', score: 50}) %}
+                <h6 class="mb-0">
+                    {{ vente.recolte.name|default(vente.description)|default('Produit') }}
+                    <span class="mk-quality {{ quality.quality }}" title="Score: {{ quality.score }}/100"></span>
+                </h6>
+                <div class="mk-meta">Vendeur ID: #{{ vente.recolte.userId|default('N/A') }}</div>
+                <div class="mk-meta">Disponible: {{ vente.availableQuantity|default(vente.recolte.quantity|default(0)) }}</div>
+                <div class="mk-price">{{ vente.price }} TND</div>
+                <div class="d-flex gap-2 mt-1">
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_vente_show', {id: vente.id}) }}">Details</a>
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_marketplace_order_new', {id: vente.id}) }}">Commander</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<h5 class="mb-3">Annonces disponibles</h5>
+{% if listings is empty %}
+    <div class="alert alert-info">Aucune annonce marketplace disponible pour le moment.</div>
+{% else %}
+    <div class="mk-grid">
+        {% for vente in listings %}
+            <article class="mk-card">
+                <span class="mk-pill">{{ vente.status|default('Disponible') }}</span>
+                {% set quality = deal_qualities[vente.id]|default({quality: 'neutral', score: 50}) %}
+                <h6 class="mb-0">
+                    {{ vente.recolte.name|default(vente.description)|default('Produit') }}
+                    <span class="mk-quality {{ quality.quality }}" title="Score: {{ quality.score }}/100"></span>
+                </h6>
+                <div class="mk-meta">Date vente: {{ vente.saleDate ? vente.saleDate|date('d/m/Y') : 'N/A' }}</div>
+                <div class="mk-meta">Disponible: {{ vente.availableQuantity|default(vente.recolte.quantity|default(0)) }}</div>
+                <div class="mk-price">{{ vente.price }} TND</div>
+                <div class="d-flex gap-2 mt-1">
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ path('app_vente_show', {id: vente.id}) }}">Details</a>
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_marketplace_order_new', {id: vente.id}) }}">Commander</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

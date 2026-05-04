@@ -1,0 +1,104 @@
+# Doctrine Doctor Documentation
+# Just the Docs Jekyll Theme Configuration
+
+title: Doctrine Doctor
+description: Runtime Analysis Tool for Doctrine ORM. Detects N+1 queries, missing indexes, security issues, and 66+ performance problems. Integrated into Symfony Web Profiler.
+baseurl: "/doctrine-doctor"
+url: "https://ahmed-bhs.github.io"
+
+# Repository
+repository: ahmed-bhs/doctrine-doctor
+github_username: ahmed-bhs
+
+# Theme
+remote_theme: just-the-docs/just-the-docs@v0.8.2
+
+# Logo
+logo: "/images/logo.png"
+
+# Search
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\s/]+/
+  rel_url: true
+  button: false
+
+# Mermaid diagrams support
+mermaid:
+  version: "9.4.0"
+
+# Navigation
+nav_sort: title
+nav_external_links:
+  - title: GitHub Repository
+    url: https://github.com/ahmed-bhs/doctrine-doctor
+  - title: Packagist
+    url: https://packagist.org/packages/ahmed-bhs/doctrine-doctor
+
+# Code highlighting
+color_scheme: light
+highlighter: rouge
+
+# Syntax highlighting theme
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+# Callouts
+callouts_level: quiet
+callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: blue
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: purple
+  warning:
+    title: Warning
+    color: red
+
+# Footer
+footer_content: 'Copyright &copy; 2024-2026 Ahmed EBEN HASSINE. Distributed under the <a href="https://github.com/ahmed-bhs/doctrine-doctor/blob/main/LICENSE">MIT License</a>.'
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
+
+# Aux links for the upper right navigation
+aux_links:
+  "View on GitHub":
+    - "https://github.com/ahmed-bhs/doctrine-doctor"
+  "Packagist":
+    - "https://packagist.org/packages/ahmed-bhs/doctrine-doctor"
+
+# Makes Aux links open in a new tab
+aux_links_new_tab: true
+
+# Heading anchor links
+heading_anchors: true
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-include-cache
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - vendor/
+  - .sass-cache/
+  - .jekyll-cache/
+  - Gemfile
+  - Gemfile.lock

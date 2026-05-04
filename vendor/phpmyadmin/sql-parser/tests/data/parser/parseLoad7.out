@@ -1,0 +1,457 @@
+{
+    "query": "SELECT a\ninto outfile '/tmp/temp.data'\nfields terminated by ',' enclosed by '\"' ESCAPED BY '$'\nFROM sometable",
+    "lexer": {
+        "@type": "PhpMyAdmin\\SqlParser\\Lexer",
+        "strict": false,
+        "errors": [],
+        "str": "SELECT a\ninto outfile '/tmp/temp.data'\nfields terminated by ',' enclosed by '\"' ESCAPED BY '$'\nFROM sometable",
+        "len": 109,
+        "last": 109,
+        "list": {
+            "@type": "PhpMyAdmin\\SqlParser\\TokensList",
+            "count": 28,
+            "idx": 28,
+            "tokens": [
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "SELECT",
+                    "value": "SELECT",
+                    "keyword": "SELECT",
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Keyword",
+                        "value": 1
+                    },
+                    "flags": 3,
+                    "position": 0
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Whitespace",
+                        "value": 3
+                    },
+                    "flags": 0,
+                    "position": 6
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "a",
+                    "value": "a",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "None",
+                        "value": 0
+                    },
+                    "flags": 0,
+                    "position": 7
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "\n",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 8
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "into",
+                    "value": "INTO",
+                    "keyword": "INTO",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 3,
+                    "position": 9
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 13
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "outfile",
+                    "value": "OUTFILE",
+                    "keyword": "OUTFILE",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 3,
+                    "position": 14
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 21
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "'/tmp/temp.data'",
+                    "value": "/tmp/temp.data",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "String",
+                        "value": 7
+                    },
+                    "flags": 1,
+                    "position": 22
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "\n",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 38
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "fields",
+                    "value": "fields",
+                    "keyword": "FIELDS",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 1,
+                    "position": 39
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 45
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "terminated by",
+                    "value": "TERMINATED BY",
+                    "keyword": "TERMINATED BY",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 7,
+                    "position": 46
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 59
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "','",
+                    "value": ",",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@14"
+                    },
+                    "flags": 1,
+                    "position": 60
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 63
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "enclosed by",
+                    "value": "ENCLOSED BY",
+                    "keyword": "ENCLOSED BY",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 7,
+                    "position": 64
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 75
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "'\"'",
+                    "value": "\"",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@14"
+                    },
+                    "flags": 1,
+                    "position": 76
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 79
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "ESCAPED BY",
+                    "value": "ESCAPED BY",
+                    "keyword": "ESCAPED BY",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 7,
+                    "position": 80
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 90
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "'$'",
+                    "value": "$",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@14"
+                    },
+                    "flags": 1,
+                    "position": 91
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "\n",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 94
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "FROM",
+                    "value": "FROM",
+                    "keyword": "FROM",
+                    "type": {
+                        "@type": "@3"
+                    },
+                    "flags": 3,
+                    "position": 95
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": " ",
+                    "value": " ",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@5"
+                    },
+                    "flags": 0,
+                    "position": 99
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "sometable",
+                    "value": "sometable",
+                    "keyword": null,
+                    "type": {
+                        "@type": "@7"
+                    },
+                    "flags": 0,
+                    "position": 100
+                },
+                {
+                    "@type": "PhpMyAdmin\\SqlParser\\Token",
+                    "token": "",
+                    "value": "",
+                    "keyword": null,
+                    "type": {
+                        "@type": "PhpMyAdmin\\SqlParser\\TokenType",
+                        "name": "Delimiter",
+                        "value": 9
+                    },
+                    "flags": 0,
+                    "position": null
+                }
+            ]
+        },
+        "delimiter": ";",
+        "delimiterLen": 1
+    },
+    "parser": {
+        "@type": "PhpMyAdmin\\SqlParser\\Parser",
+        "strict": false,
+        "errors": [],
+        "list": {
+            "@type": "@1"
+        },
+        "statements": [
+            {
+                "@type": "PhpMyAdmin\\SqlParser\\Statements\\SelectStatement",
+                "expr": [
+                    {
+                        "@type": "PhpMyAdmin\\SqlParser\\Components\\Expression",
+                        "database": null,
+                        "table": null,
+                        "column": "a",
+                        "expr": "a",
+                        "alias": null,
+                        "function": null,
+                        "subquery": null
+                    }
+                ],
+                "from": [
+                    {
+                        "@type": "PhpMyAdmin\\SqlParser\\Components\\Expression",
+                        "database": null,
+                        "table": "sometable",
+                        "column": null,
+                        "expr": "sometable",
+                        "alias": null,
+                        "function": null,
+                        "subquery": null
+                    }
+                ],
+                "indexHints": null,
+                "partition": null,
+                "where": null,
+                "group": null,
+                "groupOptions": null,
+                "having": null,
+                "order": null,
+                "limit": null,
+                "procedure": null,
+                "into": {
+                    "@type": "PhpMyAdmin\\SqlParser\\Components\\IntoKeyword",
+                    "type": "OUTFILE",
+                    "dest": "/tmp/temp.data",
+                    "columns": null,
+                    "values": null,
+                    "fieldsOptions": {
+                        "@type": "PhpMyAdmin\\SqlParser\\Components\\OptionsArray",
+                        "options": {
+                            "1": {
+                                "name": "TERMINATED BY",
+                                "equals": false,
+                                "expr": {
+                                    "@type": "PhpMyAdmin\\SqlParser\\Components\\Expression",
+                                    "database": null,
+                                    "table": null,
+                                    "column": ",",
+                                    "expr": "','",
+                                    "alias": null,
+                                    "function": null,
+                                    "subquery": null
+                                },
+                                "value": "','"
+                            },
+                            "3": {
+                                "name": "ENCLOSED BY",
+                                "equals": false,
+                                "expr": {
+                                    "@type": "PhpMyAdmin\\SqlParser\\Components\\Expression",
+                                    "database": null,
+                                    "table": null,
+                                    "column": "\"",
+                                    "expr": "'\"'",
+                                    "alias": null,
+                                    "function": null,
+                                    "subquery": null
+                                },
+                                "value": "'\"'"
+                            },
+                            "4": {
+                                "name": "ESCAPED BY",
+                                "equals": false,
+                                "expr": {
+                                    "@type": "PhpMyAdmin\\SqlParser\\Components\\Expression",
+                                    "database": null,
+                                    "table": null,
+                                    "column": "$",
+                                    "expr": "'$'",
+                                    "alias": null,
+                                    "function": null,
+                                    "subquery": null
+                                },
+                                "value": "'$'"
+                            }
+                        }
+                    },
+                    "fieldsKeyword": true,
+                    "linesOptions": null
+                },
+                "join": null,
+                "union": [],
+                "endOptions": null,
+                "options": {
+                    "@type": "PhpMyAdmin\\SqlParser\\Components\\OptionsArray",
+                    "options": []
+                },
+                "first": 0,
+                "last": 26
+            }
+        ],
+        "brackets": 0
+    },
+    "errors": {
+        "lexer": [],
+        "parser": []
+    }
+}

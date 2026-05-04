@@ -34,10 +34,10 @@
                     {% for recolte in recoltes %}
                         <tr>
                             <td>{{ recolte.id }}</td>
-                            <td>{{ recolte.nomRecolte }}</td>
-                            <td>{{ recolte.quantite }}</td>
-                            <td>{{ recolte.coutProduction }}</td>
-                            <td>{{ recolte.dateRecolte|date('d/m/Y') }}</td>
+                            <td>{{ recolte.name }}</td>
+                            <td>{{ recolte.quantity }} {{ recolte.unit|default('kg') }}</td>
+                            <td>{{ recolte.productionCost }}</td>
+                            <td>{{ recolte.harvestDate|date('d/m/Y') }}</td>
                             <td>
                                 <a href="{{ path('app_recolte_show', {id: recolte.id}) }}" class="btn btn-sm btn-info">Voir</a>
                                 <a href="{{ path('app_recolte_edit', {id: recolte.id}) }}" class="btn btn-sm btn-warning">Éditer</a>

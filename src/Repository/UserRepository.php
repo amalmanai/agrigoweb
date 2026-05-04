@@ -21,7 +21,11 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findByAdvancedFilters(?string $query, ?string $role, ?string $status, ?string $sortBy = 'idUser', ?string $sortOrder = 'DESC'): array
     {
-        $qb = $this->createQueryBuilder('u');
+        $qb = $this->createQueryBuilder('u')
+            ->leftJoin('u.parcelles', 'p')
+            ->addSelect('p')
+            ->leftJoin('u.cultures', 'c')
+            ->addSelect('c');
 
         if ($query) {
             $qb->andWhere(
@@ -46,7 +50,7 @@ class UserRepository extends ServiceEntityRepository
 
         $validSortFields = ['idUser', 'nomUser', 'prenomUser', 'emailUser', 'roleUser', 'isActive'];
         if (in_array($sortBy, $validSortFields)) {
-            $qb->orderBy('u.' . $sortBy, strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC');
+            $qb->orderBy('u.' . $sortBy, strtoupper((string)$sortOrder) === 'ASC' ? 'ASC' : 'DESC');
         } else {
             $qb->orderBy('u.idUser', 'DESC');
         }

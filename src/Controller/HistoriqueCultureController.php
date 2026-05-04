@@ -11,10 +11,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Routing\Annotation\Route;
 
-#[IsGranted('ROLE_ADMIN')]
 #[Route('/admin/historique-culture')]
 class HistoriqueCultureController extends AbstractController
 {
@@ -22,8 +20,8 @@ class HistoriqueCultureController extends AbstractController
     public function index(Request $request, HistoriqueCultureRepository $repository): Response
     {
         $search = trim((string) $request->query->get('search', ''));
-        $sort = (string) $request->query->get('sort', 'dateRecolteEffective');
-        $direction = (string) $request->query->get('direction', 'DESC');
+        $sort = (string) $request->query->get('sortField', 'dateRecolteEffective');
+        $direction = (string) $request->query->get('sortDirection', 'DESC');
 
         return $this->render('back/historique_culture/index.html.twig', [
             'historiques' => $repository->findFiltered($search, $sort, $direction),

@@ -229,7 +229,7 @@
             <div class="profile-header">
                 <div class="profile-avatar-container">
                     {% if user.photoPath %}
-                        {% set userPhotoSrc = user.photoPath starts with 'http' ? user.photoPath : asset('uploads/profiles/' ~ user.photoPath) %}
+                        {% set userPhotoSrc = user.photoPath starts with 'http' ? user.photoPath : vich_uploader_asset(user, 'photoFile') %}
                         <img src="{{ userPhotoSrc }}" alt="Photo de profil" class="profile-avatar">
                     {% else %}
                         <div class="profile-avatar-placeholder">

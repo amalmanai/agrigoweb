@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace PhpMyAdmin\SqlParser\Tests\Parser;
+
+use PhpMyAdmin\SqlParser\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+class InsertStatementTest extends TestCase
+{
+    #[DataProvider('insertProvider')]
+    public function testInsert(string $test): void
+    {
+        $this->runParserTest($test);
+    }
+
+    /** @return string[][] */
+    public static function insertProvider(): array
+    {
+        return [
+            ['parser/parseInsert'],
+            ['parser/parseInsertFunction'],
+            ['parser/parseInsertSelect'],
+            ['parser/parseInsertOnDuplicateKey'],
+            ['parser/parseInsertSetOnDuplicateKey'],
+            ['parser/parseInsertSelectOnDuplicateKey'],
+            ['parser/parseInsertOnDuplicateKeyErr'],
+            ['parser/parseInsertErr'],
+            ['parser/parseInsertErr2'],
+            ['parser/parseInsertIntoErr'],
+        ];
+    }
+}
