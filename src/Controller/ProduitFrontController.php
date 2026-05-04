@@ -32,8 +32,8 @@ class ProduitFrontController extends AbstractController
 
         if ($search) {
             $produits = array_filter($produits, function(Produit $produit) use ($search) {
-                return stripos($produit->getNomProduit(), $search) !== false 
-                    || stripos($produit->getCategorie(), $search) !== false;
+                return stripos((string) $produit->getNomProduit(), $search) !== false 
+                    || stripos((string) $produit->getCategorie(), $search) !== false;
             });
         }
 
@@ -180,7 +180,12 @@ class ProduitFrontController extends AbstractController
             throw $this->createAccessDeniedException('Vous devez être connecté.');
         }
 
+<<<<<<< HEAD
         if ($commentaire->getUser()->getIdUser() !== $currentUser->getIdUser()) {
+=======
+        $commentUser = $commentaire->getUser();
+        if (!$commentUser instanceof User || $commentUser->getIdUser() !== $currentUser->getIdUser()) {
+>>>>>>> c2d7907 (update projet)
             throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres commentaires.');
         }
 

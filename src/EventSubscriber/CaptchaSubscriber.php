@@ -27,7 +27,7 @@ class CaptchaSubscriber implements EventSubscriberInterface
         $expectedAnswer = $session->get('captcha_answer');
         $userAnswer = $request->request->get('_captcha');
 
-        if ($expectedAnswer === null || $userAnswer === null || strtoupper(trim($userAnswer)) !== strtoupper((string)$expectedAnswer)) {
+        if ($expectedAnswer === null || $userAnswer === null || strtoupper(trim((string)$userAnswer)) !== strtoupper((string)$expectedAnswer)) {
             throw new CustomUserMessageAuthenticationException('Code de sécurité (Captcha) incorrect.');
         }
 

@@ -18,7 +18,7 @@ class AlerteRisque
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_alerte', type: 'integer')]
+    #[ORM\Column(name: 'id_alerte', type: 'integer', nullable: true)]
     private ?int $id = null;
 
     #[ORM\Column(name: 'type_alerte', type: 'string', length: 50, nullable: true)]
@@ -31,7 +31,7 @@ class AlerteRisque
     #[Assert\Length(min: 5, minMessage: 'La description doit contenir au moins {{ limit }} caracteres.')]
     private ?string $description = null;
 
-    #[ORM\Column(name: 'date_alerte', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(name: 'date_alerte', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: true)]
     #[Assert\NotNull(message: 'La date de l\'alerte est obligatoire.')]
     #[Assert\LessThanOrEqual('now', message: 'La date de l\'alerte ne peut pas etre dans le futur.')]
     private ?\DateTimeImmutable $dateAlerte = null;
@@ -93,12 +93,7 @@ class AlerteRisque
         return $this->dateAlerte;
     }
 
-    public function setDateAlerte(?\DateTimeImmutable $dateAlerte): self
-    {
-        $this->dateAlerte = $dateAlerte;
-
-        return $this;
-    }
+    
 
     public function getCulture(): ?Culture
     {
@@ -149,10 +144,14 @@ class AlerteRisque
         return $this->resolvedAt;
     }
 
+<<<<<<< HEAD
     public function setResolvedAt(?\DateTimeImmutable $resolvedAt): self
     {
         $this->resolvedAt = $resolvedAt;
 
         return $this;
     }
+=======
+
+>>>>>>> c2d7907 (update projet)
 }

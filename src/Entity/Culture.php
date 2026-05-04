@@ -19,10 +19,10 @@ class Culture
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_culture', type: 'integer')]
+    #[ORM\Column(name: 'id_culture', type: 'integer', nullable: true)]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'nom_culture', type: 'string', length: 100)]
+    #[ORM\Column(name: 'nom_culture', type: 'string', length: 100, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom de la culture est obligatoire.')]
     #[Assert\Length(
         min: 2,
@@ -36,7 +36,7 @@ class Culture
     )]
     private ?string $nomCulture = null;
 
-    #[ORM\Column(name: 'date_semis', type: 'date')]
+    #[ORM\Column(name: 'date_semis', type: 'date', nullable: true)]
     #[Assert\NotNull(message: 'La date de semis est obligatoire.')]
     #[Assert\Type(type: \DateTimeInterface::class, message: 'La date de semis est invalide.')]
     private ?\DateTimeInterface $dateSemis = null;
@@ -206,12 +206,16 @@ class Culture
         return $this->updatedAt;
     }
 
+<<<<<<< HEAD
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
         return $this;
     }
+=======
+    
+>>>>>>> c2d7907 (update projet)
 
     public function getParcelle(): ?Parcelle
     {

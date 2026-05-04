@@ -24,7 +24,7 @@ class AdminVenteController extends AbstractController
         $direction = $request->query->get('direction', 'ASC');
 
         return $this->render('admin/vente/index.html.twig', [
-            'ventes' => $venteRepository->adminSearch($search, $sort, $direction),
+            'ventes' => $venteRepository->adminSearch($search, (string) $sort, (string) $direction),
             'total_revenue' => $venteRepository->getTotalRevenue(),
             'search' => $search,
             'sort' => $sort,

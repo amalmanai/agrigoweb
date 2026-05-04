@@ -14,7 +14,11 @@ class GoogleController extends AbstractController
      * Link to this controller to start the "connect" process
      */
     #[Route('/connect/google', name: 'connect_google')]
+<<<<<<< HEAD
     public function connectAction(ClientRegistry $clientRegistry)
+=======
+    public function connectAction(ClientRegistry $clientRegistry): \Symfony\Component\HttpFoundation\RedirectResponse
+>>>>>>> c2d7907 (update projet)
     {
         // will redirect to Google!
         return $clientRegistry

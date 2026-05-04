@@ -15,7 +15,11 @@ class MarketplaceOrder
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+<<<<<<< HEAD
     #[ORM\Column(name: 'id_order')]
+=======
+    #[ORM\Column(name: 'id_order', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Vente::class)]
@@ -26,6 +30,7 @@ class MarketplaceOrder
     #[ORM\JoinColumn(name: 'buyer_id', referencedColumnName: 'id_user', nullable: false, onDelete: 'CASCADE')]
     private ?User $buyer = null;
 
+<<<<<<< HEAD
     #[ORM\Column(name: 'seller_id')]
     private ?int $sellerId = null;
 
@@ -40,6 +45,22 @@ class MarketplaceOrder
     private ?string $totalPrice = null;
 
     #[ORM\Column(length: 32, options: ['default' => 'pending'])]
+=======
+    #[ORM\Column(name: 'seller_id', nullable: true)]
+    private ?int $sellerId = null;
+
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
+    #[Assert\Positive(message: 'La quantite commandee doit etre superieure a zero.')]
+    private ?float $quantity = null;
+
+    #[ORM\Column(name: 'unit_price', type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $unitPrice = null;
+
+    #[ORM\Column(name: 'total_price', type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $totalPrice = null;
+
+    #[ORM\Column(length: 32, options: ['default' => 'pending'], nullable: true)]
+>>>>>>> c2d7907 (update projet)
     private ?string $status = 'pending';
 
     #[ORM\Column(name: 'delivery_address', length: 500, nullable: true)]
@@ -174,10 +195,14 @@ class MarketplaceOrder
         return $this->orderedAt;
     }
 
+<<<<<<< HEAD
     public function setOrderedAt(?\DateTimeImmutable $orderedAt): static
     {
         $this->orderedAt = $orderedAt;
 
         return $this;
     }
+=======
+
+>>>>>>> c2d7907 (update projet)
 }

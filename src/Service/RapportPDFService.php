@@ -259,15 +259,5 @@ class RapportPDFService
         return $absoluteUrl;
     }
 
-    private function buildLanFallbackUrl(string $path): ?string
-    {
-        $host = gethostbyname(gethostname());
-        if (filter_var($host, FILTER_VALIDATE_IP) &&
-            (str_starts_with($host, '192.168.') || str_starts_with($host, '10.') || str_starts_with($host, '172.16.'))) {
-            return 'http://'.$host.':8000'.$path;
-        }
-
-        return null;
-    }
 
 }

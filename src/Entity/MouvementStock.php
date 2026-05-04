@@ -13,7 +13,7 @@ class MouvementStock
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id_mouvement = null;
 
     public function getId_mouvement(): ?int
@@ -27,7 +27,7 @@ class MouvementStock
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $type_mouvement = null;
 
     public function getType_mouvement(): ?string
@@ -41,7 +41,11 @@ class MouvementStock
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'datetime', nullable: false)]
+=======
+    #[ORM\Column(type: 'datetime', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotBlank(message: 'La date du mouvement est obligatoire.')]
     private ?\DateTimeInterface $date_mouvement = null;
 
@@ -56,7 +60,11 @@ class MouvementStock
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'integer', nullable: false)]
+=======
+    #[ORM\Column(type: 'integer', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotNull(message: 'La quantité est obligatoire.')]
     #[Assert\Positive(message: 'La quantité doit être positive.')]
     private ?int $quantite = null;
@@ -72,7 +80,11 @@ class MouvementStock
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'string', nullable: false)]
+=======
+    #[ORM\Column(type: 'string', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotBlank(message: 'Le motif est obligatoire.')]
     #[Assert\Length(min: 5, max: 255, minMessage: 'Le motif doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le motif ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $motif = null;
@@ -103,7 +115,7 @@ class MouvementStock
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id_user = null;
 
     public function getId_user(): ?int

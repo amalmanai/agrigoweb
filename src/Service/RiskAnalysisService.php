@@ -190,7 +190,11 @@ class RiskAnalysisService
             return null;
         }
 
+<<<<<<< HEAD
         $rain = max((float) ($weather['rain1h'] ?? 0.0), (float) ($weather['rain3h'] ?? 0.0));
+=======
+        $rain = max((float) $weather['rain1h'], (float) $weather['rain3h']);
+>>>>>>> c2d7907 (update projet)
         $needsFrequentWater = $this->isFrequentWatering((string) ($plant['watering'] ?? ''));
 
         if ((float) $solar < 6.2 || $rain > 0.2 || !$needsFrequentWater) {

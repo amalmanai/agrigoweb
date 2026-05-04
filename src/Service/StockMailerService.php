@@ -85,12 +85,21 @@ class StockMailerService
                         <li><strong>Motif :</strong> %s</li>
                     </ul>
                 </body></html>",
+<<<<<<< HEAD
                 htmlspecialchars($mouvementStock->getTypeMouvement(), ENT_QUOTES, 'UTF-8'),
                 htmlspecialchars($produitName, ENT_QUOTES, 'UTF-8'),
                 htmlspecialchars((string) $produitId, ENT_QUOTES, 'UTF-8'),
                 $mouvementStock->getQuantite(),
                 htmlspecialchars($mouvementStock->getDateMouvement()?->format('Y-m-d') ?? '', ENT_QUOTES, 'UTF-8'),
                 htmlspecialchars($mouvementStock->getMotif(), ENT_QUOTES, 'UTF-8')
+=======
+                htmlspecialchars((string) $mouvementStock->getTypeMouvement(), ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars((string) $produitName, ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars((string) $produitId, ENT_QUOTES, 'UTF-8'),
+                $mouvementStock->getQuantite(),
+                htmlspecialchars($mouvementStock->getDateMouvement()?->format('Y-m-d') ?? '', ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars((string) $mouvementStock->getMotif(), ENT_QUOTES, 'UTF-8')
+>>>>>>> c2d7907 (update projet)
             ));
 
         $this->logger->info('Envoi email mouvement stock', [
@@ -130,7 +139,11 @@ class StockMailerService
                 </body></html>",
                 htmlspecialchars($niveau, ENT_QUOTES, 'UTF-8'),
                 htmlspecialchars($messageSeuil, ENT_QUOTES, 'UTF-8'),
+<<<<<<< HEAD
                 htmlspecialchars($produit->getNomProduit(), ENT_QUOTES, 'UTF-8'),
+=======
+                htmlspecialchars((string) $produit->getNomProduit(), ENT_QUOTES, 'UTF-8'),
+>>>>>>> c2d7907 (update projet)
                 htmlspecialchars((string) $produit->getIdProduit(), ENT_QUOTES, 'UTF-8'),
                 $quantite
             ));

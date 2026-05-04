@@ -52,7 +52,7 @@ class SystemeIrrigationController extends AbstractController
         $parcelles = $parcelleRepository->findBy(['id' => $ids]);
         $map = [];
         foreach ($parcelles as $p) {
-            $map[$p->getId()] = $p;
+            $map[(int) $p->getId()] = $p;
         }
 
         return [$systemes, $map];

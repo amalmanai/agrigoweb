@@ -28,7 +28,7 @@ class AdminMouvementStockController extends AbstractController
         $direction = $request->query->get('direction', 'ASC');
 
         return $this->render('admin/mouvement_stock/index.html.twig', [
-            'mouvements' => $mouvementStockRepository->adminSearch($search, $sort, $direction),
+            'mouvements' => $mouvementStockRepository->adminSearch($search, (string) $sort, (string) $direction),
             'search' => $search,
             'sort' => $sort,
             'direction' => $direction,

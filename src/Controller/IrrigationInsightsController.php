@@ -71,7 +71,7 @@ class IrrigationInsightsController extends AbstractController
         $parcelles = $parcelleRepository->findFilteredByOwner($user, null, 'nomParcelle', 'ASC');
         $parcelleIds = array_map(static fn ($parcelle): int => (int) $parcelle->getId(), $parcelles);
 
-        $anomalies = $anomalieService->detectAnomaliesForParcelles($parcelleIds);
+        $anomalies = $anomalieService->detectAnomaliesForParcelles(array_values($parcelleIds));
 
         foreach ($anomalies as &$anomalie) {
             $anomalie['badge_class'] = 'sur-irrigation' === $anomalie['type_anomalie']

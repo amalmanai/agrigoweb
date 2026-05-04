@@ -13,10 +13,10 @@ class Vente
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_vente')]
+    #[ORM\Column(name: 'id_vente', nullable: true)]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "La description est obligatoire.")]
     #[Assert\Length(min: 3, max: 255, minMessage: "La description doit faire au moins 3 caractères.", maxMessage: "La description ne peut pas dépasser 255 caractères.")]
     private ?string $description = null;

@@ -1,5 +1,9 @@
 parameters:
     level: 8
+<<<<<<< HEAD
+=======
+    treatPhpDocTypesAsCertain: false
+>>>>>>> c2d7907 (update projet)
     paths:
         - src
     ignoreErrors:
@@ -12,3 +16,8 @@ parameters:
         - '#no value type specified in iterable type array#'
         - '#expects string, array\|bool\|float\|int\|string\|UnitEnum\|null given#'
         - '#Binary operation "\." between array\|bool\|float\|int\|string\|UnitEnum\|null and .* results in an error#'
+<<<<<<< HEAD
+=======
+        - '#is never assigned .* so it can be removed from the property type#'
+        - '#implements generic interface .* but does not specify its types#'
+>>>>>>> c2d7907 (update projet)

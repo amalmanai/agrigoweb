@@ -115,7 +115,11 @@ class CultureController extends AbstractController
         $recommendation = $cropRecommendationService->recommendNextForCulture($culture, new \DateTimeImmutable('now'));
         $careGuide = $plantEncyclopediaService->fetchByCulture($culture);
 
+<<<<<<< HEAD
         if (($careGuide['source'] ?? 'db_fallback') === 'db_fallback' && isset($recommendation['crop']) && is_string($recommendation['crop'])) {
+=======
+        if ($careGuide['source'] === 'db_fallback') {
+>>>>>>> c2d7907 (update projet)
             $careGuide = $plantEncyclopediaService->fetchByName($recommendation['crop']);
         }
 

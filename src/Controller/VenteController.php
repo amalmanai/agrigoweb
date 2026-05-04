@@ -25,8 +25,13 @@ class VenteController extends AbstractController
         $user = $this->requireUser();
 
         return $this->render('vente/index.html.twig', [
+<<<<<<< HEAD
             'ventes' => $venteRepository->findForUser($user->getIdUser()),
             'total_revenue' => $venteRepository->getTotalRevenueForUser($user->getIdUser()),
+=======
+            'ventes' => $venteRepository->findForUser((int) $user->getIdUser()),
+            'total_revenue' => $venteRepository->getTotalRevenueForUser((int) $user->getIdUser()),
+>>>>>>> c2d7907 (update projet)
         ]);
     }
 

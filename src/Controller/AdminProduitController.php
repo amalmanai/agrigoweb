@@ -28,7 +28,7 @@ class AdminProduitController extends AbstractController
         $direction = $request->query->get('direction', 'ASC');
 
         return $this->render('admin/produit/index.html.twig', [
-            'produits' => $produitRepository->adminSearch($search, $sort, $direction),
+            'produits' => $produitRepository->adminSearch($search, (string) $sort, (string) $direction),
             'search' => $search,
             'sort' => $sort,
             'direction' => $direction,

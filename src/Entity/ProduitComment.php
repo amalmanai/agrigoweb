@@ -14,6 +14,7 @@ class ProduitComment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+<<<<<<< HEAD
     #[ORM\Column(name: 'id_commentaire', type: 'integer')]
     private ?int $id_commentaire = null;
 
@@ -22,6 +23,16 @@ class ProduitComment
     private ?string $contenu = null;
 
     #[ORM\Column(name: 'date_commentaire', type: 'date_immutable')]
+=======
+    #[ORM\Column(name: 'id_commentaire', type: 'integer', nullable: true)]
+    private ?int $id_commentaire = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide.')]
+    private ?string $contenu = null;
+
+    #[ORM\Column(name: 'date_commentaire', type: 'date_immutable', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     private ?\DateTimeImmutable $date_commentaire = null;
 
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'comments')]

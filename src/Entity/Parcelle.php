@@ -16,10 +16,10 @@ class Parcelle
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_parcelle', type: 'integer')]
+    #[ORM\Column(name: 'id_parcelle', type: 'integer', nullable: true)]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'nom_parcelle', type: 'string', length: 100)]
+    #[ORM\Column(name: 'nom_parcelle', type: 'string', length: 100, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom de la parcelle est obligatoire.')]
     #[Assert\Length(
         min: 2,
@@ -29,7 +29,7 @@ class Parcelle
     )]
     private ?string $nomParcelle = null;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'float', nullable: true)]
     #[Assert\NotNull(message: 'La surface est obligatoire.')]
     #[Assert\Positive(message: 'La surface doit etre strictement positive.')]
     private ?float $surface = null;
@@ -54,7 +54,7 @@ class Parcelle
     )]
     private ?string $typeSol = null;
 
-    #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'parcelle')]
+    #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'parcelle', cascade: ['remove'])]
     private Collection $cultures;
 
     #[ORM\OneToMany(targetEntity: HistoriqueCulture::class, mappedBy: 'parcelle')]

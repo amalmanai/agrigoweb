@@ -31,12 +31,20 @@ class VenteFrontController extends AbstractController
         $currentUser = $this->getCurrentUserEntity();
 
         // Get ventes linked to user's recoltes
+<<<<<<< HEAD
         $ventes = $venteRepository->findForUser($currentUser->getIdUser());
+=======
+        $ventes = $venteRepository->findForUser((int) $currentUser->getIdUser());
+>>>>>>> c2d7907 (update projet)
 
         // Filter by search if provided
         if ($search) {
             $ventes = array_filter($ventes, function (Vente $vente) use ($search) {
+<<<<<<< HEAD
                 return stripos($vente->getDescription(), $search) !== false
+=======
+                return stripos((string) $vente->getDescription(), $search) !== false
+>>>>>>> c2d7907 (update projet)
                     || stripos((string) $vente->getBuyerName(), $search) !== false;
             });
         }

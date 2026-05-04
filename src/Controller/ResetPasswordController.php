@@ -45,7 +45,7 @@ class ResetPasswordController extends AbstractController
                     if ($isMailerConfigured) {
                         $emailMessage = (new Email())
                             ->from('amalmanai658@gmail.com')
-                            ->to($email)
+                            ->to((string) $email)
                             ->subject('Votre code de vérification Agrigo')
                             ->html("
                                 <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
@@ -127,7 +127,7 @@ class ResetPasswordController extends AbstractController
             $user = $userRepository->findOneBy(['emailUser' => $email]);
             if ($user) {
                 // Update password (using plaintext as requested by project config)
-                $user->setPassword($password);
+                $user->setPassword((string) $password);
                 $user->setResetToken(null);
                 $user->setResetExpiresAt(null);
                 
@@ -140,7 +140,7 @@ class ResetPasswordController extends AbstractController
                 $this->addFlash('success', 'Votre mot de passe a été réinitialisé. Vous êtes maintenant connecté.');
 
                 // Automatic Login
-                return $security->login($user, 'form_login', 'main');
+                return $security->login($user, 'form_login', 'main') ?? $this->redirectToRoute('app_home');
             }
         }
 

@@ -44,8 +44,12 @@ class ProfileCompletionSubscriber implements EventSubscriberInterface
         if ($user instanceof User && $user->getNumUser() === 0) {
             // Flash message to inform the user
             $session = $request->hasSession() ? $request->getSession() : null;
+<<<<<<< HEAD
             if ($session instanceof \Symfony\Component\HttpFoundation\Session\Flash\FlashBagAwareSessionInterface) {
                 /** @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagAwareSessionInterface $session */
+=======
+            if ($session instanceof \Symfony\Component\HttpFoundation\Session\Session) {
+>>>>>>> c2d7907 (update projet)
                 if (!$session->getFlashBag()->has('warning')) {
                     $session->getFlashBag()->add('warning', 'Veuillez compléter votre profil pour continuer.');
                 }

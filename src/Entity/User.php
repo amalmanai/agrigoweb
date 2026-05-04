@@ -20,36 +20,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_user')]
+    #[ORM\Column(name: 'id_user', nullable: true)]
     private ?int $idUser = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le nom ne peut pas être vide.")]
     private ?string $nomUser = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
     private ?string $prenomUser = null;
 
-    #[ORM\Column(name: 'email_user', length: 255, unique: true)]
+    #[ORM\Column(name: 'email_user', length: 255, unique: true, nullable: true)]
     #[Assert\NotBlank(message: "L'adresse email ne peut pas être vide.")]
     #[Assert\Email(message: "L'adresse email '{{ value }}' n'est pas valide.")]
     private ?string $emailUser = null;
 
+<<<<<<< HEAD
     #[ORM\Column(length: 255)]
+=======
+    #[ORM\Column(length: 255, nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
     #[Ignore]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $roleUser = 'ROLE_USER';
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Assert\NotBlank(message: "Le numéro de téléphone est obligatoire.")]
     #[Assert\Regex(pattern: "/^[0-9]{8}$/", message: "Le numéro doit contenir exactement 8 chiffres.")]
     private ?int $numUser = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "L'adresse ne peut pas être vide.")]
     private ?string $adresseUser = null;
 
@@ -69,12 +73,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private int $badWordCommentStrikes = 0;
 
     #[ORM\Column(name: 'reset_token', length: 20, nullable: true)]
+    #[Ignore]
     private ?string $resetToken = null;
 
     #[ORM\Column(name: 'reset_expires', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $resetExpiresAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Ignore]
     private ?string $loginToken = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -234,11 +240,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->updatedAt;
     }
 
+<<<<<<< HEAD
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
         return $this;
     }
+=======
+    
+>>>>>>> c2d7907 (update projet)
 
     public function isActive(): bool
     {
@@ -322,11 +332,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->resetExpiresAt;
     }
 
-    public function setResetExpiresAt(?\DateTimeImmutable $resetExpiresAt): self
-    {
-        $this->resetExpiresAt = $resetExpiresAt;
-        return $this;
-    }
+    
 
     public function isResetTokenValid(): bool
     {

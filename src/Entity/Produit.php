@@ -16,7 +16,11 @@ class Produit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+<<<<<<< HEAD
     #[ORM\Column(type: 'integer')]
+=======
+    #[ORM\Column(type: 'integer', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     private ?int $id_produit = null;
 
     #[ORM\OneToMany(targetEntity: ProduitComment::class, mappedBy: 'produit', orphanRemoval: true, cascade: ['persist'])]
@@ -38,7 +42,11 @@ class Produit
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
+=======
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotBlank(message: 'Le nom du produit est obligatoire.')]
     #[Assert\Length(min: 2, max: 255, minMessage: 'Le nom doit contenir au moins {{ limit }} caractères.', maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $nom_produit = null;
@@ -54,7 +62,11 @@ class Produit
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
+=======
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotBlank(message: 'La catégorie est obligatoire.')]
     #[Assert\Length(min: 2, max: 255, minMessage: 'La catégorie doit contenir au moins {{ limit }} caractères.', maxMessage: 'La catégorie ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $categorie = null;
@@ -70,7 +82,11 @@ class Produit
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'integer', nullable: false)]
+=======
+    #[ORM\Column(type: 'integer', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotNull(message: 'La quantité disponible est obligatoire.')]
     #[Assert\PositiveOrZero(message: 'La quantité disponible doit être positive ou nulle.')]
     private ?int $quantite_disponible = null;
@@ -86,7 +102,11 @@ class Produit
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
+=======
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotBlank(message: 'L\'unité est obligatoire.')]
     #[Assert\Length(min: 1, max: 50, minMessage: 'L\'unité doit contenir au moins {{ limit }} caractère.', maxMessage: 'L\'unité ne peut pas dépasser {{ limit }} caractères.')]
     private ?string $unite = null;
@@ -102,7 +122,11 @@ class Produit
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'integer', nullable: false)]
+=======
+    #[ORM\Column(type: 'integer', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotNull(message: 'Le seuil d\'alerte est obligatoire.')]
     #[Assert\Positive(message: 'Le seuil d\'alerte doit être positif.')]
     private ?int $seuil_alerte = null;
@@ -132,7 +156,11 @@ class Produit
         return $this;
     }
 
+<<<<<<< HEAD
     #[ORM\Column(type: 'integer', nullable: false)]
+=======
+    #[ORM\Column(type: 'integer', nullable: true)]
+>>>>>>> c2d7907 (update projet)
     #[Assert\NotNull(message: 'Le prix unitaire est obligatoire.')]
     #[Assert\Positive(message: 'Le prix unitaire doit être positif.')]
     private ?int $prix_unitaire = null;

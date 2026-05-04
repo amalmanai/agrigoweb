@@ -35,8 +35,13 @@ class MouvementStockFrontController extends AbstractController
 
         if ($search) {
             $mouvements = array_filter($mouvements, function (MouvementStock $m) use ($search) {
+<<<<<<< HEAD
                 return stripos($m->getMotif(), $search) !== false
                     || stripos($m->getTypeMouvement(), $search) !== false;
+=======
+                return stripos((string) $m->getMotif(), $search) !== false
+                    || stripos((string) $m->getTypeMouvement(), $search) !== false;
+>>>>>>> c2d7907 (update projet)
             });
         }
 
@@ -62,7 +67,11 @@ class MouvementStockFrontController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+<<<<<<< HEAD
             $mouvementStock->setIdUser($currentUser->getIdUser());
+=======
+            $mouvementStock->setIdUser((int) $currentUser->getIdUser());
+>>>>>>> c2d7907 (update projet)
 
             // --- Commentaire animal keyword moderation ---
             $commentaire = (string) ($form->has('commentaire') ? $form->get('commentaire')->getData() : '');

@@ -31,11 +31,19 @@ class AiChatService
 
         // Priority to Real AI if keys are present
         if ($this->isKeyValid($this->groqApiKey)) {
+<<<<<<< HEAD
             return $this->callAiProvider('https://api.groq.com/openai/v1/chat/completions', $this->groqApiKey, self::GROQ_MODEL, $user, $userMessage);
         }
 
         if ($this->isKeyValid($this->openaiApiKey)) {
             return $this->callAiProvider('https://api.openai.com/v1/chat/completions', $this->openaiApiKey, self::OPENAI_MODEL, $user, $userMessage);
+=======
+            return $this->callAiProvider('https://api.groq.com/openai/v1/chat/completions', (string) $this->groqApiKey, self::GROQ_MODEL, $user, $userMessage);
+        }
+
+        if ($this->isKeyValid($this->openaiApiKey)) {
+            return $this->callAiProvider('https://api.openai.com/v1/chat/completions', (string) $this->openaiApiKey, self::OPENAI_MODEL, $user, $userMessage);
+>>>>>>> c2d7907 (update projet)
         }
 
         // FALLBACK: Automatic Intelligent Assistant (No Key Required)
@@ -135,11 +143,19 @@ class AiChatService
         $userMessage = "Veuillez analyser le profil de l'agriculteur " . $user->getFullName() . " et me faire un résumé court avec 1 ou 2 recommandations pertinentes concernant ses parcelles et cultures. " . $contextSummary;
 
         if ($this->isKeyValid($this->groqApiKey)) {
+<<<<<<< HEAD
             return $this->callAiProviderWithoutHistory('https://api.groq.com/openai/v1/chat/completions', $this->groqApiKey, self::GROQ_MODEL, $userMessage);
         }
 
         if ($this->isKeyValid($this->openaiApiKey)) {
             return $this->callAiProviderWithoutHistory('https://api.openai.com/v1/chat/completions', $this->openaiApiKey, self::OPENAI_MODEL, $userMessage);
+=======
+            return $this->callAiProviderWithoutHistory('https://api.groq.com/openai/v1/chat/completions', (string) $this->groqApiKey, self::GROQ_MODEL, $userMessage);
+        }
+
+        if ($this->isKeyValid($this->openaiApiKey)) {
+            return $this->callAiProviderWithoutHistory('https://api.openai.com/v1/chat/completions', (string) $this->openaiApiKey, self::OPENAI_MODEL, $userMessage);
+>>>>>>> c2d7907 (update projet)
         }
 
         return "Analyse automatique (Mode hors-ligne) : L'utilisateur " . $user->getFullName() . " a actuellement plusieurs parcelles et cultures enregistrées. En surveillant régulièrement l'humidité et en optimisant l'irrigation sur les phases critiques, le rendement pourra être amélioré de 15%.";
