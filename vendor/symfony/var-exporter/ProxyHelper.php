@@ -212,7 +212,10 @@ final class ProxyHelper
                                     return parent::\${$p->name}::get();
                                 }
 
-                        EOPHP;
+                                return parent::\${$p->name}::get();
+                            }
+
+                    EOPHP;
                 } elseif ('set' === $hook) {
                     $parameters = self::exportParameters($method, true);
                     $arg = '$'.$method->getParameters()[0]->name;
@@ -226,7 +229,10 @@ final class ProxyHelper
                                     parent::\${$p->name}::set({$arg});
                                 }
 
-                        EOPHP;
+                                parent::\${$p->name}::set({$arg});
+                            }
+
+                    EOPHP;
                 } else {
                     throw new LogicException(\sprintf('Cannot generate lazy proxy: hook "%s::%s()" is not supported.', $class->name, $method->name));
                 }

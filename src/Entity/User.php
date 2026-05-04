@@ -92,10 +92,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Culture::class, mappedBy: 'owner')]
     private Collection $cultures;
 
+    #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: 'owner')]
+    private Collection $produits;
+
+    #[ORM\OneToMany(targetEntity: ProduitComment::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $produitCommentaires;
+
     public function __construct()
     {
         $this->parcelles = new ArrayCollection();
         $this->cultures = new ArrayCollection();
+        $this->produits = new ArrayCollection();
+        $this->produitCommentaires = new ArrayCollection();
     }
     public function __serialize(): array
     {
@@ -145,6 +153,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function getEmailUser(): ?string
+    {
+        return $this->emailUser;
+    }
+
+    /**
+     * E-mail personnel de l'agriculteur (notifications, avertissements).
+     * Même valeur que l'e-mail de connexion.
+     */
+    public function getEmailPersonnel(): ?string
     {
         return $this->emailUser;
     }
@@ -333,6 +350,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->resetToken !== null &&
             $this->resetExpiresAt !== null &&
             $this->resetExpiresAt > new \DateTimeImmutable();
+    }
+
+    public function getBadWordCommentStrikes(): int
+    {
+        return $this->badWordCommentStrikes;
+    }
+
+    public function incrementBadWordCommentStrikes(): void
+    {
+        $this->badWordCommentStrikes++;
     }
 
     /**

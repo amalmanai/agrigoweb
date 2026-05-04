@@ -16,6 +16,8 @@ final class Version20260406110000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Tables already exist
+        /*
         // Create systeme_irrigation table
         $this->addSql('CREATE TABLE systeme_irrigation (
             id_systeme INT AUTO_INCREMENT NOT NULL,
@@ -83,15 +85,18 @@ final class Version20260406110000 extends AbstractMigration
 
         // Add foreign key for historique_irrigation
         $this->addSql('ALTER TABLE historique_irrigation ADD CONSTRAINT FK_C2B514E14BE4C493 FOREIGN KEY (id_systeme) REFERENCES systeme_irrigation (id_systeme)');
+        */
     }
 
     public function down(Schema $schema): void
     {
+        /*
         $this->addSql('ALTER TABLE historique_irrigation DROP FOREIGN KEY FK_C2B514E14BE4C493');
         $this->addSql('DROP TABLE IF EXISTS mouvement_stock');
         $this->addSql('DROP TABLE IF EXISTS produit');
         $this->addSql('DROP TABLE IF EXISTS tache');
         $this->addSql('DROP TABLE IF EXISTS historique_irrigation');
         $this->addSql('DROP TABLE IF EXISTS systeme_irrigation');
+        */
     }
 }

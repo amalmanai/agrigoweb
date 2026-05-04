@@ -82,7 +82,7 @@ class SystemeIrrigationRepository extends ServiceEntityRepository
      */
     public function findActiveByOwner(User $owner): array
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->innerJoin(Parcelle::class, 'p', 'WITH', 'p.id = s.id_parcelle')
             ->andWhere('p.owner = :owner')
             ->andWhere('UPPER(COALESCE(s.statut, :empty)) = :actif')

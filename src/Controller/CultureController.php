@@ -275,6 +275,7 @@ class CultureController extends AbstractController
         return $this->render('back/culture/new.html.twig', [
             'culture' => $culture,
             'form' => $form->createView(),
+            'parcelle_choices' => $parcelleRepository->findAllOrderedByName(),
         ]);
     }
 
@@ -323,6 +324,7 @@ class CultureController extends AbstractController
         return $this->render('back/culture/edit.html.twig', [
             'culture' => $culture,
             'form' => $form->createView(),
+            'parcelle_choices' => $parcelleRepository->findAllOrderedByName(),
         ]);
     }
 
