@@ -352,16 +352,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->resetExpiresAt > new \DateTimeImmutable();
     }
 
-    public function getBadWordCommentStrikes(): int
-    {
-        return $this->badWordCommentStrikes;
-    }
-
-    public function incrementBadWordCommentStrikes(): void
-    {
-        $this->badWordCommentStrikes++;
-    }
-
     /**
      * @return Collection<int, Parcelle>
      */
