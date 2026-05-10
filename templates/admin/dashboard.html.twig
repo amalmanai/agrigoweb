@@ -108,6 +108,94 @@
 
     </div>
 
+    {# ===== HEADER ENHANCED ===== #}
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-info">
+                <div class="header-badge">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Vue d'ensemble</span>
+                </div>
+                <h1 class="header-title">Tableau de bord</h1>
+                <p class="header-subtitle">Suivi en temps réel de votre exploitation agricole</p>
+            </div>
+            <div class="header-actions">
+                <div class="action-group">
+                    <a href="{{ path('admin_recolte_new') }}" class="btn-modern btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Nouvelle Récolte</span>
+                    </a>
+                    <a href="{{ path('admin_vente_new') }}" class="btn-modern btn-success">
+                        <i class="bi bi-cash"></i>
+                        <span>Nouvelle Vente</span>
+                    </a>
+                </div>
+                <div class="header-meta">
+                    <div class="meta-item">
+                        <i class="bi bi-calendar3"></i>
+                        <span>{{ "now"|date("d/m/Y") }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="bi bi-clock"></i>
+                        <span>{{ "now"|date("H:i") }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ===== GOOGLE SUGGESTIONS SECTION ===== #}
+    {% if google_suggestions is defined and google_suggestions.suggestions %}
+    <div class="google-suggestions-section">
+        <div class="suggestions-header">
+            <div class="suggestions-title">
+                <div class="title-icon">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+                <div class="title-content">
+                    <h3>Suggestions intelligentes</h3>
+                    <p>Recommandations personnalisées basées sur votre activité</p>
+                </div>
+            </div>
+            <div class="suggestions-badge">
+                <i class="bi bi-google"></i>
+                <span>Google AI</span>
+            </div>
+        </div>
+        
+        <div class="suggestions-grid">
+            {% for suggestion in google_suggestions.suggestions %}
+            <div class="suggestion-card" data-suggestion="{{ suggestion|e('html_attr') }}">
+                <div class="suggestion-icon">
+                    {% if suggestion == 'Aller aux cultures' %}
+                        <i class="bi bi-flower1"></i>
+                    {% elseif suggestion == 'Créer une tâche' %}
+                        <i class="bi bi-plus-square"></i>
+                    {% elseif suggestion == 'Statistiques de ma ferme' %}
+                        <i class="bi bi-bar-chart"></i>
+                    {% elseif suggestion == 'Météo aujourd\'hui' %}
+                        <i class="bi bi-cloud-sun"></i>
+                    {% elseif suggestion == 'Aide' %}
+                        <i class="bi bi-question-circle"></i>
+                    {% else %}
+                        <i class="bi bi-star"></i>
+                    {% endif %}
+                </div>
+                <div class="suggestion-content">
+                    <h4>{{ suggestion }}</h4>
+                    <p>Action recommandée pour optimiser votre exploitation</p>
+                </div>
+                <div class="suggestion-action">
+                    <button class="btn-suggestion" onclick="handleSuggestion('{{ suggestion|e('js') }}')">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {# ===== TABLES RECENTES ===== #}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -171,7 +259,7 @@
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-3 font-medium text-gray-800">{{ v.description }}</td>
                         <td class="px-6 py-3 text-center text-gray-600">{{ v.recolte ? v.recolte.quantity ~ ' ' ~ v.recolte.unit : 'â€”' }}</td>
-                        <td class="px-6 py-3 text-right font-semibold text-emerald-600">{{ v.price|number_format(0, ',', ' ') }} TND</td>
+                        <td class="px-6 py-3 text-right font-semibold text-emerald-600">{{ (v.recolte and v.recolte.productionCost is not null) ? v.recolte.productionCost|number_format(0, ',', ' ') ~ ' TND' : 'â€”' }}</td>
                         <td class="px-6 py-3 text-right">
                             <a href="{{ path('app_vente_edit', {'id': v.id}) }}" class="text-indigo-500 hover:text-indigo-700 mr-3"><i class="ph ph-pencil-simple"></i></a>
                             <a href="{{ path('app_vente_show', {'id': v.id}) }}" class="text-gray-400 hover:text-gray-700"><i class="ph ph-eye"></i></a>
@@ -192,5 +280,533 @@
     </div>
 
 </div>
+
+<!-- GOOGLE SUGGESTIONS STYLES & SCRIPT -->
+<style>
+/* Google Suggestions Section */
+.google-suggestions-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: slideInUp 0.6s ease-out;
+}
+
+.suggestions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.suggestions-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.title-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 20px rgba(66, 133, 244, 0.2);
+}
+
+.title-content h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.title-content p {
+    margin: 0.25rem 0 0 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.suggestions-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #4285f4, #1967d2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+}
+
+.suggestions-badge i {
+    font-size: 1rem;
+}
+
+/* Suggestions Grid */
+.suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.suggestion-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.suggestion-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(66, 133, 244, 0.05), transparent);
+    transition: left 0.6s ease;
+}
+
+.suggestion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.suggestion-card:hover::before {
+    left: 100%;
+}
+
+.suggestion-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.suggestion-content {
+    flex: 1;
+}
+
+.suggestion-content h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.suggestion-content p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.suggestion-action {
+    flex-shrink: 0;
+}
+
+.btn-suggestion {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #4285f4, #1967d2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.btn-suggestion:hover {
+    background: linear-gradient(135deg, #1967d2, #1557b0);
+    transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .google-suggestions-section {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .suggestions-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .suggestions-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .suggestion-card {
+        padding: 1rem;
+    }
+    
+    .suggestion-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .btn-suggestion {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* Animation */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.suggestion-card {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.suggestion-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.suggestion-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.suggestion-card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.suggestion-card:nth-child(5) {
+    animation-delay: 0.4s;
+}
+</style>
+
+<script>
+// Handle Google Suggestions
+function handleSuggestion(suggestion) {
+    console.log('Suggestion clicked:', suggestion);
+    
+    // Track suggestion click
+    trackSuggestionClick(suggestion);
+    
+    // Navigate based on suggestion
+    switch(suggestion) {
+        case 'Aller aux cultures':
+            window.location.href = '{{ path("admin_culture_index") }}';
+            break;
+        case 'Créer une tâche':
+            // Show task creation modal or navigate to task page
+            showTaskCreationModal();
+            break;
+        case 'Statistiques de ma ferme':
+            window.location.href = '{{ path("app_admin_dashboard") }}';
+            break;
+        case 'Météo aujourd\'hui':
+            showWeatherModal();
+            break;
+        case 'Aide':
+            showHelpModal();
+            break;
+        default:
+            console.log('Unknown suggestion:', suggestion);
+    }
+}
+
+// Track suggestion click (analytics)
+function trackSuggestionClick(suggestion) {
+    // Log analytics data locally (could be sent to real analytics service later)
+    console.log('Suggestion tracked:', {
+        suggestion: suggestion,
+        timestamp: new Date().toISOString(),
+        user_agent: navigator.userAgent
+    });
+    
+    // Optional: Send to analytics service if available
+    // fetch('/api/analytics/track', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'X-Requested-With': 'XMLHttpRequest'
+    //     },
+    //     body: JSON.stringify({
+    //         suggestion: suggestion,
+    //         timestamp: new Date().toISOString(),
+    //         user_agent: navigator.userAgent
+    //     })
+    // }).catch(error => {
+    //     console.log('Analytics tracking failed:', error);
+    // });
+}
+
+// Show task creation modal
+function showTaskCreationModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-square me-2"></i>
+                        Créer une nouvelle tâche
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="taskForm">
+                        <div class="mb-3">
+                            <label class="form-label">Titre de la tâche</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Priorité</label>
+                            <select class="form-select" name="priority">
+                                <option value="low">Basse</option>
+                                <option value="medium" selected>Moyenne</option>
+                                <option value="high">Haute</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date d'échéance</label>
+                            <input type="date" class="form-control" name="due_date">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTask()">Créer la tâche</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+    
+    modal.addEventListener('hidden.bs.modal', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Save task
+function saveTask() {
+    const form = document.getElementById('taskForm');
+    const formData = new FormData(form);
+    
+    // Simulate task creation (in real app, this would send to backend)
+    const taskData = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        priority: formData.get('priority'),
+        due_date: formData.get('due_date')
+    };
+    
+    console.log('Creating task:', taskData);
+    
+    // Simulate success
+    bootstrap.Modal.getInstance(document.querySelector('.modal')).hide();
+    showNotification('Tâche créée avec succès!', 'success');
+    
+    // In real implementation:
+    // fetch('/api/tasks/create', {
+    //     method: 'POST',
+    //     headers: {
+    //         'X-Requested-With': 'XMLHttpRequest'
+    //     },
+    //     body: formData
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     if (data.success) {
+    //         bootstrap.Modal.getInstance(document.querySelector('.modal')).hide();
+    //         showNotification('Tâche créée avec succès!', 'success');
+    //     } else {
+    //         showNotification('Erreur lors de la création de la tâche', 'error');
+    //     }
+    // })
+    // .catch(error => {
+    //     console.error('Error creating task:', error);
+    //     showNotification('Erreur serveur', 'error');
+    // });
+}
+
+// Show weather modal
+function showWeatherModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-cloud-sun me-2"></i>
+                        Météo aujourd'hui
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="weather-widget">
+                        <i class="bi bi-sun" style="font-size: 4rem; color: #fbbf24;"></i>
+                        <h4>Ensoleillé</h4>
+                        <p class="text-muted">Température: 28°C</p>
+                        <p class="text-muted">Humidité: 65%</p>
+                        <p class="text-muted">Vent: 12 km/h</p>
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Conditions idéales pour les travaux agricoles aujourd'hui
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+    
+    modal.addEventListener('hidden.bs.modal', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Show help modal
+function showHelpModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-question-circle me-2"></i>
+                        Centre d'aide AgriGo
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="help-sections">
+                        <div class="help-section">
+                            <h6><i class="bi bi-book me-2"></i>Documentation</h6>
+                            <p>Consultez notre guide complet pour utiliser toutes les fonctionnalités d'AgriGo.</p>
+                            <a href="#" class="btn btn-outline-primary btn-sm">Voir la documentation</a>
+                        </div>
+                        <div class="help-section">
+                            <h6><i class="bi bi-video me-2"></i>Tutoriels vidéo</h6>
+                            <p>Apprenez rapidement avec nos tutoriels vidéo pas à pas.</p>
+                            <a href="#" class="btn btn-outline-primary btn-sm">Voir les tutoriels</a>
+                        </div>
+                        <div class="help-section">
+                            <h6><i class="bi bi-headset me-2"></i>Support technique</h6>
+                            <p>Notre équipe est disponible pour vous aider 24/7.</p>
+                            <a href="mailto:support@agrigo.tn" class="btn btn-outline-primary btn-sm">Contacter le support</a>
+                        </div>
+                        <div class="help-section">
+                            <h6><i class="bi bi-telephone me-2"></i>Téléphone</h6>
+                            <p>Appelez-nous pour une assistance immédiate.</p>
+                            <a href="tel:+216XXXXXXXX" class="btn btn-outline-primary btn-sm">+216 XX XXX XXX</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+    
+    modal.addEventListener('hidden.bs.modal', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 5000);
+}
+
+// Initialize suggestions on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to suggestion cards
+    const suggestionCards = document.querySelectorAll('.suggestion-card');
+    suggestionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Log Google suggestions for debugging
+    {% if google_suggestions is defined and google_suggestions.suggestions %}
+    console.log('Google suggestions loaded:', {{ google_suggestions.suggestions|json_encode|raw }});
+    {% endif %}
+});
+</script>
+
 {% endblock %}
 

@@ -28,7 +28,7 @@ class RecolteFrontController extends AbstractController
 
         $currentUser = $this->getCurrentUserEntity();
         $recoltes = $recolteRepository->searchAndSortForUser(
-            $currentUser->getIdUser(),
+            (int) $currentUser->getIdUser(),
             $search,
             strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC'
         );

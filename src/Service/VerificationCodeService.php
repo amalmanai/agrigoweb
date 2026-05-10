@@ -10,16 +10,13 @@ use Twig\Environment;
 class VerificationCodeService
 {
     private MailerInterface $mailer;
-    private Environment $twig;
     private UrlGeneratorInterface $urlGenerator;
 
     public function __construct(
         MailerInterface $mailer,
-        Environment $twig,
         UrlGeneratorInterface $urlGenerator
     ) {
         $this->mailer = $mailer;
-        $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
     }
 

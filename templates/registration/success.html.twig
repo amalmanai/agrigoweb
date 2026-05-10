@@ -95,7 +95,7 @@
         
         <div class="qr-container">
             <p class="small text-muted mb-3" style="font-weight: 600;">VOTRE QR CODE DE SÉCURITÉ</p>
-            <img src="{{ path('app_qr_view', {'filename': user.qr_path}) }}" alt="QR Code" class="qr-image">
+            <object data="/user-qrs/{{ user.qr_path }}" type="image/svg+xml" class="qr-image" alt="QR Code"></object>
         </div>
         
         <p class="small text-muted mb-4">

@@ -14,11 +14,11 @@ class HistoriqueCulture
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_historique', type: 'integer')]
+    #[ORM\Column(name: 'id_historique', type: 'integer', nullable: true)]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Parcelle::class, inversedBy: 'historiqueCultures')]
-    #[ORM\JoinColumn(name: 'id_parcelle', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'parcelle_id', referencedColumnName: 'id_parcelle', nullable: true, onDelete: 'SET NULL')]
     #[Assert\NotNull(message: 'La parcelle est obligatoire.')]
     private ?Parcelle $parcelle = null;
 

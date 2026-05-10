@@ -6,12 +6,12 @@ use App\Entity\User;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\SvgWriter;
 use Endroid\QrCode\Builder\BuilderInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -26,22 +26,15 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $photoFile */
-            $photoFile = $form->get('photoPath')->getData();
-
-            if ($photoFile) {
-                $newFilename = uniqid().'.'.$photoFile->guessExtension();
-
-                try {
-                    $photoFile->move(
-                        $this->getParameter('profile_photos_directory'),
-                        $newFilename
-                    );
-                    $user->setPhotoPath($newFilename);
-                } catch (FileException $e) {
-                    // silent fail or log
-                }
+            // Check if email already exists
+            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['emailUser' => $user->getEmailUser()]);
+            
+            if ($existingUser) {
+                $this->addFlash('error', 'Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.');
+                return $this->redirectToRoute('app_register');
             }
+
+            // VichUploaderBundle will automatically handle the file upload
 
             // Store password in plain text
             $user->setPassword($form->get('password')->getData());
@@ -55,16 +48,17 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // Automatic QR Code Generation
-            $qrCodePath = 'C:\Users\Amal\AgriGo\user-qrs\user_'.$user->getIdUser().'_'.$user->getEmailUser().'.png';
-            if (!file_exists('C:\Users\Amal\AgriGo\user-qrs')) {
-                mkdir('C:\Users\Amal\AgriGo\user-qrs', 0777, true);
+            $qrCodeDirectory = $this->getParameter('user_qr_codes_directory');
+            if (!is_dir($qrCodeDirectory)) {
+                mkdir($qrCodeDirectory, 0777, true);
             }
 
+            $qrCodePath = $qrCodeDirectory . '/user_' . $user->getIdUser() . '_' . $user->getEmailUser() . '.png';
+
             $result = $qrCodeBuilder->build(
-                data: 'AGRIGO-USER:'.$user->getIdUser().':'.$user->getEmailUser(),
+                data: 'AGRIGO-USER:' . $user->getIdUser() . ':' . $user->getEmailUser(),
                 size: 300,
                 margin: 10,
-                roundBlockSizeMode: RoundBlockSizeMode::Margin
             );
 
             $result->saveToFile($qrCodePath);
@@ -73,7 +67,7 @@ class RegistrationController extends AbstractController
             $request->getSession()->set('registration_success_user', [
                 'id' => $user->getIdUser(),
                 'name' => $user->getPrenomUser(),
-                'qr_path' => 'user_'.$user->getIdUser().'_'.$user->getEmailUser().'.png'
+                'qr_path' => 'user_' . $user->getIdUser() . '_' . $user->getEmailUser() . '.png'
             ]);
 
             return $this->redirectToRoute('app_registration_success');
@@ -96,16 +90,16 @@ class RegistrationController extends AbstractController
         // We'll serve the image from the custom directory or symlink
         // For now, let's assume we want to show it. 
         // A better way is to stream it since it's outside public.
-        
+
         return $this->render('registration/success.html.twig', [
             'user' => $userData
         ]);
     }
 
-    #[Route('/qr-code/download/{filename}', name: 'app_qr_download')]
+    #[Route('/qr-code/download/{filename}', name: 'app_qr_download', requirements: ['filename' => '.+'])]
     public function downloadQr(string $filename): Response
     {
-        $path = 'C:\Users\Amal\AgriGo\user-qrs\\' . $filename;
+        $path = $this->getParameter('user_qr_codes_directory') . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($path)) {
             throw $this->createNotFoundException('QR Code non trouvé.');
         }
@@ -113,14 +107,17 @@ class RegistrationController extends AbstractController
         return $this->file($path);
     }
 
-    #[Route('/qr-code/view/{filename}', name: 'app_qr_view')]
+    #[Route('/qr-code/view/{filename}', name: 'app_qr_view', requirements: ['filename' => '.+'])]
     public function viewQr(string $filename): Response
     {
-        $path = 'C:\Users\Amal\AgriGo\user-qrs\\' . $filename;
+        $path = $this->getParameter('user_qr_codes_directory') . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($path)) {
             throw $this->createNotFoundException('QR Code non trouvé.');
         }
 
-        return $this->file($path, $filename, \Symfony\Component\HttpFoundation\ResponseHeaderBag::DISPOSITION_INLINE);
+        $response = new \Symfony\Component\HttpFoundation\Response(file_get_contents($path));
+        $response->headers->set('Content-Type', 'image/png');
+        $response->headers->set('Cache-Control', 'public, max-age=604800');
+        return $response;
     }
 }

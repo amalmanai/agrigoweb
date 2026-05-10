@@ -5,6 +5,17 @@
 {% block content %}
 <h1 class="h3 mb-3">Detail de la culture</h1>
 
+{% set imagePath = culture.imageName ? vich_uploader_asset(culture, 'imageFile') : '/uploads/cultures/no-image.svg' %}
+<div class="card mb-3">
+    <div class="card-body d-flex align-items-center gap-3">
+        <img src="{{ imagePath }}" alt="culture-image" style="width:140px;height:100px;object-fit:cover;border-radius:10px;border:1px solid #dbe2d8;">
+        <div>
+            <p class="mb-1"><strong>Illustration culture:</strong></p>
+            <p class="mb-0 text-muted">Si aucune image n'est telechargee, le placeholder "no-image" est affiche.</p>
+        </div>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         <dl class="row mb-0">
@@ -17,11 +28,17 @@
             <dt class="col-sm-4">Date semis</dt>
             <dd class="col-sm-8">{{ culture.dateSemis ? culture.dateSemis|date('Y-m-d') : '-' }}</dd>
 
+            <dt class="col-sm-4">Date recolte estimee</dt>
+            <dd class="col-sm-8">{{ culture.dateRecolteEstimee ? culture.dateRecolteEstimee|date('Y-m-d') : '-' }}</dd>
+
             <dt class="col-sm-4">Etat croissance</dt>
             <dd class="col-sm-8">{{ culture.etatCroissance ?? '-' }}</dd>
 
             <dt class="col-sm-4">Rendement prevu</dt>
             <dd class="col-sm-8">{{ culture.rendementPrevu is not null ? culture.rendementPrevu : '-' }}</dd>
+
+            <dt class="col-sm-4">Rendement estime</dt>
+            <dd class="col-sm-8">{{ culture.rendementEstime is not null ? culture.rendementEstime : '-' }}</dd>
 
             <dt class="col-sm-4">Parcelle</dt>
             <dd class="col-sm-8">{{ culture.parcelle ? culture.parcelle.nomParcelle : 'Aucune' }}</dd>
@@ -29,13 +46,80 @@
     </div>
 </div>
 
-<div class="mt-3 d-flex gap-2">
+{% if weather is not null %}
+    <div class="card mt-3 border-0 shadow-sm">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Meteo parcelle (API)</h2>
+            <p class="mb-1"><strong>Zone:</strong> {{ weather.city }}</p>
+            <p class="mb-1"><strong>Temperature:</strong> {{ weather.temperature }} C</p>
+            <p class="mb-1"><strong>Ressenti:</strong> {{ weather.feelsLike }} C</p>
+            <p class="mb-1"><strong>Humidite:</strong> {{ weather.humidity }} %</p>
+            <p class="mb-0"><strong>Conditions:</strong> {{ weather.description }}</p>
+        </div>
+    </div>
+{% endif %}
+
+<div class="card mt-3 border-0 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Agri-Risk Shield Alerts</h2>
+        {% if activeAlerts is not empty %}
+            <ul class="list-group list-group-flush">
+                {% for alert in activeAlerts %}
+                    {% set severityClass = alert.severity == 'Red' ? 'danger' : (alert.severity == 'Yellow' ? 'warning' : 'success') %}
+                    <li class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div>
+                                <div><strong>{{ alert.typeAlerte }}</strong></div>
+                                <small class="text-muted">{{ alert.description }}</small>
+                            </div>
+                            <span class="badge text-bg-{{ severityClass }}">{{ alert.severity }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mb-0 text-success">Aucun risque actif detecte pour cette culture.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-3 border-0 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Suggestion IA et compatibilite terrain</h2>
+        <p class="mb-1"><strong>Culture recommandee:</strong> {{ recommendation.crop }}</p>
+        <p class="mb-1"><strong>Confiance:</strong> {{ recommendation.confidence }}%</p>
+        <p class="mb-1"><strong>Compatibilite culture actuelle:</strong> {{ recommendation.compatibilityScore ?? '-' }}/100 ({{ recommendation.compatibilityLabel ?? 'n/a' }})</p>
+        <p class="mb-1"><strong>Texture analysee:</strong> {{ recommendation.terrain.texture ?? (culture.parcelle ? culture.parcelle.typeSol : 'n/a') }}</p>
+        <p class="mb-1"><strong>pH analyse:</strong> {{ recommendation.terrain.ph is not null ? recommendation.terrain.ph : 'n/a' }}</p>
+        <p class="mb-1"><strong>Rayonnement solaire:</strong> {{ recommendation.terrain.solarRadiation is not null ? recommendation.terrain.solarRadiation ~ ' kWh/m2/day' : 'n/a' }}</p>
+        <p class="mb-2 text-muted">{{ recommendation.explanation }}</p>
+
+        {% if recommendation.alternatives is not empty %}
+            <p class="mb-1"><strong>Alternatives:</strong></p>
+            <ul class="mb-0">
+                {% for alt in recommendation.alternatives %}
+                    <li>{{ alt.crop }} ({{ alt.score }}%)</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-3 border-0 shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Care Guide (Perenual API)</h2>
+        <p class="mb-1"><strong>Plante:</strong> {{ careGuide.name ?? culture.nomCulture }}</p>
+        <p class="mb-1"><strong>Nom scientifique:</strong> {{ careGuide.scientificName ?? 'n/a' }}</p>
+        <p class="mb-1"><strong>Frequence d'arrosage:</strong> {{ careGuide.watering ?? 'n/a (fallback DB)' }}</p>
+        <p class="mb-1"><strong>Exposition soleil:</strong> {{ careGuide.sunlight ?? 'n/a (fallback DB)' }}</p>
+        <p class="mb-1"><strong>Niveau d'entretien:</strong> {{ careGuide.careLevel ?? 'n/a (fallback DB)' }}</p>
+        <p class="mb-1"><strong>Vitesse de croissance:</strong> {{ careGuide.growthRate ?? 'n/a (fallback DB)' }}</p>
+        <p class="mb-0 text-muted">Source: {{ careGuide.source ?? 'db_fallback' }}</p>
+    </div>
+</div>
+
+<div class="mt-3">
     <a href="{{ path('app_culture_list') }}" class="btn btn-secondary">Retour liste</a>
-    <a href="{{ path('app_culture_edit', {id: culture.id}) }}" class="btn btn-outline-warning">Modifier</a>
-    <form method="post" action="{{ path('app_culture_delete', {id: culture.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette culture ?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete_front_culture_' ~ culture.id) }}">
-        <button type="submit" class="btn btn-outline-danger">Supprimer</button>
-    </form>
 </div>
 {% endblock %}
 

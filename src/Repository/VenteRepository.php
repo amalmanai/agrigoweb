@@ -18,10 +18,11 @@ class VenteRepository extends ServiceEntityRepository
     public function getTotalRevenue(): float
     {
         $qb = $this->createQueryBuilder('v')
-            ->select('SUM(v.price) as total');
-
+            ->leftJoin('v.recolte', 'r')
+            ->select('SUM(r.productionCost)');
+        
         $result = $qb->getQuery()->getSingleScalarResult();
-
+        
         return $result ? (float) $result : 0.0;
     }
 
@@ -37,6 +38,7 @@ class VenteRepository extends ServiceEntityRepository
             ->andWhere('r.userId = :uid')
             ->setParameter('uid', $userId)
             ->orderBy('v.id', 'DESC')
+            ->setMaxResults(50)
             ->getQuery()
             ->getResult();
     }
@@ -44,13 +46,13 @@ class VenteRepository extends ServiceEntityRepository
     public function getTotalRevenueForUser(int $userId): float
     {
         $qb = $this->createQueryBuilder('v')
-            ->select('SUM(v.price) as total')
-            ->innerJoin('v.recolte', 'r')
-            ->andWhere('r.userId = :uid')
-            ->setParameter('uid', $userId);
-
+            ->leftJoin('v.recolte', 'r')
+            ->select('SUM(r.productionCost)')
+            ->where('r.userId = :userId')
+            ->setParameter('userId', $userId);
+        
         $result = $qb->getQuery()->getSingleScalarResult();
-
+        
         return $result ? (float) $result : 0.0;
     }
 
@@ -60,13 +62,61 @@ class VenteRepository extends ServiceEntityRepository
 
         if ($search) {
             $qb->andWhere('v.description LIKE :search OR v.buyerName LIKE :search OR v.status LIKE :search')
-               ->setParameter('search', '%' . $search . '%');
+                ->setParameter('search', '%' . $search . '%');
         }
 
         $allowedSorts = ['id', 'description', 'price', 'saleDate', 'buyerName', 'status'];
         if (in_array($sort, $allowedSorts)) {
             $direction = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
             $qb->orderBy('v.' . $sort, $direction);
+        }
+        
+        $qb->setMaxResults(50);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findMarketplaceListingsForBuyer(int $buyerId, ?string $search = '', int $limit = 30): array
+    {
+        $qb = $this->createQueryBuilder('v')
+            ->leftJoin('v.recolte', 'r')
+            ->andWhere('r.userId IS NULL OR r.userId != :buyerId')
+            ->setParameter('buyerId', $buyerId)
+            ->andWhere('v.status != :status')
+            ->setParameter('status', 'Completed')
+            ->setMaxResults($limit);
+
+        if ($search) {
+            $qb->andWhere('v.description LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findRecommendedForBuyer(int $buyerId, array $keywords, array $excludeVenteIds, int $limit = 6): array
+    {
+        $qb = $this->createQueryBuilder('v')
+            ->leftJoin('v.recolte', 'r')
+            ->andWhere('r.userId IS NULL OR r.userId != :buyerId')
+            ->setParameter('buyerId', $buyerId)
+            ->andWhere('v.status != :status')
+            ->setParameter('status', 'Completed')
+            ->setMaxResults($limit);
+
+        if (!empty($excludeVenteIds)) {
+            $qb->andWhere('v.id NOT IN (:excludeIds)')
+                ->setParameter('excludeIds', $excludeVenteIds);
+        }
+
+        if (!empty($keywords)) {
+            $orX = $qb->expr()->orX();
+            foreach ($keywords as $i => $keyword) {
+                $orX->add($qb->expr()->like('v.description', ':kw' . $i));
+                $orX->add($qb->expr()->like('r.name', ':kw' . $i));
+                $qb->setParameter('kw' . $i, '%' . $keyword . '%');
+            }
+            $qb->andWhere($orX);
         }
 
         return $qb->getQuery()->getResult();

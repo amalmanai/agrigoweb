@@ -13,7 +13,7 @@ class Recolte
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_recolte')]
+    #[ORM\Column(name: 'id_recolte', nullable: true)]
     private ?int $id = null;
 
     #[ORM\Column(name: 'nom_produit', length: 100, nullable: true)]
@@ -34,10 +34,10 @@ class Recolte
     #[Assert\NotBlank(message: "La date de récolte est obligatoire.")]
     private ?\DateTimeInterface $harvestDate = null;
 
-    #[ORM\Column(name: 'cout_production', nullable: true)]
+    #[ORM\Column(name: 'cout_production', type: 'decimal', precision: 10, scale: 2, nullable: true)]
     #[Assert\NotBlank(message: "Le coût de production est obligatoire.")]
     #[Assert\PositiveOrZero(message: "Le coût doit être positif ou nul.")]
-    private ?float $productionCost = null;
+    private ?string $productionCost = null;
 
     #[ORM\Column(name: 'id_user', nullable: true)]
     private ?int $userId = null;
@@ -91,12 +91,12 @@ class Recolte
         return $this;
     }
 
-    public function getProductionCost(): ?float
+    public function getProductionCost(): ?string
     {
         return $this->productionCost;
     }
 
-    public function setProductionCost(?float $productionCost): static
+    public function setProductionCost(?string $productionCost): static
     {
         $this->productionCost = $productionCost;
         return $this;

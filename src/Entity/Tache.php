@@ -14,7 +14,7 @@ class Tache
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id = null;
 
     public function getId(): ?int
@@ -28,7 +28,7 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $tittre_tache = null;
 
     public function getTittre_tache(): ?string
@@ -42,7 +42,7 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $description_tache = null;
 
     public function getDescription_tache(): ?string
@@ -56,7 +56,7 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $type_tache = null;
 
     public function getType_tache(): ?string
@@ -70,7 +70,7 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id_user = null;
 
     public function getId_user(): ?int
@@ -84,7 +84,7 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'date', nullable: false)]
+    #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $date_tache = null;
 
     public function getDate_tache(): ?\DateTimeInterface
@@ -98,35 +98,35 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'time', nullable: false)]
-    private ?string $heure_debut_tache = null;
+    #[ORM\Column(type: 'time', nullable: true)]
+    private ?\DateTimeInterface $heure_debut_tache = null;
 
-    public function getHeure_debut_tache(): ?string
+    public function getHeure_debut_tache(): ?\DateTimeInterface
     {
         return $this->heure_debut_tache;
     }
 
-    public function setHeure_debut_tache(string $heure_debut_tache): static
+    public function setHeure_debut_tache(\DateTimeInterface $heure_debut_tache): static
     {
         $this->heure_debut_tache = $heure_debut_tache;
         return $this;
     }
 
-    #[ORM\Column(type: 'time', nullable: false)]
-    private ?string $heure_fin_tache = null;
+    #[ORM\Column(type: 'time', nullable: true)]
+    private ?\DateTimeInterface $heure_fin_tache = null;
 
-    public function getHeure_fin_tache(): ?string
+    public function getHeure_fin_tache(): ?\DateTimeInterface
     {
         return $this->heure_fin_tache;
     }
 
-    public function setHeure_fin_tache(string $heure_fin_tache): static
+    public function setHeure_fin_tache(\DateTimeInterface $heure_fin_tache): static
     {
         $this->heure_fin_tache = $heure_fin_tache;
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $status_tache = null;
 
     public function getStatus_tache(): ?string
@@ -140,7 +140,7 @@ class Tache
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $remarque_tache = null;
 
     public function getRemarque_tache(): ?string
@@ -202,36 +202,36 @@ class Tache
         return $this;
     }
 
-    public function getDateTache(): ?\DateTime
+    public function getDateTache(): ?\DateTimeInterface
     {
         return $this->date_tache;
     }
 
-    public function setDateTache(\DateTime $date_tache): static
+    public function setDateTache(\DateTimeInterface $date_tache): static
     {
         $this->date_tache = $date_tache;
 
         return $this;
     }
 
-    public function getHeureDebutTache(): ?\DateTime
+    public function getHeureDebutTache(): ?\DateTimeInterface
     {
         return $this->heure_debut_tache;
     }
 
-    public function setHeureDebutTache(\DateTime $heure_debut_tache): static
+    public function setHeureDebutTache(\DateTimeInterface $heure_debut_tache): static
     {
         $this->heure_debut_tache = $heure_debut_tache;
 
         return $this;
     }
 
-    public function getHeureFinTache(): ?\DateTime
+    public function getHeureFinTache(): ?\DateTimeInterface
     {
         return $this->heure_fin_tache;
     }
 
-    public function setHeureFinTache(\DateTime $heure_fin_tache): static
+    public function setHeureFinTache(\DateTimeInterface $heure_fin_tache): static
     {
         $this->heure_fin_tache = $heure_fin_tache;
 

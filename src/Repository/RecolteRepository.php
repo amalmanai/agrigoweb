@@ -38,7 +38,8 @@ class RecolteRepository extends ServiceEntityRepository
                ->setParameter('id_val', is_numeric($query) ? $query : null);
         }
 
-        $qb->orderBy('r.name', $sortOrder === 'DESC' ? 'DESC' : 'ASC');
+        $qb->orderBy('r.name', $sortOrder === 'DESC' ? 'DESC' : 'ASC')
+           ->setMaxResults(50);
 
         return $qb->getQuery()->getResult();
     }
@@ -60,7 +61,8 @@ class RecolteRepository extends ServiceEntityRepository
                ->setParameter('id_val', is_numeric($query) ? $query : null);
         }
 
-        $qb->orderBy('r.name', $sortOrder === 'DESC' ? 'DESC' : 'ASC');
+        $qb->orderBy('r.name', $sortOrder === 'DESC' ? 'DESC' : 'ASC')
+           ->setMaxResults(50);
 
         return $qb->getQuery()->getResult();
     }

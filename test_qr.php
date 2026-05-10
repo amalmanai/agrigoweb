@@ -1,5 +1,5 @@
 <?php
-$cFile = curl_file_create('c:/Users/Amal/AgriGo/user-qrs/user_10_khairicha_gmail.com.png');
+$cFile = curl_file_create(__DIR__ . '/public/user-qrs/user_10_khairicha_gmail.com.png');
 $post = array('file'=> $cFile);
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,'http://api.qrserver.com/v1/read-qr-code/');

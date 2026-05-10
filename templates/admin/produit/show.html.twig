@@ -45,7 +45,7 @@
                 </tr>
                 <tr>
                     <th>Date d'expiration</th>
-                    <td>{{ produit.dateExpiration ?: '-' }}</td>
+                    <td>{{ produit.dateExpiration ? produit.dateExpiration|date('d/m/Y') : '-' }}</td>
                 </tr>
                 <tr>
                     <th>Prix Unitaire</th>
@@ -55,4 +55,26 @@
         </table>
     </div>
 </div>
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0">Commentaires</h5>
+            </div>
+            <div class="card-body">
+                {% for comment in comments %}
+                    <div class="border rounded-3 p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>{{ comment.user ? comment.user.prenomUser ~ ' ' ~ comment.user.nomUser : 'Utilisateur' }}</strong>
+                            <small class="text-muted">{{ comment.dateCommentaire ? comment.dateCommentaire|date('d/m/Y H:i') : '-' }}</small>
+                        </div>
+                        <div class="mb-2">{{ comment.contenu }}</div>
+                        <form method="post" action="{{ path('admin_produit_comment_delete', {'id_produit': produit.idProduit, 'id_commentaire': comment.idCommentaire}) }}" onsubmit="return confirm('Supprimer ce commentaire ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_admin_comment_' ~ comment.idCommentaire) }}">
+                            <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="text-muted">Aucun commentaire pour ce produit.</div>
+                {% endfor %}
+            </div>
+        </div>
 {% endblock %}

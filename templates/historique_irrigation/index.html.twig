@@ -51,6 +51,7 @@
                 <td class="text-end">
                     <a href="{{ path(pfx ~ 'historique_irrigation_show', {id: h.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
                     <a href="{{ path(pfx ~ 'historique_irrigation_edit', {id: h.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    {{ include('historique_irrigation/_delete_form.html.twig', {'historique': h}) }}
                 </td>
             </tr>
         {% else %}

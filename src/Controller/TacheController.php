@@ -23,7 +23,7 @@ class TacheController extends AbstractController
         $user = $this->requireUser();
 
         return $this->render('tache/index.html.twig', [
-            'taches' => $tacheRepository->findByOwnerId($user->getIdUser()),
+            'taches' => $tacheRepository->findByOwnerId((int) $user->getIdUser()),
         ]);
     }
 
@@ -36,7 +36,7 @@ class TacheController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $tache->setIdUser($user->getIdUser());
+            $tache->setIdUser((int) $user->getIdUser());
 
             $entityManager->persist($tache);
             $entityManager->flush();

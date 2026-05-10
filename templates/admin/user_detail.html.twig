@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="col-md-4 text-center">
                             {% if user.photoPath %}
-                                {% set photoSrc = user.photoPath starts with 'http' ? user.photoPath : asset('uploads/profiles/' ~ user.photoPath) %}
+                                {% set photoSrc = user.photoPath starts with 'http' ? user.photoPath : vich_uploader_asset(user, 'photoFile') %}
                                 <img src="{{ photoSrc }}" alt="Photo de profil" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
                             {% else %}
                                 <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px;">
@@ -46,6 +46,18 @@
                                     {% if user.isActive %}<span class="badge bg-success">Actif</span>{% else %}<span class="badge bg-danger">Inactif</span>{% endif %}
                                 </div>
                             </div>
+
+                            <!-- AI Insight Section -->
+                            <div class="mt-4 p-4 rounded shadow-sm border" style="background: linear-gradient(135deg, rgba(23, 162, 184, 0.05) 0%, rgba(23, 162, 184, 0.15) 100%); border-color: rgba(23, 162, 184, 0.3) !important;">
+                                <h5 class="text-info mb-3"><i class="fas fa-robot text-primary"></i> AgriGo AI Insight</h5>
+                                <div id="ai-insight-content" class="text-muted">
+                                    <p class="mb-0">Générez un résumé intelligent de l'activité de cet utilisateur basé sur ses parcelles et cultures.</p>
+                                </div>
+                                <button id="btn-generate-insight" class="btn btn-info text-white btn-sm mt-3 shadow-sm rounded-pill px-3" data-user-id="{{ user.idUser }}">
+                                    <i class="fas fa-magic"></i> Générer l'Analyse IA
+                                </button>
+                            </div>
+
                         </div>
                     </div>
                     <div class="mt-4">
@@ -64,4 +76,40 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('btn-generate-insight');
+        const content = document.getElementById('ai-insight-content');
+
+        if(btn) {
+            btn.addEventListener('click', function() {
+                const userId = this.getAttribute('data-user-id');
+                
+                // Loading state
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours...';
+                content.innerHTML = '<div class="d-flex align-items-center text-info"><div class="spinner-border spinner-border-sm me-2" role="status"></div> <span>L\'IA d\'AgriGo analyse les données...</span></div>';
+
+                fetch(`/admin/user/${userId}/ai-insight`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success) {
+                            btn.style.display = 'none'; // Hide button after success
+                            content.innerHTML = `<div class="text-dark"><strong>Analyse IA :</strong><br>${data.insight}</div>`;
+                        } else {
+                            content.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle"></i> ${data.error}</div>`;
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-magic"></i> Réessayer';
+                        }
+                    })
+                    .catch(error => {
+                        content.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle"></i> Erreur de connexion avec le serveur.</div>`;
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-magic"></i> Réessayer';
+                    });
+            });
+        }
+    });
+</script>
 {% endblock %}
