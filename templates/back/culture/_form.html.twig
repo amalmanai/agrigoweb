@@ -30,7 +30,7 @@
     {{ form_errors(form.parcelle) }}
 </div>
 <div class="d-flex gap-2">
-    {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}
+    {{ form_widget(form.submit, {label: button_label|default('Enregistrer'), attr: {id: 'culture-submit-btn', onclick: 'this.disabled=true;this.form.submit();'}}) }}
     <a class="btn btn-secondary" href="{{ path('admin_culture_index') }}">Annuler</a>
 </div>
 {{ form_end(form) }}

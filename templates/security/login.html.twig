@@ -389,6 +389,17 @@
                         <button class="btn-login" type="submit">
                             SE CONNECTER <i class="fas fa-arrow-right ms-2" style="font-size: 0.9em;"></i>
                         </button>
+
+                        <div style="margin: 1.5rem 0; display: flex; align-items: center; gap: 1rem;">
+                            <div style="flex: 1; height: 1px; background: rgba(0,0,0,0.05);"></div>
+                            <span style="font-size: 0.85rem; color: var(--front-muted); font-weight: 600;">OU</span>
+                            <div style="flex: 1; height: 1px; background: rgba(0,0,0,0.05);"></div>
+                        </div>
+
+                        <a href="{{ path('connect_google') }}" class="btn-login" style="background: white; color: #444; border: 1px solid #ddd; padding: 0.8rem; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-top: 0;">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 18px; height: 18px; margin-right: 12px;">
+                            Continuer avec Google
+                        </a>
                         
                         <div class="login-footer">
                             <a href="{{ path('app_register') }}" class="login-link">
@@ -411,6 +422,33 @@
                             <i class="fas fa-upload me-2"></i> IMPORTER UNE IMAGE
                         </button>
                     </div>
+
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1);">
+                        <p class="login-subtitle mb-2" style="font-size: 0.85rem; color: var(--front-muted);">
+                            <i class="fas fa-info-circle"></i> Le scan ne fonctionne pas ?
+                        </p>
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <input type="text" id="qr-manual-input" placeholder="Collez le texte du QR ici..." 
+                                style="padding: 8px 12px; border: 1px solid rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.85rem; width: 220px;">
+                            <button type="button" onclick="submitManualQR()" style="padding: 8px 16px; background: var(--front-forest); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </button>
+                        </div>
+                        <p style="font-size: 0.75rem; color: #888; margin-top: 8px;">
+                            Format attendu: <code>AGRIGO-USER:ID:email</code>
+                        </p>
+                    </div>
+
+                    <div id="qr-camera-container" style="margin-top: 20px; display: none;">
+                        <div id="qr-reader" style="width: 100%; max-width: 300px; margin: 0 auto;"></div>
+                        <button type="button" onclick="stopQrScanner()" style="margin-top: 10px; padding: 8px 16px; background: #d32f2f; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            <i class="fas fa-stop"></i> Arrêter la caméra
+                        </button>
+                    </div>
+
+                    <button type="button" onclick="startQrScanner()" style="margin-top: 15px; padding: 10px 20px; background: var(--front-leaf); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <i class="fas fa-camera"></i> Scanner avec la caméra
+                    </button>
                 </div>
 
                 <!-- TAB: Face Recognition -->
@@ -482,6 +520,14 @@
 
     // QR Code scanner logic (kept from original)
     function authenticateQRToken(decodedText) {
+        console.log('QR Code decoded:', decodedText);
+        
+        // Validate format before sending
+        if (!decodedText.startsWith('AGRIGO-USER:')) {
+            alert("Format de QR code invalide. Contenu: " + decodedText.substring(0, 50));
+            return;
+        }
+        
         fetch('{{ path("api_login_qr") }}', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
@@ -489,21 +535,104 @@
         })
         .then(response => response.json())
         .then(data => {
+            console.log('QR Login response:', data);
             if (data.success) {
                 alert("QR Code reconnu ! Connexion...");
                 window.location.href = data.redirect;
             } else {
                 alert("Erreur: " + data.message);
             }
+        })
+        .catch(err => {
+            console.error('QR Login error:', err);
+            alert("Erreur de connexion au serveur.");
         });
     }
 
     function handleQRUpload(event) {
         if (event.target.files.length == 0) return;
-        const html5QrCode = new Html5Qrcode("tab-qr"); // Use the tab as a pseudo-container if needed or just a hidden one
-        html5QrCode.scanFile(event.target.files[0], true)
-            .then(text => authenticateQRToken(text))
-            .catch(() => alert("Aucun QR Code détecté dans l'image."));
+        const file = event.target.files[0];
+        console.log('QR File selected:', file.name, 'Type:', file.type, 'Size:', file.size);
+        
+        const html5QrCode = new Html5Qrcode("tab-qr");
+        html5QrCode.scanFile(file, true)
+            .then(text => {
+                console.log('QR Scan success:', text);
+                authenticateQRToken(text);
+            })
+            .catch(err => {
+                console.error('QR Scan failed:', err);
+                alert("Aucun QR Code détecté dans l'image.\n\nAlternative :\n1. Utilisez le champ 'Collez le texte du QR' ci-dessous\n2. Ou scannez avec la caméra");
+            });
+    }
+
+    // Manual QR text input
+    function submitManualQR() {
+        const input = document.getElementById('qr-manual-input');
+        const text = input.value.trim();
+        
+        if (!text) {
+            alert("Veuillez coller le texte du QR code.");
+            return;
+        }
+        
+        console.log('Manual QR submitted:', text);
+        authenticateQRToken(text);
+    }
+
+    // Allow Enter key to submit
+    document.addEventListener('DOMContentLoaded', function() {
+        const manualInput = document.getElementById('qr-manual-input');
+        if (manualInput) {
+            manualInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitManualQR();
+                }
+            });
+        }
+    });
+
+    // QR Camera Scanner
+    let qrScanner = null;
+
+    async function startQrScanner() {
+        const container = document.getElementById('qr-camera-container');
+        container.style.display = 'block';
+        
+        try {
+            qrScanner = new Html5Qrcode("qr-reader");
+            
+            await qrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    // Success
+                    console.log('QR Camera scan success:', decodedText);
+                    stopQrScanner();
+                    authenticateQRToken(decodedText);
+                },
+                (errorMessage) => {
+                    // Error - ignore continuous scanning errors
+                    console.log('QR scan error:', errorMessage);
+                }
+            );
+        } catch (err) {
+            console.error('Failed to start QR scanner:', err);
+            alert("Impossible d'accéder à la caméra. Vérifiez les permissions.");
+            container.style.display = 'none';
+        }
+    }
+
+    async function stopQrScanner() {
+        if (qrScanner) {
+            try {
+                await qrScanner.stop();
+            } catch (e) {
+                console.error('Error stopping QR scanner:', e);
+            }
+            qrScanner = null;
+        }
+        document.getElementById('qr-camera-container').style.display = 'none';
     }
 
     // --- Face Recognition Logic ---

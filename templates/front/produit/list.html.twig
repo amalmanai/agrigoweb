@@ -57,6 +57,9 @@
                                 <a href="{{ path('app_produit_edit', {'id_produit': produit.idProduit}) }}" class="btn btn-sm btn-warning text-white rounded shadow-sm" title="Modifier">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                <a href="{{ path('app_produit_show', {'id_produit': produit.idProduit}) }}#commentaires" class="btn btn-sm btn-secondary text-white rounded shadow-sm" title="Commenter">
+                                    <i class="bi bi-chat-dots"></i>
+                                </a>
                                 <form method="post" action="{{ path('app_produit_delete', {'id_produit': produit.idProduit}) }}" onsubmit="return confirm('Supprimer ce produit ?');" class="d-inline">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete_front_produit_' ~ produit.idProduit) }}">
                                     <button type="submit" class="btn btn-sm btn-danger rounded shadow-sm" title="Supprimer">

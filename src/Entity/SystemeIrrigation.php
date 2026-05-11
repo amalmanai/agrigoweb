@@ -14,7 +14,7 @@ class SystemeIrrigation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id_systeme = null;
 
     public function getId_systeme(): ?int
@@ -28,7 +28,7 @@ class SystemeIrrigation
         return $this;
     }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id_parcelle = null;
 
     public function getId_parcelle(): ?int
@@ -42,7 +42,7 @@ class SystemeIrrigation
         return $this;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $nom_systeme = null;
 
     public function getNom_systeme(): ?string
@@ -106,11 +106,7 @@ class SystemeIrrigation
         return $this->date_creation;
     }
 
-    public function setDate_creation(\DateTimeInterface $date_creation): static
-    {
-        $this->date_creation = $date_creation;
-        return $this;
-    }
+
 
     #[ORM\OneToMany(targetEntity: HistoriqueIrrigation::class, mappedBy: 'systemeIrrigation')]
     private Collection $historiqueIrrigations;
@@ -118,6 +114,7 @@ class SystemeIrrigation
     public function __construct()
     {
         $this->historiqueIrrigations = new ArrayCollection();
+        $this->date_creation = new \DateTimeImmutable();
     }
 
     /**
@@ -125,9 +122,6 @@ class SystemeIrrigation
      */
     public function getHistoriqueIrrigations(): Collection
     {
-        if (!$this->historiqueIrrigations instanceof Collection) {
-            $this->historiqueIrrigations = new ArrayCollection();
-        }
         return $this->historiqueIrrigations;
     }
 
@@ -186,15 +180,14 @@ class SystemeIrrigation
         return $this;
     }
 
-    public function getDateCreation(): ?\DateTime
+    public function getDateCreation(): ?\DateTimeInterface
     {
         return $this->date_creation;
     }
 
-    public function setDateCreation(\DateTime $date_creation): static
+    public function setDateCreation(\DateTimeInterface $date_creation): static
     {
         $this->date_creation = $date_creation;
-
         return $this;
     }
 

@@ -31,7 +31,7 @@
     <small class="text-muted">Commencez à taper le nom de votre parcelle pour voir les suggestions.</small>
 </div>
 <div class="d-flex gap-2">
-    {{ form_widget(form.submit, {label: button_label|default('Enregistrer')}) }}
+    {{ form_widget(form.submit, {label: button_label|default('Enregistrer'), attr: {id: 'culture-submit-btn', onclick: 'this.disabled=true;this.form.submit();'}}) }}
     <a class="btn btn-outline-secondary" href="{{ cancel_path|default(path('app_culture_list')) }}">Annuler</a>
 </div>
 {{ form_end(form) }}

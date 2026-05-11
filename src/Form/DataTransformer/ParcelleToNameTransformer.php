@@ -29,7 +29,7 @@ class ParcelleToNameTransformer implements DataTransformerInterface
             return '';
         }
 
-        return $parcelle->getNomParcelle();
+        return (string) $parcelle->getNomParcelle();
     }
 
     /**

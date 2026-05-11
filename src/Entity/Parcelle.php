@@ -16,10 +16,10 @@ class Parcelle
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_parcelle', type: 'integer')]
+    #[ORM\Column(name: 'id_parcelle', type: 'integer', nullable: true)]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'nom_parcelle', type: 'string', length: 100)]
+    #[ORM\Column(name: 'nom_parcelle', type: 'string', length: 100, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom de la parcelle est obligatoire.')]
     #[Assert\Length(
         min: 2,
@@ -29,7 +29,7 @@ class Parcelle
     )]
     private ?string $nomParcelle = null;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'float', nullable: true)]
     #[Assert\NotNull(message: 'La surface est obligatoire.')]
     #[Assert\Positive(message: 'La surface doit etre strictement positive.')]
     private ?float $surface = null;
@@ -80,7 +80,7 @@ class Parcelle
         return $this->nomParcelle;
     }
 
-    public function setNomParcelle(?string $nomParcelle): self
+    public function setNomParcelle(string $nomParcelle): self
     {
         $this->nomParcelle = $nomParcelle;
 
@@ -92,7 +92,7 @@ class Parcelle
         return $this->surface;
     }
 
-    public function setSurface(?float $surface): self
+    public function setSurface(float $surface): self
     {
         $this->surface = $surface;
 
@@ -119,6 +119,18 @@ class Parcelle
     public function setTypeSol(?string $typeSol): self
     {
         $this->typeSol = $typeSol;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }
@@ -184,17 +196,5 @@ class Parcelle
     public function __toString(): string
     {
         return $this->nomParcelle ?? (string) $this->id;
-    }
-
-    public function getOwner(): ?User
-    {
-        return $this->owner;
-    }
-
-    public function setOwner(?User $owner): self
-    {
-        $this->owner = $owner;
-
-        return $this;
     }
 }

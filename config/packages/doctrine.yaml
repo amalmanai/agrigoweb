@@ -6,6 +6,10 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '16'
 
+        # Timezone configuration to match PHP and MySQL
+        options:
+            !php/const PDO::MYSQL_ATTR_INIT_COMMAND: "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci, TIME_ZONE = '+11:00'"
+
         profiling_collect_backtrace: '%kernel.debug%'
     orm:
         validate_xml_mapping: true

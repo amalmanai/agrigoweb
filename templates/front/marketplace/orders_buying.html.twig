@@ -1,0 +1,41 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes Achats Marketplace{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0" style="font-family:'DM Serif Display',serif;">Mes achats marketplace</h2>
+    <a class="btn btn-outline-secondary" href="{{ path('app_marketplace_index') }}">Retour marketplace</a>
+</div>
+
+{% if orders is empty %}
+    <div class="alert alert-info">Vous n'avez encore passe aucune commande.</div>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Produit</th>
+                    <th>Quantite</th>
+                    <th>Total</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.vente.recolte.name|default(order.vente.description)|default('Produit') }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.totalPrice }} TND</td>
+                        <td><span class="badge text-bg-secondary">{{ order.status|capitalize }}</span></td>
+                        <td>{{ order.orderedAt ? order.orderedAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

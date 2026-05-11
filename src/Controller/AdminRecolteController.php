@@ -24,7 +24,7 @@ class AdminRecolteController extends AbstractController
         $direction = $request->query->get('direction', 'ASC');
 
         return $this->render('admin/recolte/index.html.twig', [
-            'recoltes' => $recolteRepository->adminSearch($search, $sort, $direction),
+            'recoltes' => $recolteRepository->adminSearch($search, (string) $sort, (string) $direction),
             'total_cost' => $recolteRepository->getTotalProductionCost(),
             'search' => $search,
             'sort' => $sort,

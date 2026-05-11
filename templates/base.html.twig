@@ -40,6 +40,7 @@
         }
     </style>
     {% block stylesheets %}{% endblock %}
+    {{ importmap('app') }}
 </head>
 <body class="h-full flex flex-col antialiased bg-agri-light text-gray-800">
 
@@ -168,5 +169,8 @@
             }, 500); // Wait for CSS transition finish
         }
     </script>
+    
+    {# 🎤 Voice Assistant - visible for all users (will be restricted by controller if needed) #}
+    {% include 'components/_voice_assistant.html.twig' %}
 </body>
 </html>

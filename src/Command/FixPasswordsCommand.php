@@ -35,13 +35,13 @@ class FixPasswordsCommand extends Command
             $plainPassword = $user->getPassword();
             
             // Skip if already hashed
-            if (strpos($plainPassword, '$2y$') === 0 || strpos($plainPassword, '$2a$') === 0 || strpos($plainPassword, '$2b$') === 0) {
+            if (strpos((string) $plainPassword, '$2y$') === 0 || strpos((string) $plainPassword, '$2a$') === 0 || strpos((string) $plainPassword, '$2b$') === 0) {
                 $io->writeln("✓ User {$user->getEmailUser()} already hashed");
                 continue;
             }
             
             try {
-                $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
+                $hashedPassword = $this->passwordHasher->hashPassword($user, (string) $plainPassword);
                 $user->setPassword($hashedPassword);
                 $this->em->persist($user);
                 $hashedCount++;

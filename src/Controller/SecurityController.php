@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Repository\UserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -16,7 +17,7 @@ use Symfony\Component\Mime\Email;
 class SecurityController extends AbstractController
 {
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
+    public function login(AuthenticationUtils $authenticationUtils, Request $request, LoggerInterface $logger): Response
     {
         if ($this->getUser()) {
              return $this->redirectToRoute('app_home');
@@ -30,9 +31,15 @@ class SecurityController extends AbstractController
         $session = $request->getSession();
         $failures = $session->get('login_failures', 0);
 
-        // Generate Random String Captcha
-        $randomString = substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 5);
-        $session->set('captcha_answer', $randomString);
+        // Generate Random String Captcha only if not already set (preserve existing captcha on validation errors)
+        $randomString = $session->get('captcha_answer');
+        if (!$randomString) {
+            $randomString = substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZ23456789'), 0, 5);
+            $session->set('captcha_answer', $randomString);
+            $logger->debug('CAPTCHA Generated', ['captcha' => $randomString, 'session_id' => $session->getId()]);
+        } else {
+            $logger->debug('CAPTCHA Reused', ['captcha' => $randomString, 'session_id' => $session->getId()]);
+        }
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
@@ -60,7 +67,7 @@ class SecurityController extends AbstractController
     }
 
     #[Route(path: '/login/qr', name: 'api_login_qr', methods: ['POST'])]
-    public function loginQr(Request $request, UserRepository $userRepository, Security $security): JsonResponse
+    public function loginQr(Request $request, UserRepository $userRepository, Security $security, LoggerInterface $logger): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $token = $data['token'] ?? null;
@@ -69,14 +76,33 @@ class SecurityController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Aucun QR Code fourni.'], 400);
         }
 
+        $logger->debug('QR Login Attempt', ['token' => $token]);
+
+        $user = null;
+
         // Parse token format: AGRIGO-USER:{id}:{email}
         if (str_starts_with($token, 'AGRIGO-USER:')) {
             $parts = explode(':', $token);
+            $logger->debug('QR Parse', ['parts' => $parts, 'count' => count($parts)]);
+            
             if (count($parts) >= 3) {
                 $email = $parts[2];
+                $logger->debug('QR Email extracted', ['email' => $email]);
+                
+                // Try to find user by email (flexible - ignores ID mismatch)
                 $user = $userRepository->findOneBy(['emailUser' => $email]);
-            } else {
-                $user = null;
+                
+                if (!$user) {
+                    // Try case-insensitive search
+                    $conn = $userRepository->getEntityManager()->getConnection();
+                    $stmt = $conn->prepare('SELECT * FROM user WHERE LOWER(email_user) = LOWER(:email)');
+                    $result = $stmt->executeQuery(['email' => $email]);
+                    $userData = $result->fetchAssociative();
+                    
+                    if ($userData) {
+                        $user = $userRepository->find($userData['id_user']);
+                    }
+                }
             }
         } else {
             // Fallback for old loginTokens
@@ -84,11 +110,14 @@ class SecurityController extends AbstractController
         }
 
         if (!$user) {
-            return new JsonResponse(['success' => false, 'message' => 'Ce QR Code est invalide ou expiré.'], 404);
+            $logger->warning('QR Login failed - User not found', ['token' => $token]);
+            return new JsonResponse(['success' => false, 'message' => 'Ce QR Code est invalide ou expiré. Email non reconnu.'], 404);
         }
 
-        if (!$user->isActive()) {
-             return new JsonResponse(['success' => false, 'message' => 'Ce compte est inactif.'], 403);
+        $logger->info('QR Login success', ['user_id' => $user->getIdUser(), 'email' => $user->getEmailUser()]);
+
+        if (!$user->isActive() || $user->getBadWordCommentStrikes() >= 3) {
+            return new JsonResponse(['success' => false, 'message' => 'Ce compte est inactif.'], 403);
         }
 
         // Log the user in manually
@@ -183,7 +212,7 @@ class SecurityController extends AbstractController
         }
 
         if ($bestMatch) {
-            if (!$bestMatch->isActive()) {
+            if (!$bestMatch->isActive() || $bestMatch->getBadWordCommentStrikes() >= 3) {
                 return new JsonResponse(['success' => false, 'message' => 'Ce compte est inactif.'], 403);
             }
 

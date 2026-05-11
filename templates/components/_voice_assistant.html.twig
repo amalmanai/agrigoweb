@@ -1,0 +1,578 @@
+{# 🎤🧠 AgriGo Voice Task AI - Modern Voice Assistant Component #}
+
+<div id="voice-assistant-container" class="voice-assistant-container">
+    {# Floating Action Button #}
+    <button id="voice-assistant-btn" class="voice-assistant-btn" title="Assistant vocal (Cliquez ou appuyez sur Espace)">
+        <span class="voice-icon">🎤</span>
+        <span class="voice-pulse"></span>
+    </button>
+
+    {# Voice Panel #}
+    <div id="voice-panel" class="voice-panel">
+        {# Header #}
+        <div class="voice-panel-header">
+            <span class="voice-panel-title">🎤 AgriGo Voice AI</span>
+            <div class="voice-panel-controls">
+                <button id="voice-help" class="voice-control-btn" title="Aide">
+                    <i class="ph ph-question"></i>
+                </button>
+                <button id="voice-close" class="voice-control-btn" title="Fermer">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        </div>
+
+        {# Waveform Visualization #}
+        <div id="voice-waveform" class="voice-waveform">
+            {% for i in 1..40 %}
+                <div class="waveform-bar" style="animation-delay: {{ i * 0.05 }}s"></div>
+            {% endfor %}
+        </div>
+
+        {# Status Area #}
+        <div id="voice-status" class="voice-status">
+            <div class="voice-status-indicator"></div>
+            <span id="voice-status-text" class="voice-status-text">Appuyez sur le micro et parlez...</span>
+        </div>
+
+        {# Suggestions Section #}
+        <div id="voice-suggestions" class="voice-suggestions">
+            <div class="voice-suggestions-title">💡 Suggestions:</div>
+            <div class="voice-suggestions-list">
+                <button class="voice-suggestion-btn" data-command="Créer une tâche arroser les tomates">
+                    💧 Arroser les tomates
+                </button>
+                <button class="voice-suggestion-btn" data-command="Ajouter 50 kg d'engrais">
+                    📦 Ajouter du stock
+                </button>
+                <button class="voice-suggestion-btn" data-command="Statistiques de ma ferme">
+                    📊 Voir les stats
+                </button>
+                <button class="voice-suggestion-btn" data-command="Aller aux cultures">
+                    🌱 Voir les cultures
+                </button>
+            </div>
+        </div>
+
+        {# Command History #}
+        <div class="voice-history-section">
+            <div class="voice-history-title">📜 Historique récent</div>
+            <div id="voice-history" class="voice-history">
+                <p class="voice-empty">Aucune commande récente</p>
+            </div>
+        </div>
+
+        {# Quick Commands Grid #}
+        <div class="voice-quick-commands">
+            <button class="voice-quick-btn" data-command="aide" title="Afficher l'aide">
+                <span>❓</span>
+                <small>Aide</small>
+            </button>
+            <button class="voice-quick-btn" data-command="météo" title="Météo">
+                <span>🌤️</span>
+                <small>Météo</small>
+            </button>
+            <button class="voice-quick-btn" data-command="alertes stock" title="Alertes stock">
+                <span>⚠️</span>
+                <small>Alertes</small>
+            </button>
+            <button class="voice-quick-btn" data-command="conseils" title="Conseils">
+                <span>💡</span>
+                <small>Conseils</small>
+            </button>
+        </div>
+    </div>
+</div>
+
+{# Styles #}
+<style>
+/* Container */
+.voice-assistant-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Floating Button */
+.voice-assistant-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4), 0 8px 40px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.voice-assistant-btn:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 6px 30px rgba(34, 197, 94, 0.5), 0 12px 50px rgba(0, 0, 0, 0.2);
+}
+
+.voice-assistant-btn:active {
+    transform: scale(0.95);
+}
+
+.voice-assistant-btn.recording {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    animation: recordingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes recordingPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 4px 40px rgba(239, 68, 68, 0.7); }
+}
+
+.voice-icon {
+    font-size: 28px;
+    z-index: 2;
+}
+
+.voice-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0;
+    transform: scale(1);
+}
+
+.voice-assistant-btn.recording .voice-pulse {
+    animation: pulseRing 1.5s ease-out infinite;
+}
+
+@keyframes pulseRing {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.6); }
+}
+
+/* Voice Panel */
+.voice-panel {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 380px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.voice-panel.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Panel Header */
+.voice-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #324a3e 0%, #446b53 100%);
+    color: white;
+}
+
+.voice-panel-title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.voice-panel-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.voice-control-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.voice-control-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Waveform */
+.voice-waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 80px;
+    padding: 16px 20px;
+    background: linear-gradient(180deg, #f8faf8 0%, #ffffff 100%);
+}
+
+.voice-waveform:not(.active) .waveform-bar {
+    animation: none !important;
+    height: 4px !important;
+    opacity: 0.3;
+}
+
+.waveform-bar {
+    width: 4px;
+    height: 4px;
+    background: #22c55e;
+    border-radius: 2px;
+    transition: all 0.1s ease;
+    animation: waveformIdle 1.2s ease-in-out infinite;
+}
+
+@keyframes waveformIdle {
+    0%, 100% { height: 4px; opacity: 0.4; }
+    50% { height: 20px; opacity: 0.8; }
+}
+
+.voice-waveform.active .waveform-bar {
+    animation: waveformActive 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes waveformActive {
+    from { transform: scaleY(0.3); }
+    to { transform: scaleY(1); }
+}
+
+/* Status */
+.voice-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #f8faf8;
+    border-top: 1px solid #e5e7eb;
+}
+
+.voice-status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #9ca3af;
+    transition: all 0.3s;
+}
+
+.voice-status.active .voice-status-indicator {
+    background: #ef4444;
+    animation: statusBlink 1s ease-in-out infinite;
+}
+
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.voice-status-text {
+    font-size: 14px;
+    color: #374151;
+    flex: 1;
+}
+
+.voice-status-text.success { color: #16a34a; }
+.voice-status-text.error { color: #dc2626; }
+.voice-status-text.hint { color: #0369a1; }
+
+/* Suggestions */
+.voice-suggestions {
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.voice-suggestions-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.voice-suggestions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.voice-suggestion-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.voice-suggestion-btn:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+    transform: translateX(4px);
+}
+
+/* History Section */
+.voice-history-section {
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.voice-history-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.voice-history {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.voice-history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.voice-history-item.success {
+    border-left: 3px solid #22c55e;
+}
+
+.voice-history-item.error {
+    border-left: 3px solid #ef4444;
+}
+
+.voice-history-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #374151;
+}
+
+.voice-history-message {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.voice-empty {
+    color: #9ca3af;
+    font-size: 12px;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
+/* Quick Commands */
+.voice-quick-commands {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 16px 20px 20px;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+}
+
+.voice-quick-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.voice-quick-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+.voice-quick-btn span {
+    font-size: 20px;
+}
+
+.voice-quick-btn small {
+    font-size: 10px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* Help Modal */
+.voice-help-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s;
+}
+
+.voice-help-modal {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 420px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s;
+}
+
+.voice-help-modal h3 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    color: #111827;
+}
+
+.voice-help-section {
+    margin-bottom: 20px;
+}
+
+.voice-help-section h4 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin: 0 0 10px;
+}
+
+.voice-help-section ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    color: #374151;
+}
+
+.voice-help-section li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.voice-help-close {
+    width: 100%;
+    padding: 12px;
+    background: #324a3e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.voice-help-close:hover {
+    background: #446b53;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .voice-assistant-container {
+        bottom: 16px;
+        right: 16px;
+    }
+    
+    .voice-panel {
+        width: calc(100vw - 32px);
+        right: -8px;
+    }
+    
+    .voice-assistant-btn {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .voice-icon {
+        font-size: 24px;
+    }
+}
+
+/* Scrollbar styling */
+.voice-history::-webkit-scrollbar {
+    width: 4px;
+}
+
+.voice-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.voice-history::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 2px;
+}
+</style>
+
+{# Debug script #}
+<script>
+    console.log('🔍 Voice Assistant: Template loaded');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('voice-assistant-btn');
+        const container = document.getElementById('voice-assistant-container');
+        
+        console.log('🔍 Voice Assistant: DOMContentLoaded');
+        console.log('🔍 Voice Assistant: Button found?', !!btn);
+        console.log('🔍 Voice Assistant: Container found?', !!container);
+        
+        if (!btn) {
+            console.error('❌ Voice Assistant: Button NOT found!');
+        }
+        if (!container) {
+            console.error('❌ Voice Assistant: Container NOT found!');
+        }
+        
+        // Check browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        console.log('🔍 Voice Assistant: SpeechRecognition supported?', !!SpeechRecognition);
+    });
+</script>
+
+<script src="{{ asset('js/voice-assistant-advanced.js') }}"></script>

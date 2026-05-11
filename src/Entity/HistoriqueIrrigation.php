@@ -14,7 +14,7 @@ class HistoriqueIrrigation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $id = null;
 
     public function getId(): ?int
@@ -29,7 +29,8 @@ class HistoriqueIrrigation
     }
 
     #[ORM\ManyToOne(targetEntity: SystemeIrrigation::class, inversedBy: 'historiqueIrrigations')]
-    #[ORM\JoinColumn(name: 'id_systeme', referencedColumnName: 'id_systeme')]
+    // Keep DB column aligned with the Java app and existing schema: historique_irrigation.id_systeme
+    #[ORM\JoinColumn(name: 'systeme_id', referencedColumnName: 'id_systeme')]
     private ?SystemeIrrigation $systemeIrrigation = null;
 
     public function getSystemeIrrigation(): ?SystemeIrrigation
@@ -43,7 +44,7 @@ class HistoriqueIrrigation
         return $this;
     }
 
-    #[ORM\Column(type: 'datetime', nullable: false)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $date_irrigation = null;
 
     public function getDate_irrigation(): ?\DateTimeInterface
@@ -51,13 +52,9 @@ class HistoriqueIrrigation
         return $this->date_irrigation;
     }
 
-    public function setDate_irrigation(\DateTimeInterface $date_irrigation): static
-    {
-        $this->date_irrigation = $date_irrigation;
-        return $this;
-    }
 
-    #[ORM\Column(type: 'integer', nullable: false)]
+
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $duree_minutes = null;
 
     public function getDuree_minutes(): ?int
@@ -113,17 +110,12 @@ class HistoriqueIrrigation
         return $this;
     }
 
-    public function getDateIrrigation(): ?\DateTime
+    public function getDateIrrigation(): ?\DateTimeInterface
     {
         return $this->date_irrigation;
     }
 
-    public function setDateIrrigation(\DateTime $date_irrigation): static
-    {
-        $this->date_irrigation = $date_irrigation;
 
-        return $this;
-    }
 
     public function getDureeMinutes(): ?int
     {
